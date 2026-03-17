@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { screenOpportunity, type OpportunityContext } from '@/lib/scoring/opportunity-screening';
+import { analyzeOpportunity, type OpportunityContext } from '@/lib/ai/opportunity-analyzer';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'companyName, sector, and description are required' }, { status: 400 });
     }
 
-    const result = screenOpportunity(body);
+    const result = await analyzeOpportunity(body);
 
     return NextResponse.json({
       context: {
@@ -22,10 +22,11 @@ export async function POST(request: NextRequest) {
         dealSize: body.dealSize,
       },
       result,
-      screenedAt: new Date().toISOString(),
+      analyzedAt: new Date().toISOString(),
+      aiPowered: !!process.env.ANTHROPIC_API_KEY,
     });
   } catch (error) {
     console.error('[Screening API] Error:', error);
-    return NextResponse.json({ error: 'Failed to screen opportunity' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to analyze opportunity' }, { status: 500 });
   }
 }

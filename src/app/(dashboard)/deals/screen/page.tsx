@@ -16,7 +16,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { THERAPY_AREAS } from '@/lib/data/therapy-areas';
-import { screenOpportunity, type OpportunityContext, type ScreeningResult } from '@/lib/scoring/opportunity-screening';
+import type { AIScreeningResult, OpportunityContext } from '@/lib/ai/opportunity-analyzer';
 
 const SECTORS = [
   { id: 'biotech', label: 'Biotech' },
@@ -59,8 +59,9 @@ export default function OpportunityScreeningPage() {
     additionalNotes: '',
   });
 
-  const [result, setResult] = useState<ScreeningResult | null>(null);
+  const [result, setResult] = useState<AIScreeningResult | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canAnalyze = form.companyName.trim() && form.sector && form.description.trim();
 
@@ -68,13 +69,27 @@ export default function OpportunityScreeningPage() {
     if (!canAnalyze) return;
     setAnalyzing(true);
     setResult(null);
+    setError(null);
 
-    // Simulate AI processing time
-    await new Promise(r => setTimeout(r, 1500));
+    try {
+      const res = await fetch('/api/screening', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    const screening = screenOpportunity(form);
-    setResult(screening);
-    setAnalyzing(false);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Analysis failed');
+      }
+
+      const data = await res.json();
+      setResult(data.result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Analysis failed');
+    } finally {
+      setAnalyzing(false);
+    }
   }
 
   return (
@@ -264,6 +279,12 @@ export default function OpportunityScreeningPage() {
 
         {/* RIGHT: AI Assessment */}
         <div>
+          {error && (
+            <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)' }}>
+              <p className="text-[13px]" style={{ color: '#f87171' }}>{error}</p>
+            </div>
+          )}
+
           {!result && !analyzing && (
             <div className="flex flex-col items-center justify-center h-full text-center" style={{ minHeight: '400px' }}>
               <Sparkles className="w-10 h-10 mb-4" style={{ color: '#1e293b' }} />
@@ -298,7 +319,7 @@ export default function OpportunityScreeningPage() {
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#475569' }}>Recommendation</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: result.recommendationColor }}>
-                    {result.score}/25
+                    {result.overallScore}/25
                   </span>
                 </div>
                 <p style={{
@@ -313,7 +334,18 @@ export default function OpportunityScreeningPage() {
                     Suggested engagement: <strong style={{ color: '#e2e8f0' }}>{result.engagementType}</strong>
                   </span>
                 </div>
+                {result.engagementTypeRationale && (
+                  <p className="text-[12px] mt-1" style={{ color: '#475569' }}>{result.engagementTypeRationale}</p>
+                )}
               </div>
+
+              {/* Executive Summary */}
+              {result.executiveSummary && (
+                <div className="rounded-xl p-5 mb-6" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#5fd4e3' }}>Executive Summary</span>
+                  <p className="mt-2 text-[13px] leading-relaxed" style={{ color: '#cbd5e1' }}>{result.executiveSummary}</p>
+                </div>
+              )}
 
               {/* Fee Estimate */}
               <div className="rounded-xl p-5 mb-6" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.1)' }}>
@@ -328,29 +360,71 @@ export default function OpportunityScreeningPage() {
                 {(Object.entries(result.dimensions) as [keyof typeof DIMENSION_META, typeof result.dimensions.strategicFit][]).map(([key, dim]) => {
                   const meta = DIMENSION_META[key];
                   const Icon = meta.icon;
+                  const confidence = 'confidence' in dim ? (dim as { confidence?: number }).confidence : null;
                   return (
                     <div key={key} className="rounded-xl p-5" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <Icon className="w-4 h-4" style={{ color: meta.color }} />
                           <span className="text-[13px] font-medium" style={{ color: '#e2e8f0' }}>{meta.label}</span>
+                          {confidence != null && (
+                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#475569' }}>
+                              {Math.round(confidence * 100)}% conf.
+                            </span>
+                          )}
                         </div>
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 600, color: meta.color }}>
-                          {dim.score}/{dim.max}
+                          {dim.score}/5
                         </span>
                       </div>
-                      {/* Score bar */}
                       <div className="h-1.5 rounded-full mb-3" style={{ background: 'rgba(100,116,139,0.08)' }}>
                         <div className="h-full rounded-full transition-all duration-700" style={{
-                          width: `${(dim.score / dim.max) * 100}%`,
+                          width: `${(dim.score / 5) * 100}%`,
                           background: meta.color,
                         }} />
                       </div>
                       <p className="text-[12px] leading-relaxed" style={{ color: '#64748b' }}>{dim.rationale}</p>
+                      {'keyFactors' in dim && Array.isArray((dim as { keyFactors?: string[] }).keyFactors) && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {((dim as { keyFactors: string[] }).keyFactors).map((f: string, i: number) => (
+                            <span key={i} className="px-2 py-0.5 rounded text-[10px]" style={{ background: 'rgba(100,116,139,0.06)', color: '#64748b' }}>{f}</span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
               </div>
+
+              {/* Competitive Insights */}
+              {result.competitiveInsights && result.competitiveInsights.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: '#475569' }}>Competitive Insights</h3>
+                  <div className="space-y-2">
+                    {result.competitiveInsights.map((insight: string, i: number) => (
+                      <div key={i} className="flex items-start gap-2.5 rounded-lg p-3" style={{ background: 'rgba(95,212,227,0.03)', border: '1px solid rgba(95,212,227,0.08)' }}>
+                        <TrendingUp className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: '#5fd4e3' }} />
+                        <span className="text-[12px] leading-relaxed" style={{ color: '#94a3b8' }}>{insight}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Key Questions */}
+              {result.keyQuestions && result.keyQuestions.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: '#475569' }}>Key Questions to Resolve</h3>
+                  <div className="space-y-2">
+                    {result.keyQuestions.map((q: string, i: number) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <span className="text-[12px] font-medium" style={{ fontFamily: 'var(--font-mono)', color: '#475569' }}>{String(i + 1).padStart(2, '0')}</span>
+                        <span className="text-[12px] leading-relaxed" style={{ color: '#94a3b8' }}>{q}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Risk Factors */}
               {result.riskFactors.length > 0 && (
