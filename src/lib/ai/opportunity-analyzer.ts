@@ -1,4 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { researchCompany, type WebResearchResult } from './web-research';
+import { getCRMContext, type CRMContext } from './crm-context';
+import { validateScreening, ensembleScore } from './ml-validator';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -18,14 +21,14 @@ export interface OpportunityContext {
 }
 
 export interface DimensionAssessment {
-  score: number;        // 1-5
-  confidence: number;   // 0-1
+  score: number;
+  confidence: number;
   rationale: string;
   keyFactors: string[];
 }
 
 export interface AIScreeningResult {
-  overallScore: number; // 5-25
+  overallScore: number;
   recommendation: 'pursue_aggressively' | 'pursue_selectively' | 'monitor' | 'pass';
   recommendationLabel: string;
   recommendationColor: string;
@@ -43,14 +46,23 @@ export interface AIScreeningResult {
   estimatedFeeRange: { low: string; high: string };
   riskFactors: string[];
   competitiveInsights: string[];
-  keyQuestions: string[]; // questions the team should answer before proceeding
+  keyQuestions: string[];
+  // Metadata about what layers were used
+  meta: {
+    aiPowered: boolean;
+    webResearchUsed: boolean;
+    crmContextUsed: boolean;
+    validationFlags: string[];
+    confidenceMultiplier: number;
+    webResearch: WebResearchResult | null;
+    crmContext: CRMContext | null;
+  };
 }
 
 // ---------------------------------------------------------------------------
-// ML Scoring Layer — domain-calibrated Bayesian model
+// Domain Priors (ML Layer)
 // ---------------------------------------------------------------------------
 
-// Ambrosia's domain priors — calibrated from life sciences M&A advisory patterns
 const SECTOR_PRIORS: Record<string, { fitWeight: number; feeMultiplier: number; complexityBase: number }> = {
   biotech:         { fitWeight: 1.0,  feeMultiplier: 1.0,  complexityBase: 0.7 },
   pharma:          { fitWeight: 0.95, feeMultiplier: 1.1,  complexityBase: 0.6 },
@@ -61,25 +73,22 @@ const SECTOR_PRIORS: Record<string, { fitWeight: number; feeMultiplier: number; 
   nutraceuticals:  { fitWeight: 0.45, feeMultiplier: 0.7,  complexityBase: 0.4 },
 };
 
-const STAGE_PRIORS: Record<string, { dealProbability: number; avgDealMultiple: number; advisoryNeed: number }> = {
-  seed:      { dealProbability: 0.3,  avgDealMultiple: 0.5,  advisoryNeed: 0.4 },
-  series_a:  { dealProbability: 0.5,  avgDealMultiple: 0.8,  advisoryNeed: 0.7 },
-  series_b:  { dealProbability: 0.7,  avgDealMultiple: 1.0,  advisoryNeed: 0.9 },
-  series_c:  { dealProbability: 0.8,  avgDealMultiple: 1.2,  advisoryNeed: 0.95 },
-  growth:    { dealProbability: 0.75, avgDealMultiple: 1.5,  advisoryNeed: 0.85 },
-  public:    { dealProbability: 0.6,  avgDealMultiple: 2.0,  advisoryNeed: 0.7 },
+const STAGE_PRIORS: Record<string, { dealProbability: number; advisoryNeed: number }> = {
+  seed:      { dealProbability: 0.3,  advisoryNeed: 0.4 },
+  series_a:  { dealProbability: 0.5,  advisoryNeed: 0.7 },
+  series_b:  { dealProbability: 0.7,  advisoryNeed: 0.9 },
+  series_c:  { dealProbability: 0.8,  advisoryNeed: 0.95 },
+  growth:    { dealProbability: 0.75, advisoryNeed: 0.85 },
+  public:    { dealProbability: 0.6,  advisoryNeed: 0.7 },
 };
 
-// Modified Lehman fee calculation
 function calculateLehmanFee(dealSizeM: number): { low: number; high: number; base: number } {
   let fee = 0;
-  const size = dealSizeM;
-  if (size <= 10) fee = size * 0.05;
-  else if (size <= 50) fee = 0.5 + (size - 10) * 0.04;
-  else if (size <= 100) fee = 0.5 + 1.6 + (size - 50) * 0.03;
-  else if (size <= 250) fee = 0.5 + 1.6 + 1.5 + (size - 100) * 0.02;
-  else fee = 0.5 + 1.6 + 1.5 + 3.0 + (size - 250) * 0.01;
-
+  if (dealSizeM <= 10) fee = dealSizeM * 0.05;
+  else if (dealSizeM <= 50) fee = 0.5 + (dealSizeM - 10) * 0.04;
+  else if (dealSizeM <= 100) fee = 0.5 + 1.6 + (dealSizeM - 50) * 0.03;
+  else if (dealSizeM <= 250) fee = 0.5 + 1.6 + 1.5 + (dealSizeM - 100) * 0.02;
+  else fee = 0.5 + 1.6 + 1.5 + 3.0 + (dealSizeM - 250) * 0.01;
   return { low: Math.round(fee * 0.7 * 10) / 10, high: Math.round(fee * 1.3 * 10) / 10, base: Math.round(fee * 10) / 10 };
 }
 
@@ -87,92 +96,197 @@ function formatFee(m: number): string {
   return m >= 1 ? `$${m.toFixed(1)}M` : `$${Math.round(m * 1000)}K`;
 }
 
-// ML base scores — used as priors that Claude adjusts
 function computeMLBaseScores(ctx: OpportunityContext) {
   const sectorPrior = SECTOR_PRIORS[ctx.sector] || SECTOR_PRIORS.biotech;
   const stagePrior = STAGE_PRIORS[ctx.companyStage] || STAGE_PRIORS.series_b;
-  const fee = calculateLehmanFee(ctx.dealSize || 50);
-
   return {
-    strategicFitBase: Math.round(sectorPrior.fitWeight * stagePrior.advisoryNeed * 5),
-    feePotentialBase: ctx.dealSize >= 500 ? 5 : ctx.dealSize >= 200 ? 4 : ctx.dealSize >= 100 ? 3 : ctx.dealSize >= 50 ? 2 : 1,
-    winProbabilityBase: Math.round(stagePrior.dealProbability * 5),
-    executionRiskBase: Math.round((1 - sectorPrior.complexityBase) * 5),
-    strategicValueBase: sectorPrior.fitWeight < 0.7 ? 3 : 2, // outside core = more strategic expansion value
-    fee,
-    sectorPrior,
-    stagePrior,
+    strategicFit: Math.min(5, Math.round(sectorPrior.fitWeight * stagePrior.advisoryNeed * 5)),
+    feePotential: ctx.dealSize >= 500 ? 5 : ctx.dealSize >= 200 ? 4 : ctx.dealSize >= 100 ? 3 : ctx.dealSize >= 50 ? 2 : 1,
+    winProbability: Math.min(5, Math.round(stagePrior.dealProbability * 5)),
+    executionRisk: Math.min(5, Math.round((1 - sectorPrior.complexityBase) * 5)),
+    strategicValue: sectorPrior.fitWeight < 0.7 ? 3 : 2,
   };
 }
 
 // ---------------------------------------------------------------------------
-// Claude AI Layer — deep reasoning
+// Main Analyzer — 4-Layer Ensemble
 // ---------------------------------------------------------------------------
 
 export async function analyzeOpportunity(ctx: OpportunityContext): Promise<AIScreeningResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const fee = calculateLehmanFee(ctx.dealSize || 50);
   const mlBase = computeMLBaseScores(ctx);
-  const fee = mlBase.fee;
 
-  // If no API key, fall back to ML-only scoring
-  if (!apiKey) {
-    return fallbackMLScoring(ctx, mlBase);
+  // ─── Layer 1: Perplexity Web Research (parallel) ───
+  // ─── Layer 2: CRM RAG Context (parallel) ───
+  const [webResearch, crmContext] = await Promise.all([
+    researchCompany(ctx.companyName, ctx.sector, ctx.description).catch(() => null),
+    getCRMContext(ctx.companyName, ctx.sector, ctx.therapyArea).catch(() => ({
+      similarCompanies: [], existingContacts: [], relatedDeals: [],
+      sectorStats: { totalCompanies: 0, totalDeals: 0, avgDealSize: null },
+      hasExistingRelationship: false,
+    } as CRMContext)),
+  ]);
+
+  // ─── Layer 3: Claude AI Analysis ───
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  let aiResult: AIScreeningResult | null = null;
+
+  if (apiKey) {
+    aiResult = await runClaudeAnalysis(ctx, mlBase, fee, webResearch, crmContext);
   }
 
-  const anthropic = new Anthropic({ apiKey });
+  // ─── Layer 4: ML Cross-Validation ───
+  const aiScores = aiResult ? {
+    strategicFit: aiResult.dimensions.strategicFit.score,
+    feePotential: aiResult.dimensions.feePotential.score,
+    winProbability: aiResult.dimensions.winProbability.score,
+    executionRisk: aiResult.dimensions.executionRisk.score,
+    strategicValue: aiResult.dimensions.strategicValue.score,
+  } : mlBase;
 
-  const systemPrompt = `You are an elite M&A advisory analyst at Ambrosia Ventures, a boutique life sciences strategy and M&A advisory firm. You specialize in advising early-stage biotech (Series A/B/C), pharma, medtech, diagnostics, digital health, healthcare, and nutraceutical companies, as well as their investors (family offices, VCs, PEs).
+  const validation = validateScreening(aiScores, {
+    dealSize: ctx.dealSize,
+    sector: ctx.sector,
+    referralSource: ctx.referralSource,
+    companyStage: ctx.companyStage,
+  });
 
-Your task is to analyze an inbound opportunity and provide a structured assessment. You must be sharp, decisive, and commercially minded — like a senior partner evaluating whether to pursue a mandate.
+  // ─── Ensemble: Merge all layers ───
+  if (aiResult) {
+    // Apply ensemble scoring: blend AI + ML + validation
+    const ensembledDimensions = { ...aiResult.dimensions };
 
-IMPORTANT SCORING CONTEXT:
-- Our ML model has computed base scores as priors. You should adjust these based on your deeper analysis of the context. The ML base scores are:
-  - Strategic Fit: ${mlBase.strategicFitBase}/5
-  - Fee Potential: ${mlBase.feePotentialBase}/5
-  - Win Probability: ${mlBase.winProbabilityBase}/5
-  - Execution Risk: ${mlBase.executionRiskBase}/5 (higher = lower risk)
-  - Strategic Value: ${mlBase.strategicValueBase}/5
+    for (const dim of ['strategicFit', 'winProbability', 'executionRisk', 'strategicValue'] as const) {
+      const aiScore = aiResult.dimensions[dim].score;
+      const mlScore = mlBase[dim];
+      ensembledDimensions[dim] = {
+        ...aiResult.dimensions[dim],
+        score: ensembleScore(aiScore, mlScore, validation.confidenceMultiplier),
+      };
+    }
 
-- Fee calculation (Modified Lehman): base=${formatFee(fee.base)}, range=${formatFee(fee.low)}-${formatFee(fee.high)}
-- Sector prior weight: ${mlBase.sectorPrior.fitWeight} (1.0 = core, <0.5 = outside expertise)
-- Stage deal probability: ${mlBase.stagePrior.dealProbability} (historical conversion rate)
+    // Fee potential uses the adjusted score too
+    ensembledDimensions.feePotential = {
+      ...aiResult.dimensions.feePotential,
+      score: ensembleScore(aiResult.dimensions.feePotential.score, mlBase.feePotential, validation.confidenceMultiplier),
+    };
 
-You may adjust any score ±2 from the ML base based on contextual factors the model cannot capture (narrative quality, specific relationship dynamics, market timing signals, etc).
+    const overallScore = Object.values(ensembledDimensions).reduce((s, d) => s + d.score, 0);
+    const rec = getRecommendation(overallScore);
 
-Respond ONLY with valid JSON matching this exact schema:
+    // Merge validation flags into risk factors
+    const allRisks = [...(aiResult.riskFactors || []), ...validation.flags];
+    const uniqueRisks = [...new Set(allRisks)];
+
+    return {
+      ...aiResult,
+      overallScore,
+      ...rec,
+      dimensions: ensembledDimensions,
+      riskFactors: uniqueRisks,
+      meta: {
+        aiPowered: true,
+        webResearchUsed: !!webResearch,
+        crmContextUsed: crmContext.similarCompanies.length > 0 || crmContext.existingContacts.length > 0,
+        validationFlags: validation.flags,
+        confidenceMultiplier: validation.confidenceMultiplier,
+        webResearch,
+        crmContext,
+      },
+    };
+  }
+
+  // Fallback: ML-only
+  return buildMLFallback(ctx, mlBase, fee, validation, webResearch, crmContext);
+}
+
+// ---------------------------------------------------------------------------
+// Claude Analysis
+// ---------------------------------------------------------------------------
+
+async function runClaudeAnalysis(
+  ctx: OpportunityContext,
+  mlBase: ReturnType<typeof computeMLBaseScores>,
+  fee: ReturnType<typeof calculateLehmanFee>,
+  webResearch: WebResearchResult | null,
+  crmContext: CRMContext
+): Promise<AIScreeningResult | null> {
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+
+  // Build enriched context
+  let enrichedContext = '';
+
+  if (webResearch) {
+    enrichedContext += `\n\nWEB RESEARCH (from Perplexity — real-time data):
+Company Intel: ${webResearch.companyIntel}
+Recent News: ${webResearch.recentNews.join(' | ')}
+Funding: ${webResearch.fundingHistory}
+Competitive Landscape: ${webResearch.competitiveLandscape}
+Key People: ${webResearch.keyPeople}
+Clinical Pipeline: ${webResearch.clinicalPipeline}`;
+  }
+
+  if (crmContext.similarCompanies.length > 0 || crmContext.existingContacts.length > 0) {
+    enrichedContext += '\n\nCRM CONTEXT (from Ambrosia\'s internal database):';
+    if (crmContext.existingContacts.length > 0) {
+      enrichedContext += `\nExisting contacts at this company: ${crmContext.existingContacts.map(c => `${c.name} (${c.title}, ${c.relationship})`).join(', ')}`;
+    }
+    if (crmContext.similarCompanies.length > 0) {
+      enrichedContext += `\nSimilar companies in CRM: ${crmContext.similarCompanies.slice(0, 5).map(c => `${c.name} (${c.type}, score: ${c.score || 'N/A'})`).join(', ')}`;
+    }
+    if (crmContext.relatedDeals.length > 0) {
+      enrichedContext += `\nRelated deals: ${crmContext.relatedDeals.map(d => `${d.title} (${d.stage}, $${d.value}M)`).join(', ')}`;
+    }
+    enrichedContext += `\nSector stats: ${crmContext.sectorStats.totalCompanies} companies, ${crmContext.sectorStats.totalDeals} deals tracked`;
+  }
+
+  const systemPrompt = `You are an elite M&A advisory analyst at Ambrosia Ventures, a boutique life sciences strategy and M&A advisory firm. You advise early-stage biotech (Series A/B/C), pharma, medtech, diagnostics, digital health, healthcare, and nutraceutical companies, as well as their investors (family offices, VCs, PEs).
+
+Analyze an inbound opportunity with the precision of a Goldman Sachs MD evaluating a pitch.
+
+ML MODEL BASE SCORES (statistical priors — adjust ±2 based on your deeper analysis):
+- Strategic Fit: ${mlBase.strategicFit}/5
+- Fee Potential: ${mlBase.feePotential}/5
+- Win Probability: ${mlBase.winProbability}/5
+- Execution Risk: ${mlBase.executionRisk}/5 (higher = lower risk)
+- Strategic Value: ${mlBase.strategicValue}/5
+
+Fee (Modified Lehman): base=${formatFee(fee.base)}, range=${formatFee(fee.low)}-${formatFee(fee.high)}
+
+Respond ONLY with valid JSON:
 {
-  "overallScore": <number 5-25>,
+  "overallScore": <5-25>,
   "engagementType": "<M&A Advisory | Licensing Advisory | Partnership Advisory | Fundraising Advisory | Strategic Advisory>",
   "engagementTypeRationale": "<1 sentence>",
-  "executiveSummary": "<2-3 sentence assessment suitable for a partner meeting>",
+  "executiveSummary": "<2-3 sentences — partner meeting quality>",
   "dimensions": {
-    "strategicFit": { "score": <1-5>, "confidence": <0-1>, "rationale": "<2 sentences>", "keyFactors": ["<factor1>", "<factor2>"] },
-    "feePotential": { "score": <1-5>, "confidence": <0-1>, "rationale": "<2 sentences>", "keyFactors": ["<factor1>", "<factor2>"], "estimatedFee": "<fee range string>" },
-    "winProbability": { "score": <1-5>, "confidence": <0-1>, "rationale": "<2 sentences>", "keyFactors": ["<factor1>", "<factor2>"] },
-    "executionRisk": { "score": <1-5>, "confidence": <0-1>, "rationale": "<2 sentences>", "keyFactors": ["<factor1>", "<factor2>"] },
-    "strategicValue": { "score": <1-5>, "confidence": <0-1>, "rationale": "<2 sentences>", "keyFactors": ["<factor1>", "<factor2>"] }
+    "strategicFit": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] },
+    "feePotential": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"], "estimatedFee": "${formatFee(fee.low)} – ${formatFee(fee.high)}" },
+    "winProbability": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] },
+    "executionRisk": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] },
+    "strategicValue": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] }
   },
   "suggestedNextSteps": ["<step1>", "<step2>", "<step3>", "<step4>"],
   "riskFactors": ["<risk1>", "<risk2>"],
   "competitiveInsights": ["<insight1>", "<insight2>"],
-  "keyQuestions": ["<question the team should answer before proceeding>", "<question2>"]
+  "keyQuestions": ["<question1>", "<question2>"]
 }`;
 
-  const userPrompt = `Analyze this inbound opportunity for Ambrosia Ventures:
+  const userPrompt = `OPPORTUNITY SCREENING:
 
 COMPANY: ${ctx.companyName}
 SECTOR: ${ctx.sector}
 THERAPY AREA: ${ctx.therapyArea || 'Not specified'}
 STAGE: ${ctx.companyStage || 'Not specified'}
-ESTIMATED DEAL SIZE: $${ctx.dealSize || 'Unknown'}M
+ESTIMATED DEAL SIZE: $${ctx.dealSize || 'TBD'}M
 
-DESCRIPTION:
-${ctx.description}
+DESCRIPTION: ${ctx.description}
 
 REFERRAL SOURCE: ${ctx.referralSource || 'Not specified'}
-EXISTING CONTACTS: ${ctx.knownContacts || 'None mentioned'}
+EXISTING CONTACTS: ${ctx.knownContacts || 'None'}
 TIMELINE/URGENCY: ${ctx.urgency || 'Not specified'}
 ADDITIONAL NOTES: ${ctx.additionalNotes || 'None'}
+${enrichedContext}
 
 Provide your structured assessment.`;
 
@@ -180,123 +294,85 @@ Provide your structured assessment.`;
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
-      messages: [
-        { role: 'user', content: userPrompt },
-      ],
       system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
     });
 
     const text = response.content[0].type === 'text' ? response.content[0].text : '';
-
-    // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      return fallbackMLScoring(ctx, mlBase);
-    }
+    if (!jsonMatch) return null;
 
     const parsed = JSON.parse(jsonMatch[0]);
-
-    // Determine recommendation from overall score
-    const score = parsed.overallScore;
-    let recommendation: AIScreeningResult['recommendation'];
-    let recommendationLabel: string;
-    let recommendationColor: string;
-
-    if (score >= 20) {
-      recommendation = 'pursue_aggressively';
-      recommendationLabel = 'Pursue Aggressively';
-      recommendationColor = '#34d399';
-    } else if (score >= 15) {
-      recommendation = 'pursue_selectively';
-      recommendationLabel = 'Pursue Selectively';
-      recommendationColor = '#5fd4e3';
-    } else if (score >= 10) {
-      recommendation = 'monitor';
-      recommendationLabel = 'Monitor & Revisit';
-      recommendationColor = '#fbbf24';
-    } else {
-      recommendation = 'pass';
-      recommendationLabel = 'Decline or Refer';
-      recommendationColor = '#f87171';
-    }
+    const rec = getRecommendation(parsed.overallScore);
 
     return {
-      overallScore: score,
-      recommendation,
-      recommendationLabel,
-      recommendationColor,
-      engagementType: parsed.engagementType || 'Strategic Advisory',
-      engagementTypeRationale: parsed.engagementTypeRationale || '',
-      executiveSummary: parsed.executiveSummary || '',
-      dimensions: {
-        strategicFit: parsed.dimensions.strategicFit,
-        feePotential: {
-          ...parsed.dimensions.feePotential,
-          estimatedFee: parsed.dimensions.feePotential?.estimatedFee || `${formatFee(fee.low)} – ${formatFee(fee.high)}`,
-        },
-        winProbability: parsed.dimensions.winProbability,
-        executionRisk: parsed.dimensions.executionRisk,
-        strategicValue: parsed.dimensions.strategicValue,
-      },
+      ...rec,
+      overallScore: parsed.overallScore,
+      engagementType: parsed.engagementType,
+      engagementTypeRationale: parsed.engagementTypeRationale,
+      executiveSummary: parsed.executiveSummary,
+      dimensions: parsed.dimensions,
       suggestedNextSteps: parsed.suggestedNextSteps || [],
       estimatedFeeRange: { low: formatFee(fee.low), high: formatFee(fee.high) },
       riskFactors: parsed.riskFactors || [],
       competitiveInsights: parsed.competitiveInsights || [],
       keyQuestions: parsed.keyQuestions || [],
+      meta: { aiPowered: true, webResearchUsed: false, crmContextUsed: false, validationFlags: [], confidenceMultiplier: 1, webResearch: null, crmContext: null },
     };
   } catch (error) {
-    console.error('[AI Analyzer] Claude API error:', error);
-    return fallbackMLScoring(ctx, mlBase);
+    console.error('[Claude Analysis] Error:', error);
+    return null;
   }
 }
 
 // ---------------------------------------------------------------------------
-// Fallback: ML-only scoring when Claude is unavailable
+// Helpers
 // ---------------------------------------------------------------------------
 
-function fallbackMLScoring(
+function getRecommendation(score: number) {
+  if (score >= 20) return { recommendation: 'pursue_aggressively' as const, recommendationLabel: 'Pursue Aggressively', recommendationColor: '#34d399' };
+  if (score >= 15) return { recommendation: 'pursue_selectively' as const, recommendationLabel: 'Pursue Selectively', recommendationColor: '#5fd4e3' };
+  if (score >= 10) return { recommendation: 'monitor' as const, recommendationLabel: 'Monitor & Revisit', recommendationColor: '#fbbf24' };
+  return { recommendation: 'pass' as const, recommendationLabel: 'Decline or Refer', recommendationColor: '#f87171' };
+}
+
+function buildMLFallback(
   ctx: OpportunityContext,
-  ml: ReturnType<typeof computeMLBaseScores>
+  ml: ReturnType<typeof computeMLBaseScores>,
+  fee: ReturnType<typeof calculateLehmanFee>,
+  validation: ReturnType<typeof validateScreening>,
+  webResearch: WebResearchResult | null,
+  crmContext: CRMContext
 ): AIScreeningResult {
-  const totalScore = ml.strategicFitBase + ml.feePotentialBase + ml.winProbabilityBase + ml.executionRiskBase + ml.strategicValueBase;
-
-  let recommendation: AIScreeningResult['recommendation'];
-  let recommendationLabel: string;
-  let recommendationColor: string;
-
-  if (totalScore >= 20) {
-    recommendation = 'pursue_aggressively'; recommendationLabel = 'Pursue Aggressively'; recommendationColor = '#34d399';
-  } else if (totalScore >= 15) {
-    recommendation = 'pursue_selectively'; recommendationLabel = 'Pursue Selectively'; recommendationColor = '#5fd4e3';
-  } else if (totalScore >= 10) {
-    recommendation = 'monitor'; recommendationLabel = 'Monitor & Revisit'; recommendationColor = '#fbbf24';
-  } else {
-    recommendation = 'pass'; recommendationLabel = 'Decline or Refer'; recommendationColor = '#f87171';
-  }
+  const total = Object.values(ml).reduce((s, v) => s + v, 0);
+  const rec = getRecommendation(total);
 
   return {
-    overallScore: totalScore,
-    recommendation,
-    recommendationLabel,
-    recommendationColor,
+    ...rec,
+    overallScore: total,
     engagementType: 'Strategic Advisory',
-    engagementTypeRationale: 'Engagement type inferred from ML model (AI analysis unavailable).',
-    executiveSummary: `${ctx.companyName} is a ${ctx.companyStage?.replace('_', ' ') || ''} ${ctx.sector} company. ML-based scoring suggests a ${recommendationLabel.toLowerCase()} approach based on sector alignment and deal characteristics. Full AI analysis unavailable — connect your Anthropic API key for deeper assessment.`,
+    engagementTypeRationale: 'Engagement type inferred from ML model. Connect Claude API for deeper analysis.',
+    executiveSummary: `${ctx.companyName} is a ${ctx.companyStage?.replace('_', ' ') || ''} ${ctx.sector} company${ctx.dealSize ? ` with an estimated deal size of $${ctx.dealSize}M` : ''}. ML-based scoring suggests a ${rec.recommendationLabel.toLowerCase()} approach. ${webResearch ? 'Web research was incorporated.' : 'Full AI analysis unavailable — add ANTHROPIC_API_KEY for deeper assessment.'}`,
     dimensions: {
-      strategicFit: { score: ml.strategicFitBase, confidence: 0.6, rationale: `Sector weight: ${ml.sectorPrior.fitWeight}. Stage advisory need: ${ml.stagePrior.advisoryNeed}.`, keyFactors: [ctx.sector, ctx.companyStage || 'unknown stage'] },
-      feePotential: { score: ml.feePotentialBase, confidence: 0.8, rationale: `Deal size of $${ctx.dealSize}M implies a Lehman fee of ${formatFee(ml.fee.base)}.`, keyFactors: [`$${ctx.dealSize}M deal`, `${formatFee(ml.fee.low)}-${formatFee(ml.fee.high)} fee range`], estimatedFee: `${formatFee(ml.fee.low)} – ${formatFee(ml.fee.high)}` },
-      winProbability: { score: ml.winProbabilityBase, confidence: 0.5, rationale: `Stage-based conversion rate: ${(ml.stagePrior.dealProbability * 100).toFixed(0)}%.`, keyFactors: ['Stage-based prior', 'No referral context analyzed'] },
-      executionRisk: { score: ml.executionRiskBase, confidence: 0.5, rationale: `Sector complexity base: ${ml.sectorPrior.complexityBase}.`, keyFactors: ['Sector complexity baseline'] },
-      strategicValue: { score: ml.strategicValueBase, confidence: 0.4, rationale: 'ML-assessed strategic value based on sector positioning.', keyFactors: ['Sector expansion potential'] },
+      strategicFit: { score: ml.strategicFit, confidence: 0.6, rationale: 'Scored by ML model based on sector and stage alignment.', keyFactors: [ctx.sector, ctx.companyStage || 'unknown'] },
+      feePotential: { score: ml.feePotential, confidence: 0.8, rationale: `Deal size of $${ctx.dealSize}M implies a Lehman fee of ${formatFee(fee.base)}.`, keyFactors: [`$${ctx.dealSize}M`, `${formatFee(fee.low)}-${formatFee(fee.high)}`], estimatedFee: `${formatFee(fee.low)} – ${formatFee(fee.high)}` },
+      winProbability: { score: ml.winProbability, confidence: 0.5, rationale: 'Stage-based conversion prior. Full context analysis requires Claude.', keyFactors: ['Stage prior only'] },
+      executionRisk: { score: ml.executionRisk, confidence: 0.5, rationale: 'Sector complexity baseline. Narrative analysis requires Claude.', keyFactors: ['Sector baseline'] },
+      strategicValue: { score: ml.strategicValue, confidence: 0.4, rationale: 'ML-assessed. Full strategic analysis requires Claude.', keyFactors: ['ML prior'] },
     },
-    suggestedNextSteps: [
-      'Connect Anthropic API key for full AI-powered analysis',
-      'Review opportunity in next team meeting',
-      'Assess team capacity for this sector',
-    ],
-    estimatedFeeRange: { low: formatFee(ml.fee.low), high: formatFee(ml.fee.high) },
-    riskFactors: ['AI analysis unavailable — assessment based on ML priors only'],
-    competitiveInsights: [],
-    keyQuestions: ['What is the competitive landscape for advisory mandates in this space?', 'Do we have relevant sector expertise on the team?'],
+    suggestedNextSteps: ['Connect Anthropic API key for full AI analysis', 'Review in next team meeting', 'Assess team capacity'],
+    estimatedFeeRange: { low: formatFee(fee.low), high: formatFee(fee.high) },
+    riskFactors: [...validation.flags, 'AI analysis unavailable — assessment based on ML priors only'],
+    competitiveInsights: webResearch ? [`Web research: ${webResearch.competitiveLandscape}`] : [],
+    keyQuestions: ['Is the deal size estimate reliable?', 'Do we have sector expertise for this engagement?'],
+    meta: {
+      aiPowered: false,
+      webResearchUsed: !!webResearch,
+      crmContextUsed: crmContext.similarCompanies.length > 0,
+      validationFlags: validation.flags,
+      confidenceMultiplier: validation.confidenceMultiplier,
+      webResearch,
+      crmContext,
+    },
   };
 }
