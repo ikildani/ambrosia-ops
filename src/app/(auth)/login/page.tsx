@@ -21,9 +21,9 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <img
-                src="/logo.svg"
+                src="/logo-reversed.png"
                 alt="Ambrosia Ventures"
-                className="h-10 w-auto"
+                className="h-9 w-auto"
               />
             </div>
             <div className="flex items-center justify-center gap-2 mb-2">

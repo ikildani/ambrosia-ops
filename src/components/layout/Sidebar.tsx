@@ -87,9 +87,9 @@ export function Sidebar() {
       <div className="sidebar-logo">
         <div className="flex items-center gap-2">
           <img
-            src="/logo.svg"
+            src="/logo-reversed.png"
             alt="Ambrosia Ventures"
-            className="h-8 w-auto"
+            className="h-7 w-auto"
           />
           <span className="badge badge-teal text-[10px] font-semibold tracking-wider">
             OPS
