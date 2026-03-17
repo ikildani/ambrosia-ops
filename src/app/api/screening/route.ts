@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { analyzeOpportunity, type OpportunityContext } from '@/lib/ai/opportunity-analyzer';
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = (await request.json()) as OpportunityContext;
 
     if (!body || typeof body !== 'object') {

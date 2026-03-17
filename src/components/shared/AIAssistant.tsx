@@ -62,6 +62,24 @@ function getMockResponse(input: string): string {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   SAFE MARKDOWN RENDERING
+   ══════════════════════════════════════════════════════════════════ */
+
+function renderMessageContent(content: string, role: string) {
+  return content.split('\n').map((line, i) => (
+    <span key={i}>
+      {i > 0 && <br />}
+      {line.split(/(\*\*.*?\*\*)/).map((part, j) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={j} style={{ color: role === 'user' ? '#04080f' : '#f0f4f8' }}>{part.slice(2, -2)}</strong>;
+        }
+        return <span key={j}>{part}</span>;
+      })}
+    </span>
+  ));
+}
+
+/* ══════════════════════════════════════════════════════════════════
    COMPONENT
    ══════════════════════════════════════════════════════════════════ */
 
@@ -279,12 +297,9 @@ export function AIAssistant() {
                     <div
                       className="text-[13px] leading-relaxed whitespace-pre-wrap"
                       style={{ color: msg.role === 'user' ? '#04080f' : '#cbd5e1' }}
-                      dangerouslySetInnerHTML={{
-                        __html: msg.content
-                          .replace(/\*\*(.*?)\*\*/g, '<strong style="color: ' + (msg.role === 'user' ? '#04080f' : '#f0f4f8') + '">$1</strong>')
-                          .replace(/\n/g, '<br/>')
-                      }}
-                    />
+                    >
+                      {renderMessageContent(msg.content, msg.role)}
+                    </div>
                   </div>
                   <p className="mt-1.5 text-[9px]" style={{ color: '#334155', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
                     {msg.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}

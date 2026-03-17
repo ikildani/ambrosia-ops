@@ -4,13 +4,18 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
 
     const type = searchParams.get('type');
     const therapy_area = searchParams.get('therapy_area');
     const search = searchParams.get('search');
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '25', 10);
+    const page = Math.max(1, Math.min(parseInt(searchParams.get('page') || '1', 10) || 1, 1000));
+    const limit = Math.max(1, Math.min(parseInt(searchParams.get('limit') || '25', 10) || 25, 100));
     const offset = (page - 1) * limit;
 
     let query = supabase
@@ -60,6 +65,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
 
     if (!body.name || !body.type) {

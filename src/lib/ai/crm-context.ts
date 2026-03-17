@@ -1,5 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Server-side only — these functions use service role keys
+if (typeof window !== 'undefined') {
+  throw new Error('This module can only be used server-side');
+}
+
 // ---------------------------------------------------------------------------
 // RAG Pipeline — Pull relevant context from CRM
 // ---------------------------------------------------------------------------

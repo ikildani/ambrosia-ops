@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { randomUUID } from 'crypto';
 
 /* ══════════════════════════════════════════════════════════════════
@@ -90,6 +91,12 @@ function generateMockSection(analysisType: string, companyName: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body: GenerateRequest = await request.json();
 
     // Validate required fields

@@ -95,7 +95,6 @@ export default function NewResearchNotePage() {
 
   async function onSubmit(data: NoteFormData) {
     // In production, this would POST to /api/research
-    console.log('Creating note:', { ...data, tags });
     router.push('/research');
   }
 

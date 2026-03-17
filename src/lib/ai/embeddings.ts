@@ -5,6 +5,11 @@
 
 import { createClient } from '@supabase/supabase-js';
 
+// Server-side only — these functions use service role keys
+if (typeof window !== 'undefined') {
+  throw new Error('This module can only be used server-side');
+}
+
 export interface EmbeddingResult {
   embedding: number[];
   text: string;
@@ -174,38 +179,35 @@ export async function findSimilar(
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, limit);
 
-  // Fetch names for the similar entities
-  const results: SimilarEntity[] = [];
+  // Batch fetch names by type
+  const supabaseClient = createClient(supabaseUrl, serviceKey);
 
-  for (const item of scored) {
-    let name = item.context.slice(0, 50);
+  const orgIds = scored.filter(s => s.type === 'organization').map(s => s.id);
+  const dealIds = scored.filter(s => s.type === 'deal').map(s => s.id);
+  const screeningIds = scored.filter(s => s.type === 'screening').map(s => s.id);
+  const contactIds = scored.filter(s => s.type === 'contact').map(s => s.id);
 
-    const supabase2 = createClient(supabaseUrl, serviceKey);
+  const [orgs, deals, screenings, contacts] = await Promise.all([
+    orgIds.length ? supabaseClient.from('organizations').select('id, name').in('id', orgIds) : { data: [] },
+    dealIds.length ? supabaseClient.from('deals').select('id, title').in('id', dealIds) : { data: [] },
+    screeningIds.length ? supabaseClient.from('screenings').select('id, company_name').in('id', screeningIds) : { data: [] },
+    contactIds.length ? supabaseClient.from('contacts').select('id, first_name, last_name').in('id', contactIds) : { data: [] },
+  ]);
 
-    if (item.type === 'organization') {
-      const { data: org } = await supabase2.from('organizations').select('name').eq('id', item.id).single();
-      if (org) name = org.name;
-    } else if (item.type === 'deal') {
-      const { data: deal } = await supabase2.from('deals').select('title').eq('id', item.id).single();
-      if (deal) name = deal.title;
-    } else if (item.type === 'screening') {
-      const { data: screen } = await supabase2.from('screenings').select('company_name').eq('id', item.id).single();
-      if (screen) name = screen.company_name;
-    } else if (item.type === 'contact') {
-      const { data: contact } = await supabase2.from('contacts').select('first_name, last_name').eq('id', item.id).single();
-      if (contact) name = `${contact.first_name} ${contact.last_name}`;
-    }
+  // Build name map
+  const nameMap: Record<string, string> = {};
+  (orgs.data || []).forEach((o: { id: string; name: string }) => { nameMap[o.id] = o.name; });
+  (deals.data || []).forEach((d: { id: string; title: string }) => { nameMap[d.id] = d.title; });
+  (screenings.data || []).forEach((s: { id: string; company_name: string }) => { nameMap[s.id] = s.company_name; });
+  (contacts.data || []).forEach((c: { id: string; first_name: string; last_name: string }) => { nameMap[c.id] = `${c.first_name} ${c.last_name}`; });
 
-    results.push({
-      id: item.id,
-      name,
-      type: item.type,
-      similarity: Math.round(item.similarity * 100) / 100,
-      context: item.context,
-    });
-  }
-
-  return results;
+  return scored.map(item => ({
+    id: item.id,
+    name: nameMap[item.id] || item.context.slice(0, 50),
+    type: item.type,
+    similarity: Math.round(item.similarity * 100) / 100,
+    context: item.context,
+  }));
 }
 
 // ---------------------------------------------------------------------------
