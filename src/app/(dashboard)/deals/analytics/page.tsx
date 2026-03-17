@@ -15,36 +15,19 @@ import { Card } from '@/components/ui/Card';
 /* ── Stat cards data ──────────────────────────── */
 
 const stats = [
-  { label: 'Total Pipeline Value', value: '$1.5B', icon: DollarSign, highlight: true },
-  { label: 'Win Rate', value: '67%', icon: TrendingUp, highlight: false },
-  { label: 'Avg Days to Close', value: '94', icon: Clock, highlight: false },
-  { label: 'Mandates This Quarter', value: '3', icon: Briefcase, highlight: false },
+  { label: 'Total Pipeline Value', value: '$0', icon: DollarSign, highlight: true },
+  { label: 'Win Rate', value: '0%', icon: TrendingUp, highlight: false },
+  { label: 'Avg Days to Close', value: '0', icon: Clock, highlight: false },
+  { label: 'Mandates This Quarter', value: '0', icon: Briefcase, highlight: false },
 ];
 
 /* ── Mock chart data ──────────────────────────── */
 
-const pipelineByStage = [
-  { label: 'Sourcing', value: 35, color: 'bg-slate-400' },
-  { label: 'Initial Review', value: 22, color: 'bg-signal-blue' },
-  { label: 'Due Diligence', value: 18, color: 'bg-signal-amber' },
-  { label: 'Negotiation', value: 15, color: 'bg-purple-400' },
-  { label: 'Closing', value: 10, color: 'bg-teal-400' },
-];
+const pipelineByStage: { label: string; value: number; color: string }[] = [];
 
-const revenueByQuarter = [
-  { label: 'Q1', value: 65, color: 'bg-teal-500/70' },
-  { label: 'Q2', value: 82, color: 'bg-teal-500/80' },
-  { label: 'Q3', value: 48, color: 'bg-teal-500/60' },
-  { label: 'Q4', value: 95, color: 'bg-teal-400' },
-];
+const revenueByQuarter: { label: string; value: number; color: string }[] = [];
 
-const dealsByTherapyArea = [
-  { label: 'Oncology', value: 40, color: 'bg-red-400' },
-  { label: 'Neurology', value: 25, color: 'bg-purple-400' },
-  { label: 'Immunology', value: 20, color: 'bg-blue-400' },
-  { label: 'Rare Disease', value: 10, color: 'bg-amber-400' },
-  { label: 'Cardiovascular', value: 5, color: 'bg-rose-400' },
-];
+const dealsByTherapyArea: { label: string; value: number; color: string }[] = [];
 
 export default function PipelineAnalyticsPage() {
   return (

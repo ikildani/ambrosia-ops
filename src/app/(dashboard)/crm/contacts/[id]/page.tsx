@@ -39,199 +39,8 @@ import { THERAPY_AREA_MAP } from '@/lib/data/therapy-areas';
 import { formatCurrency, formatRelativeDate, daysSince } from '@/lib/utils/format';
 
 // ---------------------------------------------------------------------------
-// Mock data
+// Data will be fetched from Supabase — no mock data
 // ---------------------------------------------------------------------------
-
-const MOCK_CONTACT: Contact = {
-  id: 'ct_010',
-  first_name: 'Sarah',
-  last_name: 'Chen',
-  email: 'sarah.chen@neurogentx.com',
-  phone: '+1 617-555-0234',
-  title: 'VP, Business Development',
-  organization_id: 'comp_005',
-  contact_type: 'executive',
-  linkedin: 'https://linkedin.com/in/sarahchen-bd',
-  therapy_area_expertise: ['oncology', 'neurology'],
-  relationship_strength: 'warm_intro',
-  relationship_owner_id: 'tm_001',
-  last_contacted_at: '2026-03-09T14:30:00Z',
-  notes: '## Key Insights\n\nDr. Chen has deep connections across both neuroscience and oncology BD teams at major pharma. Previously at Biogen for 8 years where she led the Aduhelm commercial partnership negotiations.\n\n**Priority follow-ups:**\n- Reconnect re: NeuroGen Phase 2 data readout (expected Q2 2026)\n- Explore co-development interest from her network\n- Intro to her former Biogen colleague now at Roche Neuroscience',
-  tags: ['high-priority', 'neuroscience-network', 'conference-speaker'],
-  created_by: 'tm_001',
-  created_at: '2025-04-18T10:00:00Z',
-  updated_at: '2026-03-09T14:30:00Z',
-};
-
-const MOCK_ORG = {
-  id: 'comp_005',
-  name: 'NeuroGen Therapeutics',
-  type: 'biotech' as const,
-};
-
-const MOCK_ACTIVITIES: ActivityType[] = [
-  {
-    id: 'act_020',
-    activity_type: 'meeting',
-    subject: 'BD Strategy Session & Pipeline Review',
-    body: 'Reviewed NeuroGen\'s updated pipeline positioning. Sarah shared competitive intel on Cerevel\'s CNS program. Discussed potential licensing structure for NGN-205 with 3 interested parties.',
-    organization_id: 'comp_005',
-    contact_id: 'ct_010',
-    deal_id: 'deal_010',
-    project_id: null,
-    participant_contact_ids: ['ct_010', 'ct_011'],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-03-09T14:00:00Z',
-    duration_minutes: 45,
-    is_pinned: true,
-    metadata: null,
-    created_at: '2026-03-09T15:00:00Z',
-  },
-  {
-    id: 'act_021',
-    activity_type: 'email',
-    subject: 'Follow-up: Term Sheet Comparables',
-    body: 'Sent Sarah the compiled comparable deal terms for recent neurology licensing transactions. Included Biogen/Sage, AbbVie/Cerevel, and Roche/Prothena as benchmarks.',
-    organization_id: 'comp_005',
-    contact_id: 'ct_010',
-    deal_id: 'deal_010',
-    project_id: null,
-    participant_contact_ids: ['ct_010'],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-03-06T11:00:00Z',
-    duration_minutes: null,
-    is_pinned: false,
-    metadata: null,
-    created_at: '2026-03-06T11:05:00Z',
-  },
-  {
-    id: 'act_022',
-    activity_type: 'call',
-    subject: 'Quick Check-in on JPM Week Leads',
-    body: 'Sarah flagged 2 warm leads from JPM Healthcare Conference. One large pharma interested in NGN-205 neuro-oncology crossover data. Will send intros next week.',
-    organization_id: 'comp_005',
-    contact_id: 'ct_010',
-    deal_id: null,
-    project_id: null,
-    participant_contact_ids: ['ct_010'],
-    team_member_id: 'tm_002',
-    occurred_at: '2026-02-14T16:30:00Z',
-    duration_minutes: 20,
-    is_pinned: false,
-    metadata: null,
-    created_at: '2026-02-14T17:00:00Z',
-  },
-  {
-    id: 'act_023',
-    activity_type: 'intro_made',
-    subject: 'Intro: Sarah Chen <> Mark Hoffman (Roche Neuroscience)',
-    body: 'Facilitated introduction between Sarah and Mark Hoffman, Head of Neuroscience Partnerships at Roche. Mark expressed interest in NeuroGen\'s dual mechanism approach.',
-    organization_id: 'comp_005',
-    contact_id: 'ct_010',
-    deal_id: null,
-    project_id: null,
-    participant_contact_ids: ['ct_010'],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-01-28T09:00:00Z',
-    duration_minutes: null,
-    is_pinned: false,
-    metadata: null,
-    created_at: '2026-01-28T09:15:00Z',
-  },
-];
-
-const MOCK_DEALS: Deal[] = [
-  {
-    id: 'deal_010',
-    title: 'NeuroGen NGN-205 Licensing',
-    deal_type: 'licensing',
-    stage: 'negotiation',
-    priority: 'high',
-    company_id: 'comp_005',
-    counterparty_ids: ['comp_042'],
-    estimated_value: 380_000_000,
-    upfront_amount: 60_000_000,
-    milestone_amount: 320_000_000,
-    royalty_range: '10-15%',
-    therapy_area: 'neurology',
-    indication: 'Alzheimer\'s Disease',
-    modality: 'Small Molecule',
-    development_stage: 'Phase 2',
-    scorecard: null,
-    confidentiality_level: 'highly_confidential',
-    lead_advisor_id: 'tm_001',
-    team_member_ids: ['tm_001', 'tm_002'],
-    sourced_at: '2025-11-10T10:00:00Z',
-    expected_close_date: '2026-06-15T00:00:00Z',
-    actual_close_date: null,
-    tags: ['flagship', 'active-negotiation'],
-    notes: null,
-    created_by: 'tm_001',
-    created_at: '2025-11-10T10:00:00Z',
-    updated_at: '2026-03-08T14:00:00Z',
-  },
-  {
-    id: 'deal_011',
-    title: 'NeuroGen Series B Extension',
-    deal_type: 'fundraising',
-    stage: 'due_diligence',
-    priority: 'medium',
-    company_id: 'comp_005',
-    counterparty_ids: [],
-    estimated_value: 120_000_000,
-    upfront_amount: null,
-    milestone_amount: null,
-    royalty_range: null,
-    therapy_area: 'neurology',
-    indication: null,
-    modality: null,
-    development_stage: null,
-    scorecard: null,
-    confidentiality_level: 'confidential',
-    lead_advisor_id: 'tm_001',
-    team_member_ids: ['tm_001'],
-    sourced_at: '2026-01-20T10:00:00Z',
-    expected_close_date: '2026-05-01T00:00:00Z',
-    actual_close_date: null,
-    tags: [],
-    notes: null,
-    created_by: 'tm_001',
-    created_at: '2026-01-20T10:00:00Z',
-    updated_at: '2026-03-01T09:00:00Z',
-  },
-];
-
-const MOCK_CONNECTIONS = [
-  {
-    id: 'ct_011',
-    name: 'Dr. Michael Park',
-    title: 'Chief Scientific Officer',
-    org: 'NeuroGen Therapeutics',
-    relationship_type: 'colleague',
-    relationship_strength: 'direct' as const,
-  },
-  {
-    id: 'ct_012',
-    name: 'Lisa Huang',
-    title: 'General Counsel',
-    org: 'NeuroGen Therapeutics',
-    relationship_type: 'colleague',
-    relationship_strength: 'met_once' as const,
-  },
-  {
-    id: 'ct_013',
-    name: 'Prof. Robert Klein',
-    title: 'Scientific Advisory Board Chair',
-    org: 'NeuroGen Therapeutics',
-    relationship_type: 'advisor_to',
-    relationship_strength: 'warm_intro' as const,
-  },
-];
-
-const MOCK_TEAM_MEMBERS: Record<string, string> = {
-  tm_001: 'Marcus Reed',
-  tm_002: 'Anna Kowalski',
-};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -368,15 +177,35 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState<Contact | null>(null);
 
+  // TODO: Fetch real data from Supabase by id
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setContact(MOCK_CONTACT);
-      setLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, [id]);
 
-  if (loading || !contact) return <ContactDetailSkeleton />;
+  if (loading) return <ContactDetailSkeleton />;
+
+  if (!contact) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <Users className="w-12 h-12 mb-4" style={{ color: '#334155' }} />
+        <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+          Contact not found
+        </h2>
+        <p className="mt-2 text-[14px]" style={{ color: '#64748b' }}>
+          This contact doesn&apos;t exist or has been removed.
+        </p>
+        <Link href="/crm/contacts" className="mt-6 text-[13px] font-medium" style={{ color: '#5fd4e3' }}>
+          &larr; Back to Contacts
+        </Link>
+      </div>
+    );
+  }
+
+  // TODO: These will be populated from Supabase queries
+  const contactActivities: ActivityType[] = [];
+  const contactDeals: Deal[] = [];
+  const contactConnections: { id: string; name: string; title: string; org: string; relationship_type: string; relationship_strength: 'warm_intro' | 'direct' | 'met_once' | 'cold' }[] = [];
+  const teamMembers: Record<string, string> = {};
 
   const rel = RELATIONSHIP_COLORS[contact.relationship_strength] ?? RELATIONSHIP_COLORS.cold;
   const aging = contactAgingInfo(contact.last_contacted_at);
@@ -425,7 +254,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                       href={`/crm/companies/${contact.organization_id}`}
                       className="text-teal-400 hover:text-teal-300 transition-colors"
                     >
-                      {MOCK_ORG.name}
+                      {contact.organization_id ?? ''}
                     </Link>
                   </>
                 )}
@@ -552,16 +381,16 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   Activity Timeline
                 </h2>
               </div>
-              <span className="text-xs text-slate-500 font-mono">{MOCK_ACTIVITIES.length} entries</span>
+              <span className="text-xs text-slate-500 font-mono">{contactActivities.length} entries</span>
             </div>
 
-            {MOCK_ACTIVITIES.length > 0 ? (
+            {contactActivities.length > 0 ? (
               <div className="relative">
                 {/* Vertical timeline line */}
                 <div className="absolute left-[11px] top-2 bottom-2 w-px bg-navy-700" />
 
                 <div className="space-y-5">
-                  {MOCK_ACTIVITIES.map((act, idx) => {
+                  {contactActivities.map((act, idx) => {
                     const IconComponent = ACTIVITY_ICONS[act.activity_type] ?? Activity;
                     return (
                       <div key={act.id} className="relative flex items-start gap-4 pl-1">
@@ -600,7 +429,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                           )}
 
                           <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-600">
-                            <span>{MOCK_TEAM_MEMBERS[act.team_member_id] ?? 'Team'}</span>
+                            <span>{teamMembers[act.team_member_id] ?? 'Team'}</span>
                             {act.duration_minutes && (
                               <>
                                 <span className="text-slate-700">&middot;</span>
@@ -640,12 +469,12 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                   Deals Involving This Contact
                 </h2>
               </div>
-              <span className="text-xs text-slate-500 font-mono">{MOCK_DEALS.length} deals</span>
+              <span className="text-xs text-slate-500 font-mono">{contactDeals.length} deals</span>
             </div>
 
-            {MOCK_DEALS.length > 0 ? (
+            {contactDeals.length > 0 ? (
               <div className="space-y-3">
-                {MOCK_DEALS.map((deal) => {
+                {contactDeals.map((deal) => {
                   const stageLabel = DEAL_STAGES.find((s) => s.id === deal.stage)?.label ?? deal.stage;
                   const typeLabel = DEAL_TYPES.find((t) => t.id === deal.deal_type)?.label ?? deal.deal_type;
                   return (
@@ -765,11 +594,11 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                 <span className="label">Organization</span>
                 <div className="mt-0.5">
                   <Link
-                    href={`/crm/companies/${MOCK_ORG.id}`}
+                    href={`/crm/companies/${contact.organization_id}`}
                     className="flex items-center gap-1.5 text-sm text-teal-400 hover:text-teal-300 transition-colors"
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    {MOCK_ORG.name}
+                    {contact.organization_id ?? ''}
                   </Link>
                 </div>
               </div>
@@ -847,7 +676,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                 <span className="label">Relationship Owner</span>
                 <p className="text-sm text-slate-300 mt-0.5">
                   {contact.relationship_owner_id
-                    ? MOCK_TEAM_MEMBERS[contact.relationship_owner_id] ?? 'Unknown'
+                    ? teamMembers[contact.relationship_owner_id] ?? 'Unknown'
                     : '\u2014'}
                 </p>
               </div>
@@ -915,9 +744,9 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               </h2>
             </div>
 
-            {MOCK_CONNECTIONS.length > 0 ? (
+            {contactConnections.length > 0 ? (
               <div className="space-y-3">
-                {MOCK_CONNECTIONS.map((conn) => {
+                {contactConnections.map((conn) => {
                   const connRel = RELATIONSHIP_COLORS[conn.relationship_strength] ?? RELATIONSHIP_COLORS.cold;
                   return (
                     <Link

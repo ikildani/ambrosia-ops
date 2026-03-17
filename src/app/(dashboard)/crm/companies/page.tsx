@@ -96,56 +96,7 @@ const taLabel: Record<string, string> = {
 /*  Mock data                                                          */
 /* ------------------------------------------------------------------ */
 
-const MOCK_COMPANIES: MockCompany[] = [
-  {
-    id: '1',
-    name: 'NeuroGen Therapeutics',
-    type: 'biotech',
-    stage: 'Series B',
-    therapyAreas: ['oncology', 'neurology'],
-    leadAsset: 'NGT-201',
-    phase: 'Phase 2',
-    hq: 'San Francisco, CA',
-    totalFunding: '$85M',
-    ownerInitials: 'IK',
-    ownerColor: 'bg-teal-700',
-    lastContactedDays: 3,
-  },
-  {
-    id: '2',
-    name: 'Apex Capital Partners',
-    type: 'vc',
-    therapyAreas: ['oncology', 'rare_disease'],
-    hq: 'New York, NY',
-    ownerInitials: 'IK',
-    ownerColor: 'bg-blue-700',
-    lastContactedDays: 14,
-  },
-  {
-    id: '3',
-    name: 'BioVantage Inc.',
-    type: 'biotech',
-    stage: 'Series A',
-    therapyAreas: ['immunology'],
-    leadAsset: 'BVX-100',
-    phase: 'Phase 1',
-    hq: 'Boston, MA',
-    totalFunding: '$32M',
-    ownerInitials: 'AV',
-    ownerColor: 'bg-teal-700',
-    lastContactedDays: 8,
-  },
-  {
-    id: '4',
-    name: 'Wellington Family Office',
-    type: 'family_office',
-    therapyAreas: ['cardiovascular', 'metabolic'],
-    hq: 'London, UK',
-    ownerInitials: 'IK',
-    ownerColor: 'bg-amber-700',
-    lastContactedDays: 42,
-  },
-];
+const MOCK_COMPANIES: MockCompany[] = [];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */

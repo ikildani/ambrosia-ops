@@ -66,64 +66,7 @@ interface MockNote {
   created_at: string;
 }
 
-const mockNotes: MockNote[] = [
-  {
-    id: '1',
-    title: 'ADC Landscape 2026 — Competitive Analysis',
-    content:
-      'The antibody-drug conjugate market continues its explosive growth trajectory, with 14 approved products and over 200 in clinical development. Key competitive dynamics are shifting as second-generation linker-payload technologies demonstrate superior therapeutic indices...',
-    note_type: 'competitive_intel',
-    ai_generated: true,
-    therapy_area: 'oncology',
-    is_pinned: true,
-    tags: ['ADC', 'competitive landscape', 'market sizing'],
-    linked_entity: null,
-    author_name: 'Sarah Chen',
-    created_at: '2026-03-12T10:30:00Z',
-  },
-  {
-    id: '2',
-    title: 'NeuroGen Therapeutics — Company Deep Dive',
-    content:
-      'NeuroGen Therapeutics is a clinical-stage biotech focused on novel small molecule approaches to neurodegeneration. Their lead asset, NGT-4127, is a first-in-class LRRK2 inhibitor currently in Phase 2 trials for Parkinson\'s disease with promising interim data showing 40% reduction in biomarker levels...',
-    note_type: 'company_deep_dive',
-    ai_generated: false,
-    therapy_area: 'neurology',
-    is_pinned: false,
-    tags: ['LRRK2', 'Parkinson\'s', 'Phase 2'],
-    linked_entity: { type: 'organization', name: 'NeuroGen Therapeutics' },
-    author_name: 'James Rivera',
-    created_at: '2026-03-10T14:15:00Z',
-  },
-  {
-    id: '3',
-    title: 'KRAS G12C Market Sizing Implications',
-    content:
-      'Updated market sizing analysis for KRAS G12C inhibitors incorporating Q4 2025 commercial data. Sotorasib and adagrasib have established the category with combined peak sales now projected at $4.2B. Second-generation agents from Mirati, Revolution Medicines, and others could expand the addressable market...',
-    note_type: 'market_memo',
-    ai_generated: false,
-    therapy_area: 'oncology',
-    is_pinned: false,
-    tags: ['KRAS', 'market sizing', 'NSCLC'],
-    linked_entity: null,
-    author_name: 'Sarah Chen',
-    created_at: '2026-03-08T09:00:00Z',
-  },
-  {
-    id: '4',
-    title: 'Q1 Board Meeting — Strategic Priorities',
-    content:
-      'Summary of Q1 2026 board meeting. Key decisions: (1) Expand oncology practice to include radiopharmaceuticals, (2) Hire two senior associates by Q2, (3) Launch Terrain integration for automated market intelligence. Pipeline review covered 12 active mandates with 3 expected to close in Q2...',
-    note_type: 'meeting_summary',
-    ai_generated: false,
-    therapy_area: null,
-    is_pinned: false,
-    tags: ['board meeting', 'strategy', 'Q1 2026'],
-    linked_entity: null,
-    author_name: 'Michael Torres',
-    created_at: '2026-03-05T16:45:00Z',
-  },
-];
+const mockNotes: MockNote[] = [];
 
 /* -------------------------------------------------- */
 /* HELPERS                                             */

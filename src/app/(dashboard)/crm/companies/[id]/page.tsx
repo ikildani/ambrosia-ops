@@ -40,283 +40,8 @@ import { THERAPY_AREAS, THERAPY_AREA_MAP } from '@/lib/data/therapy-areas';
 import { formatCurrency, formatRelativeDate, daysSince, formatDate } from '@/lib/utils/format';
 
 // ---------------------------------------------------------------------------
-// Mock data — demonstrates a fully populated company profile
+// Data will be fetched from Supabase — no mock data
 // ---------------------------------------------------------------------------
-
-const MOCK_COMPANY: Organization = {
-  id: 'comp_001',
-  name: 'Helix Therapeutics',
-  type: 'biotech',
-  stage: 'series_b',
-  therapy_areas: ['oncology', 'immunology'],
-  indications: ['NSCLC', 'Melanoma'],
-  website: 'https://helixtx.com',
-  linkedin: 'https://linkedin.com/company/helixtx',
-  hq_city: 'San Francisco',
-  hq_country: 'US',
-  description:
-    'Helix Therapeutics is a clinical-stage biopharmaceutical company developing next-generation bispecific antibodies for solid tumors. Their lead program, HLX-101, targets PD-L1/4-1BB and has demonstrated durable responses in a Phase 2 study across multiple solid tumor types including NSCLC and melanoma.',
-  employee_count_range: '51-200',
-  founded_year: 2019,
-  lead_asset: 'HLX-101',
-  lead_asset_phase: 'Phase 2',
-  last_funding_amount: 85_000_000,
-  last_funding_date: '2025-09-15',
-  total_funding: 142_000_000,
-  tags: ['high-conviction', 'board-relationship', 'active-fundraise'],
-  notes: 'Strong executive network. CEO previously built and sold ArgenX subsidiary. Keep close for upcoming Series C.',
-  owner_id: 'tm_001',
-  targeting_score: 87,
-  targeting_signals: null,
-  created_by: 'tm_001',
-  created_at: '2024-06-10T14:00:00Z',
-  updated_at: '2026-03-01T09:30:00Z',
-};
-
-const MOCK_CONTACTS: Contact[] = [
-  {
-    id: 'ct_001',
-    first_name: 'Elena',
-    last_name: 'Vasquez',
-    email: 'elena.v@helixtx.com',
-    phone: '+1 415-555-0142',
-    title: 'Chief Executive Officer',
-    organization_id: 'comp_001',
-    contact_type: 'executive',
-    linkedin: 'https://linkedin.com/in/elenavasquez',
-    therapy_area_expertise: ['oncology'],
-    relationship_strength: 'warm_intro',
-    relationship_owner_id: 'tm_001',
-    last_contacted_at: '2026-03-10T11:00:00Z',
-    notes: null,
-    tags: [],
-    created_by: 'tm_001',
-    created_at: '2024-06-10T14:00:00Z',
-    updated_at: '2026-03-10T11:00:00Z',
-  },
-  {
-    id: 'ct_002',
-    first_name: 'James',
-    last_name: 'Thornton',
-    email: 'j.thornton@helixtx.com',
-    phone: '+1 415-555-0198',
-    title: 'VP, Business Development',
-    organization_id: 'comp_001',
-    contact_type: 'founder',
-    linkedin: null,
-    therapy_area_expertise: ['oncology', 'immunology'],
-    relationship_strength: 'direct',
-    relationship_owner_id: 'tm_001',
-    last_contacted_at: '2026-02-22T15:00:00Z',
-    notes: null,
-    tags: [],
-    created_by: 'tm_001',
-    created_at: '2024-09-05T10:00:00Z',
-    updated_at: '2026-02-22T15:00:00Z',
-  },
-  {
-    id: 'ct_003',
-    first_name: 'Priya',
-    last_name: 'Mehta',
-    email: 'p.mehta@helixtx.com',
-    phone: null,
-    title: 'Chief Medical Officer',
-    organization_id: 'comp_001',
-    contact_type: 'advisor',
-    linkedin: 'https://linkedin.com/in/priyamehta',
-    therapy_area_expertise: ['oncology'],
-    relationship_strength: 'met_once',
-    relationship_owner_id: null,
-    last_contacted_at: '2026-01-05T09:00:00Z',
-    notes: null,
-    tags: [],
-    created_by: 'tm_001',
-    created_at: '2025-03-12T10:00:00Z',
-    updated_at: '2026-01-05T09:00:00Z',
-  },
-];
-
-const MOCK_DEALS: Deal[] = [
-  {
-    id: 'deal_001',
-    title: 'Helix Series C Advisory',
-    deal_type: 'fundraising',
-    stage: 'due_diligence',
-    priority: 'high',
-    company_id: 'comp_001',
-    counterparty_ids: [],
-    estimated_value: 200_000_000,
-    upfront_amount: null,
-    milestone_amount: null,
-    royalty_range: null,
-    therapy_area: 'oncology',
-    indication: 'NSCLC',
-    modality: 'Bispecific Antibody',
-    development_stage: 'Phase 2',
-    scorecard: null,
-    confidentiality_level: 'highly_confidential',
-    lead_advisor_id: 'tm_001',
-    team_member_ids: ['tm_001', 'tm_002'],
-    sourced_at: '2026-01-15T10:00:00Z',
-    expected_close_date: '2026-06-30T00:00:00Z',
-    actual_close_date: null,
-    tags: ['flagship'],
-    notes: null,
-    created_by: 'tm_001',
-    created_at: '2026-01-15T10:00:00Z',
-    updated_at: '2026-03-01T09:00:00Z',
-  },
-  {
-    id: 'deal_002',
-    title: 'Helix / NovaPharma Licensing',
-    deal_type: 'licensing',
-    stage: 'initial_review',
-    priority: 'medium',
-    company_id: 'comp_001',
-    counterparty_ids: ['comp_042'],
-    estimated_value: 450_000_000,
-    upfront_amount: 75_000_000,
-    milestone_amount: 375_000_000,
-    royalty_range: '8-12%',
-    therapy_area: 'oncology',
-    indication: 'Melanoma',
-    modality: 'Bispecific Antibody',
-    development_stage: 'Phase 2',
-    scorecard: null,
-    confidentiality_level: 'confidential',
-    lead_advisor_id: 'tm_001',
-    team_member_ids: ['tm_001'],
-    sourced_at: '2026-02-20T10:00:00Z',
-    expected_close_date: '2026-09-01T00:00:00Z',
-    actual_close_date: null,
-    tags: [],
-    notes: null,
-    created_by: 'tm_001',
-    created_at: '2026-02-20T10:00:00Z',
-    updated_at: '2026-03-05T14:00:00Z',
-  },
-];
-
-const MOCK_ACTIVITIES: ActivityType[] = [
-  {
-    id: 'act_001',
-    activity_type: 'meeting',
-    subject: 'Series C Kick-off Meeting',
-    body: 'Discussed timeline, target raise amount ($200M), and investor landscape. Elena wants to prioritize crossover funds with oncology expertise. Agreed on 6-week roadshow starting May.',
-    organization_id: 'comp_001',
-    contact_id: 'ct_001',
-    deal_id: 'deal_001',
-    project_id: null,
-    participant_contact_ids: ['ct_001', 'ct_002'],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-03-10T14:00:00Z',
-    duration_minutes: 60,
-    is_pinned: true,
-    metadata: null,
-    created_at: '2026-03-10T15:00:00Z',
-  },
-  {
-    id: 'act_002',
-    activity_type: 'call',
-    subject: 'BD Strategy Follow-up',
-    body: 'James walked through the NovaPharma term sheet. Key sticking point is territory rights for Greater China. Need to run comps on recent bispecific licensing deals.',
-    organization_id: 'comp_001',
-    contact_id: 'ct_002',
-    deal_id: 'deal_002',
-    project_id: null,
-    participant_contact_ids: ['ct_002'],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-03-07T10:30:00Z',
-    duration_minutes: 30,
-    is_pinned: false,
-    metadata: null,
-    created_at: '2026-03-07T11:00:00Z',
-  },
-  {
-    id: 'act_003',
-    activity_type: 'email',
-    subject: 'Updated CIM Draft Sent',
-    body: 'Sent v3 of the Confidential Information Memorandum to Elena for review. Incorporated latest Phase 2 interim data and updated competitive landscape section.',
-    organization_id: 'comp_001',
-    contact_id: 'ct_001',
-    deal_id: 'deal_001',
-    project_id: null,
-    participant_contact_ids: ['ct_001'],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-03-04T16:00:00Z',
-    duration_minutes: null,
-    is_pinned: false,
-    metadata: null,
-    created_at: '2026-03-04T16:05:00Z',
-  },
-  {
-    id: 'act_004',
-    activity_type: 'note',
-    subject: 'Competitive Intel: BioNova Phase 3 Read-out',
-    body: 'BioNova reported positive Phase 3 topline for their PD-L1/TIGIT bispecific in NSCLC. ORR 42% vs 28% SOC. Could affect Helix positioning — need to discuss differentiation strategy.',
-    organization_id: 'comp_001',
-    contact_id: null,
-    deal_id: null,
-    project_id: null,
-    participant_contact_ids: [],
-    team_member_id: 'tm_001',
-    occurred_at: '2026-02-28T09:00:00Z',
-    duration_minutes: null,
-    is_pinned: true,
-    metadata: null,
-    created_at: '2026-02-28T09:15:00Z',
-  },
-];
-
-const MOCK_DOCUMENTS: DocumentType[] = [
-  {
-    id: 'doc_001',
-    name: 'Helix CIM v3.pdf',
-    file_path: '/docs/helix-cim-v3.pdf',
-    file_size: 4_200_000,
-    mime_type: 'application/pdf',
-    document_type: 'cim',
-    organization_id: 'comp_001',
-    deal_id: 'deal_001',
-    project_id: null,
-    uploaded_by: 'tm_001',
-    confidentiality_level: 'highly_confidential',
-    tags: [],
-    created_at: '2026-03-04T16:00:00Z',
-  },
-  {
-    id: 'doc_002',
-    name: 'Helix Pitch Deck Q1 2026.pptx',
-    file_path: '/docs/helix-pitch-q1.pptx',
-    file_size: 8_700_000,
-    mime_type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    document_type: 'pitch_deck',
-    organization_id: 'comp_001',
-    deal_id: 'deal_001',
-    project_id: null,
-    uploaded_by: 'tm_001',
-    confidentiality_level: 'confidential',
-    tags: [],
-    created_at: '2026-02-15T10:00:00Z',
-  },
-  {
-    id: 'doc_003',
-    name: 'HLX-101 Phase 2 Interim Data.pdf',
-    file_path: '/docs/hlx101-ph2-interim.pdf',
-    file_size: 2_100_000,
-    mime_type: 'application/pdf',
-    document_type: 'other',
-    organization_id: 'comp_001',
-    deal_id: null,
-    project_id: null,
-    uploaded_by: 'tm_001',
-    confidentiality_level: 'confidential',
-    tags: ['clinical-data'],
-    created_at: '2026-01-20T14:00:00Z',
-  },
-];
-
-const MOCK_INVESTOR_PROFILE: InvestorProfile | null = null;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -489,29 +214,36 @@ export default function CompanyDetailPage({
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
 
-  // Simulate data fetch
+  // TODO: Fetch real data from Supabase by id
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setCompany(MOCK_COMPANY);
-      setContacts(MOCK_CONTACTS);
-      setDeals(MOCK_DEALS);
-      setActivities(MOCK_ACTIVITIES);
-      setDocuments(MOCK_DOCUMENTS);
-      setInvestorProfile(MOCK_INVESTOR_PROFILE);
-      setLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
+    setLoading(false);
   }, [id]);
 
   if (loading) return <CompanyDetailSkeleton />;
-  if (!company) return null;
+
+  if (!company) {
+    return (
+      <div className="flex flex-col items-center justify-center py-32 text-center">
+        <Building2 className="w-12 h-12 mb-4" style={{ color: '#334155' }} />
+        <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+          Company not found
+        </h2>
+        <p className="mt-2 text-[14px]" style={{ color: '#64748b' }}>
+          The company you&apos;re looking for doesn&apos;t exist or has been removed.
+        </p>
+        <Link href="/crm/companies" className="mt-6 text-[13px] font-medium" style={{ color: '#5fd4e3' }}>
+          &larr; Back to Companies
+        </Link>
+      </div>
+    );
+  }
 
   const orgTypeLabel = ORG_TYPES.find((o) => o.id === company.type)?.label ?? company.type;
   const stageLabel = company.stage ? ORG_STAGE_LABELS[company.stage] ?? company.stage : null;
   const isInvestorType = INVESTOR_ORG_TYPES.includes(company.type);
 
-  // Relationship owner (mock)
-  const ownerName = company.owner_id ? 'Sarah Chen' : null;
+  // Relationship owner — will be resolved from team_members table
+  const ownerName = company.owner_id ? company.owner_id : null;
 
   // Last contacted — most recent activity
   const lastContactedDate =

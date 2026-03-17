@@ -86,113 +86,7 @@ const PRIORITY_BORDER: Record<string, string> = {
 
 /* ── Mock deals ──────────────────────────────── */
 
-const MOCK_DEALS: MockDeal[] = [
-  {
-    id: 'deal-001',
-    title: 'Project Atlas',
-    company: 'BioVantage',
-    companyId: 'org-bv',
-    dealType: 'licensing',
-    stage: 'sourcing',
-    therapyArea: 'immunology',
-    estimatedValue: 200_000_000,
-    priority: 'medium',
-    confidentiality: 'confidential',
-    leadAdvisor: 'Sarah Chen',
-    leadInitials: 'SC',
-    expectedClose: '2026-09-30',
-  },
-  {
-    id: 'deal-002',
-    title: 'MedTech Acquisition',
-    company: 'OmniDevice',
-    companyId: 'org-od',
-    dealType: 'ma',
-    stage: 'sourcing',
-    therapyArea: 'cardiovascular',
-    estimatedValue: 150_000_000,
-    priority: 'critical',
-    confidentiality: 'confidential',
-    leadAdvisor: 'James Whitfield',
-    leadInitials: 'JW',
-    expectedClose: '2026-08-15',
-  },
-  {
-    id: 'deal-003',
-    title: 'Series C Advisory',
-    company: 'CellFrame Bio',
-    companyId: 'org-cf',
-    dealType: 'fundraising',
-    stage: 'initial_review',
-    therapyArea: 'oncology',
-    estimatedValue: 80_000_000,
-    priority: 'medium',
-    confidentiality: 'public',
-    leadAdvisor: 'Priya Patel',
-    leadInitials: 'PP',
-    expectedClose: '2026-07-30',
-  },
-  {
-    id: 'deal-004',
-    title: 'Project Falcon',
-    company: 'NeuroGen',
-    companyId: 'org-ng',
-    dealType: 'ma',
-    stage: 'due_diligence',
-    therapyArea: 'neurology',
-    estimatedValue: 450_000_000,
-    priority: 'high',
-    confidentiality: 'highly_confidential',
-    leadAdvisor: 'Sarah Chen',
-    leadInitials: 'SC',
-    expectedClose: '2026-06-30',
-  },
-  {
-    id: 'deal-005',
-    title: 'ADC Licensing',
-    company: 'PharmaLink',
-    companyId: 'org-pl',
-    dealType: 'licensing',
-    stage: 'negotiation',
-    therapyArea: 'oncology',
-    estimatedValue: 380_000_000,
-    priority: 'high',
-    confidentiality: 'confidential',
-    leadAdvisor: 'James Whitfield',
-    leadInitials: 'JW',
-    expectedClose: '2026-05-15',
-  },
-  {
-    id: 'deal-006',
-    title: 'Gene Therapy Partnership',
-    company: 'GenVista',
-    companyId: 'org-gv',
-    dealType: 'partnership',
-    stage: 'closing',
-    therapyArea: 'rare_disease',
-    estimatedValue: 275_000_000,
-    priority: 'high',
-    confidentiality: 'confidential',
-    leadAdvisor: 'Priya Patel',
-    leadInitials: 'PP',
-    expectedClose: '2026-04-10',
-  },
-  {
-    id: 'deal-007',
-    title: 'Project Summit',
-    company: 'Apex Therapeutics',
-    companyId: 'org-at',
-    dealType: 'ma',
-    stage: 'closed_won',
-    therapyArea: 'oncology',
-    estimatedValue: 520_000_000,
-    priority: 'medium',
-    confidentiality: 'confidential',
-    leadAdvisor: 'Sarah Chen',
-    leadInitials: 'SC',
-    expectedClose: '2026-02-28',
-  },
-];
+const MOCK_DEALS: MockDeal[] = [];
 
 /* ── Computed metrics ────────────────────────── */
 
@@ -261,6 +155,7 @@ export default function DealsPage() {
       />
 
       {/* ── Pipeline Value Strip ──────────── */}
+      {MOCK_DEALS.length > 0 && (
       <div className="grid grid-cols-4 gap-px bg-navy-700/50 rounded-lg overflow-hidden border border-subtle mb-6">
         <div className="bg-navy-900 p-4 flex flex-col items-center justify-center">
           <span className="label mb-1 flex items-center gap-1.5">
@@ -291,14 +186,17 @@ export default function DealsPage() {
           <span className="font-mono text-xl text-signal-green">{winRate}%</span>
         </div>
       </div>
+      )}
 
       {/* ── View Toggle ───────────────────── */}
+      {MOCK_DEALS.length > 0 && (
       <div className="mb-6">
         <Tabs tabs={viewTabs} activeTab={activeView} onTabChange={handleTabChange} />
       </div>
+      )}
 
       {/* ── KANBAN VIEW ───────────────────── */}
-      {activeView === 'kanban' && (
+      {MOCK_DEALS.length > 0 && activeView === 'kanban' && (
         <div className="flex gap-3 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollBehavior: 'smooth' }}>
           {DEAL_STAGES.map((stage) => {
             const stageDeals = MOCK_DEALS.filter((d) => d.stage === stage.id);
@@ -388,7 +286,7 @@ export default function DealsPage() {
       )}
 
       {/* ── LIST VIEW ─────────────────────── */}
-      {activeView === 'list' && (
+      {MOCK_DEALS.length > 0 && activeView === 'list' && (
         <Card className="overflow-x-auto">
           <table className="data-table">
             <thead>
@@ -464,7 +362,7 @@ export default function DealsPage() {
       )}
 
       {/* ── ANALYTICS PLACEHOLDER ─────────── */}
-      {activeView === 'analytics' && (
+      {MOCK_DEALS.length > 0 && activeView === 'analytics' && (
         <Card>
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <BarChart3 className="w-12 h-12 text-slate-600 mb-4" />

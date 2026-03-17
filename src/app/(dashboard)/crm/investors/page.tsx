@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
-/* ── Mock investor data ───────────────────────── */
+/* ── Data will be fetched from Supabase ───────── */
 
 const INVESTOR_TYPE_BADGE: Record<string, 'blue' | 'green' | 'amber' | 'teal'> = {
   vc: 'blue',
@@ -23,47 +23,23 @@ const INVESTOR_TYPE_LABEL: Record<string, string> = {
   crossover: 'Crossover',
 };
 
-const mockInvestors = [
-  {
-    id: 'inv-001',
-    name: 'Apex Capital Partners',
-    type: 'vc',
-    therapyAreas: ['Oncology', 'Rare Disease', 'Immunology'],
-    checkSizeMin: '$10M',
-    checkSizeMax: '$75M',
-    stageFocus: 'Series A - C',
-    portfolioCount: 23,
-    hq: 'New York, NY',
-  },
-  {
-    id: 'inv-002',
-    name: 'Wellington Health Ventures',
-    type: 'family_office',
-    therapyAreas: ['Cardiovascular', 'Metabolic'],
-    checkSizeMin: '$5M',
-    checkSizeMax: '$25M',
-    stageFocus: 'Seed - Series B',
-    portfolioCount: 8,
-    hq: 'London, UK',
-  },
-  {
-    id: 'inv-003',
-    name: 'Summit BioEquity',
-    type: 'pe',
-    therapyAreas: ['Oncology', 'Neurology', 'Rare Disease'],
-    checkSizeMin: '$50M',
-    checkSizeMax: '$250M',
-    stageFocus: 'Late Stage / Buyout',
-    portfolioCount: 14,
-    hq: 'Boston, MA',
-  },
-];
+const investors: {
+  id: string;
+  name: string;
+  type: string;
+  therapyAreas: string[];
+  checkSizeMin: string;
+  checkSizeMax: string;
+  stageFocus: string;
+  portfolioCount: number;
+  hq: string;
+}[] = [];
 
 const stats = [
-  { label: 'Total Investors', value: 3, icon: Building2 },
-  { label: 'VC Firms', value: 1, icon: Briefcase },
-  { label: 'Avg Check Size', value: '$69M', icon: Wallet },
-  { label: 'Portfolio Cos.', value: 45, icon: Target },
+  { label: 'Total Investors', value: 0, icon: Building2 },
+  { label: 'VC Firms', value: 0, icon: Briefcase },
+  { label: 'Avg Check Size', value: '--', icon: Wallet },
+  { label: 'Portfolio Cos.', value: 0, icon: Target },
 ];
 
 export default function InvestorsPage() {
@@ -102,8 +78,19 @@ export default function InvestorsPage() {
       </div>
 
       {/* Investor cards */}
+      {investors.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <Building2 className="w-12 h-12 mb-4" style={{ color: '#334155' }} />
+          <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+            No investors yet
+          </h2>
+          <p className="mt-2 text-[14px]" style={{ color: '#64748b' }}>
+            Add your first investor to start tracking thesis alignment and check sizes.
+          </p>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-        {mockInvestors.map((investor, idx) => (
+        {investors.map((investor, idx) => (
           <Card
             key={investor.id}
             className="group hover:border-teal-500/20 transition-all duration-200"
@@ -172,6 +159,7 @@ export default function InvestorsPage() {
           </Card>
         ))}
       </div>
+      )}
     </div>
   );
 }

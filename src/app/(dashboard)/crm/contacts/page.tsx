@@ -113,62 +113,7 @@ const taLabel: Record<string, string> = {
 /*  Mock data                                                          */
 /* ------------------------------------------------------------------ */
 
-const MOCK_CONTACTS: MockContact[] = [
-  {
-    id: '1',
-    firstName: 'Sarah',
-    lastName: 'Chen',
-    title: 'VP Business Development',
-    organization: 'NeuroGen Therapeutics',
-    orgId: '1',
-    contactType: 'executive',
-    relationshipStrength: 'warm_intro',
-    email: 's.chen@neurogen.com',
-    phone: '+1 (415) 555-0142',
-    therapyAreas: ['oncology'],
-    lastContactedDays: 5,
-  },
-  {
-    id: '2',
-    firstName: 'Michael',
-    lastName: 'Torres',
-    title: 'Partner',
-    organization: 'Apex Capital Partners',
-    orgId: '2',
-    contactType: 'investor',
-    relationshipStrength: 'direct',
-    email: 'mtorres@apexcap.com',
-    therapyAreas: [],
-    lastContactedDays: 12,
-  },
-  {
-    id: '3',
-    firstName: 'Emily',
-    lastName: 'Walsh',
-    title: 'Chief Scientific Officer',
-    organization: 'BioVantage Inc.',
-    orgId: '3',
-    contactType: 'advisor',
-    relationshipStrength: 'met_once',
-    email: 'e.walsh@biovantage.com',
-    phone: '+1 (617) 555-0198',
-    therapyAreas: ['immunology'],
-    lastContactedDays: 45,
-  },
-  {
-    id: '4',
-    firstName: 'James',
-    lastName: 'Liu',
-    title: 'Managing Director',
-    organization: 'Wellington Family Office',
-    orgId: '4',
-    contactType: 'investor',
-    relationshipStrength: 'cold',
-    email: 'j.liu@wellingtonfamily.com',
-    therapyAreas: [],
-    lastContactedDays: undefined,
-  },
-];
+const MOCK_CONTACTS: MockContact[] = [];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */

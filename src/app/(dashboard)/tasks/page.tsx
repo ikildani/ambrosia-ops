@@ -43,41 +43,19 @@ function dueDateInfo(dateStr: string | null): { text: string; className: string 
 
 /* ---------- mock data ---------- */
 
-const mockTasks = [
-  {
-    id: 'task_001',
-    title: 'Complete competitive landscape analysis for ADC market',
-    project_name: 'Market Assessment — Oncology ADC Landscape',
-    project_id: 'proj_001',
-    status: 'in_progress' as string,
-    priority: 'high' as string,
-    due_date: '2026-03-16',
-    assigned_to: 'Sarah Chen',
-    assigned_initials: 'SC',
-  },
-  {
-    id: 'task_002',
-    title: 'Draft CIM executive summary for Project Falcon',
-    project_name: 'Due Diligence — Project Atlas',
-    project_id: 'proj_002',
-    status: 'todo' as string,
-    priority: 'urgent' as string,
-    due_date: '2026-03-14',
-    assigned_to: 'James Park',
-    assigned_initials: 'JP',
-  },
-  {
-    id: 'task_003',
-    title: 'Schedule advisory board meeting for oncology review',
-    project_name: 'Market Assessment — Oncology ADC Landscape',
-    project_id: 'proj_001',
-    status: 'review' as string,
-    priority: 'medium' as string,
-    due_date: '2026-03-20',
-    assigned_to: 'Maria Santos',
-    assigned_initials: 'MS',
-  },
-];
+interface MockTask {
+  id: string;
+  title: string;
+  project_name: string;
+  project_id: string;
+  status: string;
+  priority: string;
+  due_date: string;
+  assigned_to: string;
+  assigned_initials: string;
+}
+
+const mockTasks: MockTask[] = [];
 
 const filterTabs = [
   { id: 'all', label: 'All' },

@@ -45,50 +45,30 @@ function daysRemaining(targetDate: string): { text: string; variant: 'green' | '
 
 /* ---------- mock data ---------- */
 
-const mockProjects = [
-  {
-    id: 'proj_001',
-    name: 'Market Assessment — Oncology ADC Landscape',
-    client_name: 'NeuroGen Therapeutics',
-    client_id: 'org_001',
-    project_type: 'market_assessment',
-    status: 'active',
-    completed_deliverables: 3,
-    total_deliverables: 7,
-    lead_name: 'Sarah Chen',
-    target_end_date: '2026-03-26',
-    team: [
-      { initials: 'SC', name: 'Sarah Chen' },
-      { initials: 'JP', name: 'James Park' },
-      { initials: 'MS', name: 'Maria Santos' },
-    ],
-  },
-  {
-    id: 'proj_002',
-    name: 'Due Diligence — Project Atlas',
-    client_name: 'BioVantage Inc.',
-    client_id: 'org_002',
-    project_type: 'due_diligence',
-    status: 'planning',
-    completed_deliverables: 0,
-    total_deliverables: 5,
-    lead_name: 'David Kim',
-    target_end_date: '2026-04-13',
-    team: [
-      { initials: 'DK', name: 'David Kim' },
-      { initials: 'AT', name: 'Alicia Torres' },
-    ],
-  },
-];
+interface MockProject {
+  id: string;
+  name: string;
+  client_name: string;
+  client_id: string;
+  project_type: string;
+  status: string;
+  completed_deliverables: number;
+  total_deliverables: number;
+  lead_name: string;
+  target_end_date: string;
+  team: { initials: string; name: string }[];
+}
+
+const mockProjects: MockProject[] = [];
 
 const stats = [
-  { label: 'Active Projects', value: 1, icon: FolderKanban },
+  { label: 'Active Projects', value: 0, icon: FolderKanban },
   { label: 'Completed', value: 0, icon: CheckCircle2 },
-  { label: 'Total Tasks', value: 12, icon: ListTodo },
+  { label: 'Total Tasks', value: 0, icon: ListTodo },
   { label: 'Overdue Tasks', value: 0, icon: AlertTriangle },
 ];
 
-const showEmpty = false; // toggle for empty state demo
+const showEmpty = false;
 
 /* ---------- page ---------- */
 

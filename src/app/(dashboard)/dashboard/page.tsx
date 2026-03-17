@@ -36,26 +36,11 @@ const HAS_DATA = false; // Set to true to see the populated dashboard
    MOCK DATA (only used when HAS_DATA = true)
    ══════════════════════════════════════════════════════════════════ */
 
-const STAGES = [
-  { id: 'sourcing', label: 'Sourcing', count: 2, value: 350, color: '#94a3b8' },
-  { id: 'review', label: 'Review', count: 1, value: 80, color: '#60a5fa' },
-  { id: 'diligence', label: 'Diligence', count: 1, value: 450, color: '#fbbf24' },
-  { id: 'negotiation', label: 'Negotiation', count: 1, value: 380, color: '#a78bfa' },
-  { id: 'closing', label: 'Closing', count: 1, value: 275, color: '#00c9a7' },
-];
+const STAGES: { id: string; label: string; count: number; value: number; color: string }[] = [];
 
-const MANDATES = [
-  { id: '1', codename: 'Project Falcon', client: 'NeuroGen Therapeutics', stage: 'Due Diligence', stageColor: '#fbbf24', ev: 450, type: 'M&A', priority: 'high', days: 18 },
-  { id: '2', codename: 'ADC Licensing', client: 'PharmaLink', stage: 'Negotiation', stageColor: '#a78bfa', ev: 380, type: 'Licensing', priority: 'medium', days: 34 },
-  { id: '3', codename: 'Gene Therapy Partnership', client: 'GenVista', stage: 'Closing', stageColor: '#00c9a7', ev: 275, type: 'Partnership', priority: 'medium', days: 7 },
-];
+const MANDATES: { id: string; codename: string; client: string; stage: string; stageColor: string; ev: number; type: string; priority: string; days: number }[] = [];
 
-const FEED = [
-  { id: '1', text: 'Project Falcon advanced to Due Diligence', by: 'Alex Rivera', time: '23m ago', accent: true },
-  { id: '2', text: 'Management presentation completed — GenVista', by: 'You', time: '2h ago', accent: false },
-  { id: '3', text: 'Valuation model updated for ADC Licensing', by: 'Jordan Lee', time: '4h ago', accent: false },
-  { id: '4', text: 'NDA executed with BioVantage', by: 'Maya Patel', time: '1d ago', accent: false },
-];
+const FEED: { id: string; text: string; by: string; time: string; accent: boolean }[] = [];
 
 /* ══════════════════════════════════════════════════════════════════
    ONBOARDING WIZARD
