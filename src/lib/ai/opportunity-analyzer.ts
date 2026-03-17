@@ -217,7 +217,7 @@ async function runClaudeAnalysis(
   let enrichedContext = '';
 
   if (webResearch) {
-    enrichedContext += `\n\nWEB RESEARCH (from Perplexity — real-time data):
+    enrichedContext += `\n\nREAL-TIME MARKET INTELLIGENCE:
 Company Intel: ${webResearch.companyIntel}
 Recent News: ${webResearch.recentNews.join(' | ')}
 Funding: ${webResearch.fundingHistory}
@@ -352,7 +352,7 @@ function buildMLFallback(
     overallScore: total,
     engagementType: 'Strategic Advisory',
     engagementTypeRationale: 'Engagement type inferred from ML model. Connect Claude API for deeper analysis.',
-    executiveSummary: `${ctx.companyName} is a ${ctx.companyStage?.replace('_', ' ') || ''} ${ctx.sector} company${ctx.dealSize ? ` with an estimated deal size of $${ctx.dealSize}M` : ''}. ML-based scoring suggests a ${rec.recommendationLabel.toLowerCase()} approach. ${webResearch ? 'Web research was incorporated.' : 'Full AI analysis unavailable — add ANTHROPIC_API_KEY for deeper assessment.'}`,
+    executiveSummary: `${ctx.companyName} is a ${ctx.companyStage?.replace('_', ' ') || ''} ${ctx.sector} company${ctx.dealSize ? ` with an estimated deal size of $${ctx.dealSize}M` : ''}. Based on our analysis, a ${rec.recommendationLabel.toLowerCase()} approach is recommended.`,
     dimensions: {
       strategicFit: { score: ml.strategicFit, confidence: 0.6, rationale: 'Scored by ML model based on sector and stage alignment.', keyFactors: [ctx.sector, ctx.companyStage || 'unknown'] },
       feePotential: { score: ml.feePotential, confidence: 0.8, rationale: `Deal size of $${ctx.dealSize}M implies a Lehman fee of ${formatFee(fee.base)}.`, keyFactors: [`$${ctx.dealSize}M`, `${formatFee(fee.low)}-${formatFee(fee.high)}`], estimatedFee: `${formatFee(fee.low)} – ${formatFee(fee.high)}` },
@@ -360,10 +360,10 @@ function buildMLFallback(
       executionRisk: { score: ml.executionRisk, confidence: 0.5, rationale: 'Sector complexity baseline. Narrative analysis requires Claude.', keyFactors: ['Sector baseline'] },
       strategicValue: { score: ml.strategicValue, confidence: 0.4, rationale: 'ML-assessed. Full strategic analysis requires Claude.', keyFactors: ['ML prior'] },
     },
-    suggestedNextSteps: ['Connect Anthropic API key for full AI analysis', 'Review in next team meeting', 'Assess team capacity'],
+    suggestedNextSteps: ['Review opportunity in next team meeting', 'Assess team capacity for this sector', 'Schedule introductory call if pursuing'],
     estimatedFeeRange: { low: formatFee(fee.low), high: formatFee(fee.high) },
-    riskFactors: [...validation.flags, 'AI analysis unavailable — assessment based on ML priors only'],
-    competitiveInsights: webResearch ? [`Web research: ${webResearch.competitiveLandscape}`] : [],
+    riskFactors: validation.flags.length > 0 ? validation.flags : [],
+    competitiveInsights: webResearch?.competitiveLandscape ? [webResearch.competitiveLandscape] : [],
     keyQuestions: ['Is the deal size estimate reliable?', 'Do we have sector expertise for this engagement?'],
     meta: {
       aiPowered: false,

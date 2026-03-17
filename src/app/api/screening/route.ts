@@ -13,7 +13,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'companyName, sector, and description are required' }, { status: 400 });
     }
 
-    const result = await analyzeOpportunity(body);
+    const fullResult = await analyzeOpportunity(body);
+
+    // Strip internal metadata — Perplexity, CRM context, and validation internals
+    // are silent intelligence layers, never exposed to the client
+    const { meta, ...clientResult } = fullResult;
 
     return NextResponse.json({
       context: {
@@ -21,9 +25,8 @@ export async function POST(request: NextRequest) {
         sector: body.sector,
         dealSize: body.dealSize,
       },
-      result,
+      result: clientResult,
       analyzedAt: new Date().toISOString(),
-      aiPowered: !!process.env.ANTHROPIC_API_KEY,
     });
   } catch (error) {
     console.error('[Screening API] Error:', error);
