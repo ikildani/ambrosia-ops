@@ -135,7 +135,7 @@ function OnboardingWizard() {
       </div>
 
       {/* Steps */}
-      <div className="max-w-xl mx-auto space-y-4">
+      <div className="max-w-lg mx-auto space-y-4">
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
           const isExpanded = expandedStep === step.id;
@@ -144,7 +144,7 @@ function OnboardingWizard() {
           return (
             <div
               key={step.id}
-              className="rounded-xl overflow-hidden transition-all duration-300"
+              className="rounded-xl transition-all duration-300"
               style={{
                 background: isExpanded ? '#0a1628' : '#07101e',
                 border: `1px solid ${isExpanded ? 'rgba(95,212,227,0.12)' : 'rgba(100,116,139,0.08)'}`,
@@ -153,7 +153,7 @@ function OnboardingWizard() {
             >
               {/* Header */}
               <button
-                className="w-full flex items-center gap-4 px-6 py-5 text-left transition-colors"
+                className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors"
                 onClick={() => setExpandedStep(isExpanded ? null : step.id)}
               >
                 <div
@@ -187,21 +187,21 @@ function OnboardingWizard() {
 
               {/* Expanded content */}
               {isExpanded && !isComplete && (
-                <div className="px-6 pb-6 pt-1 pl-[72px]" style={{ animation: 'fadeIn 0.3s ease-out' }}>
-                  <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#64748b' }}>
+                <div className="px-5 pb-5" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '68px' }}>
+                  <p className="text-[13px] leading-relaxed mb-5" style={{ color: '#64748b' }}>
                     {step.description}
                   </p>
-                  <div className="flex items-center gap-3 flex-wrap">
+                  <div className="flex items-center gap-3">
                     <Link
                       href={step.href}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold transition-all"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-semibold transition-all"
                       style={{ background: step.accent, color: '#04080f' }}
                     >
                       <Icon className="w-4 h-4" />
                       {step.cta}
                     </Link>
                     <button
-                      className="text-[12px] font-medium transition-colors px-3 py-2"
+                      className="text-[12px] font-medium transition-colors px-3 py-2.5"
                       style={{ color: '#475569' }}
                       onClick={(e) => {
                         e.stopPropagation();
