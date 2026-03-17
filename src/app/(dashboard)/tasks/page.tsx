@@ -83,23 +83,23 @@ export default function TasksPage() {
       />
 
       {/* Filter tabs */}
-      <div className="mb-6">
+      <div className="mb-8">
         <Tabs tabs={filterTabs} activeTab={activeFilter} onTabChange={setActiveFilter} />
       </div>
 
       {/* Task list */}
       {filteredTasks.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-navy-800 flex items-center justify-center mb-5">
+        <Card className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-navy-800 flex items-center justify-center mb-6">
             <CheckCircle2 className="w-8 h-8 text-teal-500" />
           </div>
-          <h3 className="font-display text-xl text-slate-100 mb-2">You&apos;re all caught up</h3>
-          <p className="text-sm text-slate-500 max-w-sm">
+          <h3 className="font-display text-xl text-slate-100 mb-3">You&apos;re all caught up</h3>
+          <p className="text-sm text-slate-500 max-w-sm leading-relaxed">
             No tasks match this filter. Check other categories or enjoy the moment.
           </p>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {filteredTasks.map((task) => {
             const status = statusConfig[task.status] ?? statusConfig.todo;
             const due = dueDateInfo(task.due_date);

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { THERAPY_AREAS } from '@/lib/data/therapy-areas';
-import { DEAL_TYPES } from '@/lib/data/constants';
+import { DEAL_TYPES, ORG_TYPES } from '@/lib/data/constants';
 import {
   screenOpportunity,
   type ScreeningInput,
@@ -239,6 +239,7 @@ function ScoreBar({
 interface ContextState {
   opportunityName: string;
   companyName: string;
+  companySector: string;
   therapyArea: string;
   dealType: string;
   estimatedDealSize: string;
@@ -259,6 +260,7 @@ export default function OpportunityScreeningPage() {
   const [context, setContext] = useState<ContextState>({
     opportunityName: '',
     companyName: '',
+    companySector: '',
     therapyArea: '',
     dealType: '',
     estimatedDealSize: '',
@@ -414,8 +416,8 @@ export default function OpportunityScreeningPage() {
         }}
       >
         <div className="label mb-4">Opportunity Context</div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-3">
             <label className="input-label">Opportunity Name</label>
             <input
               type="text"
@@ -440,7 +442,32 @@ export default function OpportunityScreeningPage() {
             />
           </div>
           <div>
-            <label className="input-label">Therapy Area</label>
+            <label className="input-label">Company Sector</label>
+            <div className="relative">
+              <select
+                className="input appearance-none pr-10"
+                value={context.companySector}
+                onChange={(e) =>
+                  setContext((p) => ({ ...p, companySector: e.target.value }))
+                }
+              >
+                <option value="">Select sector</option>
+                {ORG_TYPES.filter((t) => !['family_office', 'angel', 'vc', 'pe', 'cro', 'advisory', 'other'].includes(t.id)).map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+                <option value="other">Other</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="input-label">Therapy Area <span className="text-[11px] font-normal" style={{ color: 'var(--text-muted)' }}>(optional)</span></label>
             <div className="relative">
               <select
                 className="input appearance-none pr-10"
@@ -638,7 +665,7 @@ export default function OpportunityScreeningPage() {
           <div className="flex flex-wrap gap-2">
             <ToggleButton
               field="opensNewTA"
-              label="Opens New TA"
+              label="Opens New Sector / TA"
               value={screening.opensNewTA}
               onChange={handleToggleChange}
             />

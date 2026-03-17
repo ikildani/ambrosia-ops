@@ -136,8 +136,8 @@ export default function DealsPage() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="Deal Pipeline"
-        subtitle="Track M&A advisory engagements through every stage"
+        title="Mandate Pipeline"
+        subtitle="Track advisory engagements across M&amp;A, licensing, partnerships, and fundraising"
         actions={
           <>
             <Link href="/deals/analytics">
@@ -156,31 +156,31 @@ export default function DealsPage() {
 
       {/* ── Pipeline Value Strip ──────────── */}
       {MOCK_DEALS.length > 0 && (
-      <div className="grid grid-cols-4 gap-px bg-navy-700/50 rounded-lg overflow-hidden border border-subtle mb-6">
-        <div className="bg-navy-900 p-4 flex flex-col items-center justify-center">
-          <span className="label mb-1 flex items-center gap-1.5">
+      <div className="grid grid-cols-4 gap-px bg-navy-700/50 rounded-lg overflow-hidden border border-subtle mb-8">
+        <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+          <span className="label mb-1.5 flex items-center gap-1.5">
             <DollarSign className="w-3 h-3" /> Total Pipeline
           </span>
           <span className="font-mono text-xl text-teal-400">
             {formatCurrency(totalPipelineValue, true)}
           </span>
         </div>
-        <div className="bg-navy-900 p-4 flex flex-col items-center justify-center">
-          <span className="label mb-1 flex items-center gap-1.5">
-            <Target className="w-3 h-3" /> Active Deals
+        <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+          <span className="label mb-1.5 flex items-center gap-1.5">
+            <Target className="w-3 h-3" /> Active Engagements
           </span>
           <span className="font-mono text-xl text-slate-100">{activeDeals.length}</span>
         </div>
-        <div className="bg-navy-900 p-4 flex flex-col items-center justify-center">
-          <span className="label mb-1 flex items-center gap-1.5">
+        <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+          <span className="label mb-1.5 flex items-center gap-1.5">
             <Activity className="w-3 h-3" /> Avg Deal Size
           </span>
           <span className="font-mono text-xl text-slate-100">
             {formatCurrency(avgDealSize, true)}
           </span>
         </div>
-        <div className="bg-navy-900 p-4 flex flex-col items-center justify-center">
-          <span className="label mb-1 flex items-center gap-1.5">
+        <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+          <span className="label mb-1.5 flex items-center gap-1.5">
             <TrendingUp className="w-3 h-3" /> Win Rate
           </span>
           <span className="font-mono text-xl text-signal-green">{winRate}%</span>
@@ -190,14 +190,14 @@ export default function DealsPage() {
 
       {/* ── View Toggle ───────────────────── */}
       {MOCK_DEALS.length > 0 && (
-      <div className="mb-6">
+      <div className="mb-8">
         <Tabs tabs={viewTabs} activeTab={activeView} onTabChange={handleTabChange} />
       </div>
       )}
 
       {/* ── KANBAN VIEW ───────────────────── */}
       {MOCK_DEALS.length > 0 && activeView === 'kanban' && (
-        <div className="flex gap-3 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollBehavior: 'smooth' }}>
+        <div className="flex gap-5 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollBehavior: 'smooth' }}>
           {DEAL_STAGES.map((stage) => {
             const stageDeals = MOCK_DEALS.filter((d) => d.stage === stage.id);
             const stageValue = stageDeals.reduce((s, d) => s + d.estimatedValue, 0);
@@ -209,7 +209,7 @@ export default function DealsPage() {
                 style={{ minWidth: 280, width: 280 }}
               >
                 {/* Column header */}
-                <div className="flex items-center gap-2 p-3 border-b border-subtle">
+                <div className="flex items-center gap-2 px-3 py-3.5 border-b border-subtle">
                   <span className={`w-2 h-2 rounded-full ${STAGE_DOT[stage.id]}`} />
                   <span className="text-xs font-medium text-slate-300 uppercase tracking-wider flex-1">
                     {stage.label}
@@ -223,7 +223,7 @@ export default function DealsPage() {
                 </div>
 
                 {/* Cards */}
-                <div className="p-2 space-y-2 min-h-[120px]">
+                <div className="p-3 space-y-3 min-h-[120px]">
                   {stageDeals.length === 0 ? (
                     <div className="text-center py-10">
                       <p className="text-xs text-slate-600">No deals</p>
@@ -384,9 +384,9 @@ export default function DealsPage() {
         <Card>
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Kanban className="w-12 h-12 text-slate-600 mb-4" />
-            <h3 className="text-lg font-medium text-slate-300 mb-1">Your pipeline is empty</h3>
-            <p className="text-sm text-slate-500 max-w-md mb-6">
-              Create your first deal to start tracking M&A engagements
+            <h3 className="text-lg font-medium text-slate-300 mb-2">Your pipeline is empty</h3>
+            <p className="text-sm text-slate-500 max-w-md mb-8 leading-relaxed">
+              Create your first engagement to start tracking advisory mandates
             </p>
             <Link href="/deals/new">
               <Button>

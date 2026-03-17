@@ -159,7 +159,7 @@ export default function CompaniesPage() {
       />
 
       {/* --- Stats Strip --- */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Companies', value: MOCK_COMPANIES.length, icon: Building2 },
           { label: 'Biotech', value: MOCK_COMPANIES.filter((c) => c.type === 'biotech').length, icon: FlaskConical },
@@ -181,7 +181,7 @@ export default function CompaniesPage() {
       </div>
 
       {/* --- Filter / Search Bar --- */}
-      <Card className="mb-6 !bg-navy-900">
+      <Card className="mb-8 !bg-navy-900">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
@@ -259,14 +259,14 @@ export default function CompaniesPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((company, idx) => (
             <Card
               key={company.id}
               className="group transition-all duration-200 hover:border-teal-500/20 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
               style={{ animation: `slideUp 0.4s ease-out ${idx * 0.06}s both` }}
             >
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 {/* Top row: Name + type badge */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">

@@ -182,7 +182,7 @@ export default function ContactsPage() {
       />
 
       {/* --- Stats Strip --- */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
           { label: 'Total Contacts', value: MOCK_CONTACTS.length, icon: Users },
           { label: 'Warm Intros', value: MOCK_CONTACTS.filter((c) => c.relationshipStrength === 'warm_intro').length, icon: Handshake },
@@ -204,7 +204,7 @@ export default function ContactsPage() {
       </div>
 
       {/* --- Filter / Search Bar --- */}
-      <Card className="mb-6 !bg-navy-900">
+      <Card className="mb-8 !bg-navy-900">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           {/* Search */}
           <div className="relative flex-1 min-w-0">
@@ -273,14 +273,14 @@ export default function ContactsPage() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((contact, idx) => (
             <Card
               key={contact.id}
               className="group transition-all duration-200 hover:border-teal-500/20 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
               style={{ animation: `slideUp 0.4s ease-out ${idx * 0.06}s both` }}
             >
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 {/* Top row: avatar + name + badges */}
                 <div className="flex items-start gap-3">
                   {/* Avatar */}

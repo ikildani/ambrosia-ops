@@ -19,6 +19,11 @@ export const DEAL_TYPES = [
 export const ORG_TYPES = [
   { id: 'biotech', label: 'Biotech' },
   { id: 'pharma', label: 'Pharma' },
+  { id: 'medtech', label: 'MedTech / Devices' },
+  { id: 'diagnostics', label: 'Diagnostics' },
+  { id: 'digital_health', label: 'Digital Health' },
+  { id: 'healthcare', label: 'Healthcare Services' },
+  { id: 'nutraceuticals', label: 'Nutraceuticals / Consumer Health' },
   { id: 'family_office', label: 'Family Office' },
   { id: 'angel', label: 'Angel' },
   { id: 'vc', label: 'VC' },

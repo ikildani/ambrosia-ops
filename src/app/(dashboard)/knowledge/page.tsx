@@ -168,12 +168,12 @@ export default function KnowledgeBasePage() {
       />
 
       {/* Filter Tabs */}
-      <div className="mb-5">
+      <div className="mb-6">
         <Tabs tabs={categoryTabs} activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
       {/* Search */}
-      <div className="relative mb-6">
+      <div className="relative mb-8">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input
           type="text"
@@ -188,14 +188,14 @@ export default function KnowledgeBasePage() {
       {showEmpty ? (
         <EmptyState />
       ) : filtered.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-16 text-center">
-          <Search className="mb-3 h-8 w-8 text-slate-600" />
-          <p className="text-sm text-slate-400">
+        <Card className="flex flex-col items-center justify-center py-20 text-center">
+          <Search className="mb-4 h-8 w-8 text-slate-600" />
+          <p className="text-sm text-slate-400 leading-relaxed">
             No entries match your search. Try different keywords or filters.
           </p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {filtered.map((entry, i) => (
             <div
               key={entry.id}
@@ -222,7 +222,7 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
   return (
     <Card className="group relative cursor-pointer transition-all duration-200 hover:border-teal-500/20 hover:shadow-[var(--shadow-card-hover)]">
       {/* Category icon + badge */}
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy-800 border border-subtle">
             <Icon className="h-4 w-4 text-teal-400" />
@@ -233,17 +233,17 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
       </div>
 
       {/* Title */}
-      <h3 className="mb-2 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors">
+      <h3 className="mb-3 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors">
         {entry.title}
       </h3>
 
       {/* Description preview */}
-      <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-slate-400">
+      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-400">
         {entry.description}
       </p>
 
       {/* Tags */}
-      <div className="mb-3 flex flex-wrap gap-1.5">
+      <div className="mb-4 flex flex-wrap gap-1.5">
         {entry.tags.map((tag) => (
           <span
             key={tag}
@@ -255,7 +255,7 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
       </div>
 
       {/* Author + date */}
-      <div className="flex items-center gap-2 border-t border-subtle pt-3 text-xs text-slate-500">
+      <div className="flex items-center gap-2 border-t border-subtle pt-4 text-xs text-slate-500">
         <User className="h-3 w-3" />
         <span className="font-medium text-slate-400">{entry.author}</span>
         <span className="text-slate-600">·</span>
@@ -272,14 +272,14 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
 
 function EmptyState() {
   return (
-    <Card className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-navy-800 border border-subtle">
+    <Card className="flex flex-col items-center justify-center py-24 text-center">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-navy-800 border border-subtle">
         <Library className="h-8 w-8 text-teal-400" />
       </div>
-      <h3 className="font-display text-xl text-slate-100 mb-2">
+      <h3 className="font-display text-xl text-slate-100 mb-3">
         Build your team&apos;s knowledge base
       </h3>
-      <p className="max-w-md text-sm text-slate-400 mb-6">
+      <p className="max-w-md text-sm text-slate-400 mb-8 leading-relaxed">
         Capture institutional knowledge — playbooks, sector primers, templates,
         and lessons learned — so nothing gets lost when deals move fast.
       </p>

@@ -12,7 +12,7 @@ export type TeamMember = {
 export type Organization = {
   id: string;
   name: string;
-  type: 'biotech' | 'pharma' | 'family_office' | 'angel' | 'vc' | 'pe' | 'cro' | 'advisory' | 'other';
+  type: 'biotech' | 'pharma' | 'medtech' | 'diagnostics' | 'digital_health' | 'healthcare' | 'nutraceuticals' | 'family_office' | 'angel' | 'vc' | 'pe' | 'cro' | 'advisory' | 'other';
   stage: 'seed' | 'series_a' | 'series_b' | 'series_c' | 'growth' | 'public' | null;
   therapy_areas: string[];
   indications: string[];

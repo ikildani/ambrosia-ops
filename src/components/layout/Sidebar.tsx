@@ -18,12 +18,15 @@ import {
   Library,
   Settings,
   Shield,
+  Calculator,
+  ExternalLink,
 } from 'lucide-react';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
+  external?: boolean;
 }
 
 interface NavSection {
@@ -53,6 +56,7 @@ const navigation: NavSection[] = [
       { label: 'Pipeline', href: '/deals', icon: Kanban },
       { label: 'Screen', href: '/deals/screen', icon: Eye },
       { label: 'Analytics', href: '/deals/analytics', icon: BarChart3 },
+      { label: 'Deal Calculator', href: 'https://calculator.ambrosiaventures.co', icon: Calculator, external: true },
     ],
   },
   {
@@ -104,8 +108,25 @@ export function Sidebar() {
             {section.items.map((item) => {
               const Icon = item.icon;
               const isActive =
-                pathname === item.href ||
-                (item.href !== '/dashboard' && pathname.startsWith(item.href));
+                !item.external &&
+                (pathname === item.href ||
+                (item.href !== '/dashboard' && pathname.startsWith(item.href)));
+
+              if (item.external) {
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sidebar-nav-item"
+                  >
+                    <Icon />
+                    {item.label}
+                    <ExternalLink className="w-3 h-3 ml-auto opacity-40" />
+                  </a>
+                );
+              }
 
               return (
                 <Link

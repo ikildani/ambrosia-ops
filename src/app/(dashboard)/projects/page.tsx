@@ -89,7 +89,7 @@ export default function ProjectsPage() {
       />
 
       {/* Stats Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {stats.map((stat) => (
           <Card key={stat.label} variant="stat">
             <div className="flex items-center justify-between">
@@ -107,12 +107,12 @@ export default function ProjectsPage() {
 
       {/* Project Cards or Empty State */}
       {projects.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-navy-800 flex items-center justify-center mb-5">
+        <Card className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-navy-800 flex items-center justify-center mb-6">
             <FolderKanban className="w-8 h-8 text-teal-500" />
           </div>
-          <h3 className="font-display text-xl text-slate-100 mb-2">No projects yet</h3>
-          <p className="text-sm text-slate-500 max-w-sm mb-6">
+          <h3 className="font-display text-xl text-slate-100 mb-3">No projects yet</h3>
+          <p className="text-sm text-slate-500 max-w-sm mb-8 leading-relaxed">
             Create your first engagement to start tracking deliverables and team assignments.
           </p>
           <Button>
@@ -121,7 +121,7 @@ export default function ProjectsPage() {
           </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {projects.map((project) => {
             const status = statusConfig[project.status] ?? statusConfig.planning;
             const remaining = daysRemaining(project.target_end_date);
@@ -132,7 +132,7 @@ export default function ProjectsPage() {
 
             return (
               <Card key={project.id} className="group hover:border-teal-500/20 transition-all duration-200">
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/projects/${project.id}`}
@@ -150,12 +150,12 @@ export default function ProjectsPage() {
                   <Badge variant={status.variant}>{status.label}</Badge>
                 </div>
 
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-5">
                   <Badge variant="slate">{projectTypeLabels[project.project_type] ?? project.project_type}</Badge>
                 </div>
 
                 {/* Progress bar */}
-                <div className="mb-4">
+                <div className="mb-5">
                   <div className="flex items-center justify-between text-xs mb-1.5">
                     <span className="text-slate-500">Deliverables</span>
                     <span className="font-mono text-slate-300">
@@ -171,7 +171,7 @@ export default function ProjectsPage() {
                 </div>
 
                 {/* Footer row */}
-                <div className="flex items-center justify-between pt-3 border-t border-subtle">
+                <div className="flex items-center justify-between pt-4 border-t border-subtle">
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <Users className="w-3.5 h-3.5" />
                     <span>{project.lead_name}</span>

@@ -29,6 +29,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { THERAPY_AREAS } from '@/lib/data/therapy-areas';
+import { ORG_TYPES } from '@/lib/data/constants';
 
 /* ══════════════════════════════════════════════════════════════════
    ANALYSIS TYPES
@@ -171,10 +172,13 @@ interface MockCompany {
 
 const MOCK_COMPANIES: MockCompany[] = [
   { id: '1', name: 'NeuroGen Therapeutics', type: 'Biotech', therapyArea: 'neurology', stage: 'Phase 2', score: 87 },
-  { id: '2', name: 'PharmaLink Oncology', type: 'Biotech', therapyArea: 'oncology', stage: 'Phase 3', score: 92 },
+  { id: '2', name: 'PharmaLink Oncology', type: 'Pharma', therapyArea: 'oncology', stage: 'Phase 3', score: 92 },
   { id: '3', name: 'CardioVista', type: 'Biotech', therapyArea: 'cardiovascular', stage: 'Phase 1', score: 74 },
-  { id: '4', name: 'ImmunoForge Bio', type: 'Biotech', therapyArea: 'immunology', stage: 'Preclinical', score: 68 },
+  { id: '4', name: 'MedVance Surgical', type: 'MedTech / Devices', therapyArea: '', stage: 'Commercial', score: 79 },
   { id: '5', name: 'RarePath Sciences', type: 'Biotech', therapyArea: 'rare_disease', stage: 'Phase 2', score: 81 },
+  { id: '6', name: 'Clarity Dx', type: 'Diagnostics', therapyArea: 'oncology', stage: 'Growth', score: 76 },
+  { id: '7', name: 'Vitara Health', type: 'Digital Health', therapyArea: '', stage: 'Series B', score: 71 },
+  { id: '8', name: 'NutriGen Labs', type: 'Nutraceuticals / Consumer Health', therapyArea: '', stage: 'Growth', score: 65 },
 ];
 
 interface RecentReport {
@@ -300,6 +304,7 @@ export default function IntelligencePage() {
   const [selectedCompany, setSelectedCompany] = useState<MockCompany | null>(null);
   const [isNewCompany, setIsNewCompany] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState('');
+  const [newSector, setNewSector] = useState('');
   const [newTherapyArea, setNewTherapyArea] = useState('');
   const [newIndication, setNewIndication] = useState('');
 
@@ -358,21 +363,35 @@ export default function IntelligencePage() {
   // AI-Suggested analyses based on company profile
   const getRecommendedAnalyses = useCallback((): string[] => {
     const recommended = ['market_sizing', 'competitive_landscape'];
-    const cType = selectedCompany?.type?.toLowerCase() || '';
+    const cType = (selectedCompany?.type || newSector || '').toLowerCase();
     const searchLower = searchQuery.toLowerCase();
+
+    // Biotech/Pharma: clinical pipeline + deal valuation
     if (cType.includes('biotech') || cType.includes('pharma')) {
-      recommended.push('deal_valuation');
+      recommended.push('deal_valuation', 'clinical_pipeline');
     }
+    // MedTech/Devices & Diagnostics: patent landscape + deal valuation
+    if (cType.includes('medtech') || cType.includes('device') || cType.includes('diagnostics')) {
+      recommended.push('deal_valuation', 'patent_ip_landscape');
+    }
+    // Digital health: company deep dive + partner discovery
+    if (cType.includes('digital') || cType.includes('health')) {
+      if (!recommended.includes('deal_valuation')) recommended.push('deal_valuation');
+      recommended.push('company_deep_dive');
+    }
+    // Nutraceuticals: pricing intelligence + company deep dive
+    if (cType.includes('nutraceutical') || cType.includes('consumer')) {
+      recommended.push('pricing_intelligence');
+      if (!recommended.includes('company_deep_dive')) recommended.push('company_deep_dive');
+    }
+    // Search-based hints
     if (searchLower.includes('bio') || searchLower.includes('pharma') || searchLower.includes('therapeutics')) {
       if (!recommended.includes('deal_valuation')) recommended.push('deal_valuation');
-      recommended.push('clinical_pipeline');
+      if (!recommended.includes('clinical_pipeline')) recommended.push('clinical_pipeline');
     }
-    // If none of the above triggered clinical_pipeline, add it for biotech
-    if (cType.includes('biotech') && !recommended.includes('clinical_pipeline')) {
-      recommended.push('clinical_pipeline');
-    }
-    return recommended;
-  }, [selectedCompany, searchQuery]);
+    // Deduplicate
+    return [...new Set(recommended)];
+  }, [selectedCompany, newSector, searchQuery]);
 
   const selectRecommended = useCallback(() => {
     const recommended = getRecommendedAnalyses();
@@ -445,6 +464,7 @@ export default function IntelligencePage() {
     setSelectedCompany(null);
     setIsNewCompany(false);
     setNewCompanyName('');
+    setNewSector('');
     setNewTherapyArea('');
     setNewIndication('');
     setSelectedAnalyses(new Set());
@@ -458,7 +478,7 @@ export default function IntelligencePage() {
   // Auto-set report title
   const effectiveTitle = reportTitle || (companyName ? `${companyName} — Advisory Intelligence Report` : '');
 
-  const canProceedStep1 = selectedCompany || (isNewCompany && newCompanyName && newTherapyArea);
+  const canProceedStep1 = selectedCompany || (isNewCompany && newCompanyName && newSector);
   const canProceedStep2 = selectedAnalyses.size > 0;
 
   return (
@@ -608,7 +628,7 @@ export default function IntelligencePage() {
                                 <Building2 className="w-4 h-4 flex-shrink-0" style={{ color: '#475569' }} />
                                 <div>
                                   <p className="text-[13px] font-medium" style={{ color: '#e2e8f0' }}>{company.name}</p>
-                                  <p className="text-[11px]" style={{ color: '#475569' }}>{company.type} · {therapyAreaLabel(company.therapyArea)}</p>
+                                  <p className="text-[11px]" style={{ color: '#475569' }}>{company.type}{company.therapyArea ? ` · ${therapyAreaLabel(company.therapyArea)}` : ''}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
@@ -641,7 +661,7 @@ export default function IntelligencePage() {
                                 <div className="flex items-center gap-3 mt-1">
                                   <span className="text-[12px]" style={{ color: '#64748b' }}>{selectedCompany.type}</span>
                                   <span style={{ color: '#1e293b' }}>·</span>
-                                  <span className="text-[12px]" style={{ color: '#64748b' }}>{therapyAreaLabel(selectedCompany.therapyArea)}</span>
+                                  <span className="text-[12px]" style={{ color: '#64748b' }}>{selectedCompany.therapyArea ? therapyAreaLabel(selectedCompany.therapyArea) : selectedCompany.type}</span>
                                   <span style={{ color: '#1e293b' }}>·</span>
                                   <span className="text-[12px]" style={{ color: '#64748b' }}>{selectedCompany.stage}</span>
                                 </div>
@@ -666,19 +686,35 @@ export default function IntelligencePage() {
                   ) : (
                     /* New Company Form */
                     <div className="space-y-4">
-                      <div>
-                        <label className="input-label">Company Name</label>
-                        <input
-                          type="text"
-                          className="input"
-                          placeholder="e.g., BioNova Therapeutics"
-                          value={newCompanyName}
-                          onChange={e => setNewCompanyName(e.target.value)}
-                        />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="input-label">Company Name</label>
+                          <input
+                            type="text"
+                            className="input"
+                            placeholder="e.g., BioNova Therapeutics"
+                            value={newCompanyName}
+                            onChange={e => setNewCompanyName(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="input-label">Sector</label>
+                          <select
+                            className="input"
+                            value={newSector}
+                            onChange={e => setNewSector(e.target.value)}
+                          >
+                            <option value="">Select sector...</option>
+                            {ORG_TYPES.filter(t => !['family_office', 'angel', 'vc', 'pe', 'cro', 'advisory', 'other'].includes(t.id)).map(t => (
+                              <option key={t.id} value={t.id}>{t.label}</option>
+                            ))}
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="input-label">Therapy Area</label>
+                          <label className="input-label">Therapy Area <span className="text-[11px] font-normal" style={{ color: '#475569' }}>(optional)</span></label>
                           <select
                             className="input"
                             value={newTherapyArea}
@@ -691,7 +727,7 @@ export default function IntelligencePage() {
                           </select>
                         </div>
                         <div>
-                          <label className="input-label">Indication</label>
+                          <label className="input-label">Indication <span className="text-[11px] font-normal" style={{ color: '#475569' }}>(optional)</span></label>
                           <input
                             type="text"
                             className="input"
@@ -774,7 +810,7 @@ export default function IntelligencePage() {
                             </span>
                           </div>
                           <p className="text-[12px] leading-relaxed mb-3" style={{ color: '#64748b' }}>
-                            Based on {companyName}&apos;s profile as a {selectedCompany?.stage || 'clinical-stage'} {selectedCompany?.type || 'company'} in {selectedCompany ? therapyAreaLabel(selectedCompany.therapyArea) : 'this therapy area'}, we recommend these analyses:
+                            Based on {companyName}&apos;s profile as a {selectedCompany?.stage || 'clinical-stage'} {selectedCompany?.type || newSector || 'company'}{selectedCompany?.therapyArea ? ` in ${therapyAreaLabel(selectedCompany.therapyArea)}` : newTherapyArea ? ` in ${therapyAreaLabel(newTherapyArea)}` : ''}, we recommend these analyses:
                           </p>
                           <div className="flex flex-wrap gap-1.5 mb-3">
                             {getRecommendedAnalyses().map(id => {

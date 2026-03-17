@@ -141,12 +141,12 @@ export default function ResearchPage() {
       />
 
       {/* Filter Tabs */}
-      <div className="mb-5">
+      <div className="mb-6">
         <Tabs tabs={noteTabs} activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
       {/* Search */}
-      <div className="relative mb-6">
+      <div className="relative mb-8">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input
           type="text"
@@ -161,14 +161,14 @@ export default function ResearchPage() {
       {showEmpty ? (
         <EmptyState />
       ) : filtered.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-16 text-center">
-          <Search className="mb-3 h-8 w-8 text-slate-600" />
-          <p className="text-sm text-slate-400">
+        <Card className="flex flex-col items-center justify-center py-20 text-center">
+          <Search className="mb-4 h-8 w-8 text-slate-600" />
+          <p className="text-sm text-slate-400 leading-relaxed">
             No notes match your search. Try different keywords or filters.
           </p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {filtered.map((note) => (
             <NoteCard key={note.id} note={note} />
           ))}
@@ -189,7 +189,7 @@ function NoteCard({ note }: { note: MockNote }) {
     <Link href={`/research/${note.id}`} className="block">
       <Card className="group relative cursor-pointer transition-all duration-200 hover:border-teal-500/20 hover:shadow-[var(--shadow-card-hover)]">
         {/* Top row: type badge + pin */}
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
           {note.is_pinned && (
             <Pin className="h-3.5 w-3.5 text-teal-400" />
@@ -197,17 +197,17 @@ function NoteCard({ note }: { note: MockNote }) {
         </div>
 
         {/* Title */}
-        <h3 className="mb-2 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors">
+        <h3 className="mb-3 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors">
           {note.title}
         </h3>
 
         {/* Body preview */}
-        <p className="mb-3 line-clamp-3 text-sm leading-relaxed text-slate-400">
+        <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-400">
           {note.content}
         </p>
 
         {/* AI + Therapy area badges */}
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           {note.ai_generated && (
             <span className="inline-flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-400 border border-teal-500/20">
               <Sparkles className="h-3 w-3" />
@@ -223,7 +223,7 @@ function NoteCard({ note }: { note: MockNote }) {
 
         {/* Linked entity */}
         {note.linked_entity && (
-          <div className="mb-3 flex items-center gap-1.5 text-xs text-slate-500">
+          <div className="mb-4 flex items-center gap-1.5 text-xs text-slate-500">
             <Building2 className="h-3 w-3" />
             <span className="text-teal-400/80 hover:text-teal-300">
               {note.linked_entity.name}
@@ -233,7 +233,7 @@ function NoteCard({ note }: { note: MockNote }) {
 
         {/* Tags */}
         {note.tags.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-1.5">
+          <div className="mb-4 flex flex-wrap gap-1.5">
             {note.tags.map((tag) => (
               <span
                 key={tag}
@@ -246,7 +246,7 @@ function NoteCard({ note }: { note: MockNote }) {
         )}
 
         {/* Author + date */}
-        <div className="flex items-center gap-2 border-t border-subtle pt-3 text-xs text-slate-500">
+        <div className="flex items-center gap-2 border-t border-subtle pt-4 text-xs text-slate-500">
           <span className="font-medium text-slate-400">{note.author_name}</span>
           <span className="text-slate-600">·</span>
           <Clock className="h-3 w-3" />
@@ -263,14 +263,14 @@ function NoteCard({ note }: { note: MockNote }) {
 
 function EmptyState() {
   return (
-    <Card className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-navy-800 border border-subtle">
+    <Card className="flex flex-col items-center justify-center py-24 text-center">
+      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-navy-800 border border-subtle">
         <BookOpen className="h-8 w-8 text-teal-400" />
       </div>
-      <h3 className="font-display text-xl text-slate-100 mb-2">
+      <h3 className="font-display text-xl text-slate-100 mb-3">
         Start building your research library
       </h3>
-      <p className="max-w-md text-sm text-slate-400 mb-6">
+      <p className="max-w-md text-sm text-slate-400 mb-8 leading-relaxed">
         Create AI-powered deep dives, market memos, and competitive intelligence
         reports. All your proprietary research in one place.
       </p>

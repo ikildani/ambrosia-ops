@@ -96,9 +96,9 @@ function OnboardingWizard() {
   return (
     <div style={{ animation: 'fadeIn 0.8s ease-out' }}>
       {/* Welcome */}
-      <div className="text-center mb-14" style={{ animation: 'slideUp 0.6s ease-out' }}>
+      <div className="text-center mb-20" style={{ animation: 'slideUp 0.6s ease-out' }}>
         {/* Ambrosia icon */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-10 pt-4">
           <img src="/icon-white.png" alt="" className="w-16 h-auto opacity-40" />
         </div>
 
@@ -135,7 +135,7 @@ function OnboardingWizard() {
       </div>
 
       {/* Steps */}
-      <div className="max-w-xl mx-auto space-y-3">
+      <div className="max-w-xl mx-auto space-y-4">
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
           const isExpanded = expandedStep === step.id;
@@ -153,7 +153,7 @@ function OnboardingWizard() {
             >
               {/* Header */}
               <button
-                className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors"
+                className="w-full flex items-center gap-4 px-6 py-5 text-left transition-colors"
                 onClick={() => setExpandedStep(isExpanded ? null : step.id)}
               >
                 <div
@@ -187,7 +187,7 @@ function OnboardingWizard() {
 
               {/* Expanded content */}
               {isExpanded && !isComplete && (
-                <div className="px-5 pb-5 pt-0 pl-[68px]" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                <div className="px-6 pb-6 pt-1 pl-[72px]" style={{ animation: 'fadeIn 0.3s ease-out' }}>
                   <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#64748b' }}>
                     {step.description}
                   </p>
@@ -227,7 +227,7 @@ function OnboardingWizard() {
       </div>
 
       {/* Bottom help text */}
-      <div className="text-center mt-10" style={{ animation: 'slideUp 0.5s ease-out 800ms both' }}>
+      <div className="text-center mt-14" style={{ animation: 'slideUp 0.5s ease-out 800ms both' }}>
         <p className="text-[12px]" style={{ color: '#334155' }}>
           You can always access these steps from Settings.
         </p>
