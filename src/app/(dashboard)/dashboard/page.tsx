@@ -127,9 +127,9 @@ function OnboardingWizard() {
         }}>
           Welcome to Ambrosia Ops
         </h1>
-        <p className="mt-4 max-w-lg mx-auto leading-relaxed" style={{ fontSize: '15px', color: '#64748b' }}>
+        <p className="mt-4 max-w-md mx-auto leading-relaxed" style={{ fontSize: '15px', color: '#64748b' }}>
           Your team&apos;s command center for mandates, relationships, and market intelligence.
-          Let&apos;s get you set up in five steps.
+          Let&apos;s get you set up in four steps.
         </p>
 
         {/* Progress */}
@@ -150,7 +150,7 @@ function OnboardingWizard() {
       </div>
 
       {/* Steps */}
-      <div className="max-w-2xl mx-auto space-y-3">
+      <div className="max-w-xl mx-auto space-y-3">
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
           const isExpanded = expandedStep === step.id;
@@ -168,74 +168,71 @@ function OnboardingWizard() {
             >
               {/* Header */}
               <button
-                className="w-full flex items-center gap-5 px-6 py-5 text-left transition-colors"
+                className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors"
                 onClick={() => setExpandedStep(isExpanded ? null : step.id)}
               >
-                {/* Step indicator */}
                 <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{
                     background: isComplete ? `${step.accent}12` : 'rgba(100,116,139,0.06)',
                     border: `1px solid ${isComplete ? `${step.accent}25` : 'rgba(100,116,139,0.1)'}`,
                   }}
                 >
                   {isComplete ? (
-                    <CheckCircle2 className="w-5 h-5" style={{ color: step.accent }} />
+                    <CheckCircle2 className="w-4 h-4" style={{ color: step.accent }} />
                   ) : (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
                       {step.number}
                     </span>
                   )}
                 </div>
 
-                {/* Title */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-medium" style={{ color: isComplete ? '#64748b' : '#e2e8f0', textDecoration: isComplete ? 'line-through' : 'none' }}>
-                    {step.title}
-                  </p>
-                </div>
+                <p className="flex-1 text-[14px] font-medium" style={{
+                  color: isComplete ? '#64748b' : '#e2e8f0',
+                  textDecoration: isComplete ? 'line-through' : 'none',
+                }}>
+                  {step.title}
+                </p>
 
                 <ChevronDown
-                  className="w-4 h-4 transition-transform duration-200 flex-shrink-0"
+                  className="w-4 h-4 flex-shrink-0 transition-transform duration-200"
                   style={{ color: '#475569', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}
                 />
               </button>
 
               {/* Expanded content */}
               {isExpanded && !isComplete && (
-                <div className="px-6 pb-6 pt-0" style={{ animation: 'fadeIn 0.3s ease-out' }}>
-                  <div className="ml-[60px]">
-                    <p className="text-[13px] leading-relaxed mb-5" style={{ color: '#64748b' }}>
-                      {step.description}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={step.href}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-semibold transition-all"
-                        style={{ background: step.accent, color: '#04080f' }}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {step.cta}
-                      </Link>
-                      <button
-                        className="text-[12px] font-medium transition-colors px-3 py-2.5"
-                        style={{ color: '#475569' }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCompletedSteps(prev => [...prev, step.id]);
-                          const nextIdx = WIZARD_STEPS.findIndex(s => s.id === step.id) + 1;
-                          if (nextIdx < WIZARD_STEPS.length) {
-                            setExpandedStep(WIZARD_STEPS[nextIdx].id);
-                          } else {
-                            setExpandedStep(null);
-                          }
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.color = '#94a3b8'; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = '#475569'; }}
-                      >
-                        Skip for now
-                      </button>
-                    </div>
+                <div className="px-5 pb-5 pt-0 pl-[68px]" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                  <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#64748b' }}>
+                    {step.description}
+                  </p>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <Link
+                      href={step.href}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold transition-all"
+                      style={{ background: step.accent, color: '#04080f' }}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {step.cta}
+                    </Link>
+                    <button
+                      className="text-[12px] font-medium transition-colors px-3 py-2"
+                      style={{ color: '#475569' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCompletedSteps(prev => [...prev, step.id]);
+                        const nextIdx = WIZARD_STEPS.findIndex(s => s.id === step.id) + 1;
+                        if (nextIdx < WIZARD_STEPS.length) {
+                          setExpandedStep(WIZARD_STEPS[nextIdx].id);
+                        } else {
+                          setExpandedStep(null);
+                        }
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.color = '#94a3b8'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = '#475569'; }}
+                    >
+                      Skip for now
+                    </button>
                   </div>
                 </div>
               )}
@@ -247,7 +244,7 @@ function OnboardingWizard() {
       {/* Bottom help text */}
       <div className="text-center mt-10" style={{ animation: 'slideUp 0.5s ease-out 800ms both' }}>
         <p className="text-[12px]" style={{ color: '#334155' }}>
-          You can always access these steps from Settings. Need help? Ask the AI assistant.
+          You can always access these steps from Settings.
         </p>
       </div>
     </div>
