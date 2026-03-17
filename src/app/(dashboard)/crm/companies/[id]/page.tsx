@@ -214,9 +214,27 @@ export default function CompanyDetailPage({
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
 
-  // TODO: Fetch real data from Supabase by id
   useEffect(() => {
-    setLoading(false);
+    async function loadCompany() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/organizations/${id}`);
+        if (res.ok) {
+          const { data } = await res.json();
+          setCompany(data);
+        }
+        const actRes = await fetch(`/api/activities?organization_id=${id}`);
+        if (actRes.ok) {
+          const { data } = await actRes.json();
+          setActivities(data || []);
+        }
+      } catch (err) {
+        console.error('Failed to load company:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCompany();
   }, [id]);
 
   if (loading) return <CompanyDetailSkeleton />;

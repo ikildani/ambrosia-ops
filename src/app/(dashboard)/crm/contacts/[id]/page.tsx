@@ -176,10 +176,29 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const { id } = use(params);
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState<Contact | null>(null);
+  const [contactActivities, setContactActivities] = useState<ActivityType[]>([]);
 
-  // TODO: Fetch real data from Supabase by id
   useEffect(() => {
-    setLoading(false);
+    async function loadContact() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/contacts/${id}`);
+        if (res.ok) {
+          const { data } = await res.json();
+          setContact(data);
+        }
+        const actRes = await fetch(`/api/activities?contact_id=${id}`);
+        if (actRes.ok) {
+          const { data } = await actRes.json();
+          setContactActivities(data || []);
+        }
+      } catch (err) {
+        console.error('Failed to load contact:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadContact();
   }, [id]);
 
   if (loading) return <ContactDetailSkeleton />;
@@ -202,7 +221,6 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   }
 
   // TODO: These will be populated from Supabase queries
-  const contactActivities: ActivityType[] = [];
   const contactDeals: Deal[] = [];
   const contactConnections: { id: string; name: string; title: string; org: string; relationship_type: string; relationship_strength: 'warm_intro' | 'direct' | 'met_once' | 'cold' }[] = [];
   const teamMembers: Record<string, string> = {};
