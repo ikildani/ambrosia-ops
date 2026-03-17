@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { researchCompany, type WebResearchResult } from './web-research';
 import { getCRMContext, type CRMContext } from './crm-context';
 import { validateScreening, ensembleScore } from './ml-validator';
+import { generateEmbedding, findSimilar, storeEmbedding, buildScreeningEmbeddingText, type SimilarEntity } from './embeddings';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -116,23 +117,38 @@ export async function analyzeOpportunity(ctx: OpportunityContext): Promise<AIScr
   const fee = calculateLehmanFee(ctx.dealSize || 50);
   const mlBase = computeMLBaseScores(ctx);
 
-  // ─── Layer 1: Perplexity Web Research (parallel) ───
-  // ─── Layer 2: CRM RAG Context (parallel) ───
-  const [webResearch, crmContext] = await Promise.all([
+  // ─── Layer 1: Web Research + CRM RAG + Embeddings (all parallel) ───
+  const embeddingText = buildScreeningEmbeddingText({
+    companyName: ctx.companyName,
+    sector: ctx.sector,
+    therapyArea: ctx.therapyArea,
+    companyStage: ctx.companyStage,
+    description: ctx.description,
+    dealSize: ctx.dealSize,
+  });
+
+  const [webResearch, crmContext, queryEmbedding] = await Promise.all([
     researchCompany(ctx.companyName, ctx.sector, ctx.description).catch(() => null),
     getCRMContext(ctx.companyName, ctx.sector, ctx.therapyArea).catch(() => ({
       similarCompanies: [], existingContacts: [], relatedDeals: [],
       sectorStats: { totalCompanies: 0, totalDeals: 0, avgDealSize: null },
       hasExistingRelationship: false,
     } as CRMContext)),
+    generateEmbedding(embeddingText).catch(() => null),
   ]);
+
+  // Find semantically similar past screenings and companies
+  let similarEntities: SimilarEntity[] = [];
+  if (queryEmbedding) {
+    similarEntities = await findSimilar(queryEmbedding, null, 5).catch(() => []);
+  }
 
   // ─── Layer 3: Claude AI Analysis ───
   const apiKey = process.env.ANTHROPIC_API_KEY;
   let aiResult: AIScreeningResult | null = null;
 
   if (apiKey) {
-    aiResult = await runClaudeAnalysis(ctx, mlBase, fee, webResearch, crmContext);
+    aiResult = await runClaudeAnalysis(ctx, mlBase, fee, webResearch, crmContext, similarEntities);
   }
 
   // ─── Layer 4: ML Cross-Validation ───
@@ -178,6 +194,11 @@ export async function analyzeOpportunity(ctx: OpportunityContext): Promise<AIScr
     const allRisks = [...(aiResult.riskFactors || []), ...validation.flags];
     const uniqueRisks = [...new Set(allRisks)];
 
+    // Store embedding for future similarity searches (fire and forget)
+    if (queryEmbedding) {
+      storeEmbedding('screening', `screening-${Date.now()}`, embeddingText, queryEmbedding).catch(() => {});
+    }
+
     return {
       ...aiResult,
       overallScore,
@@ -196,6 +217,11 @@ export async function analyzeOpportunity(ctx: OpportunityContext): Promise<AIScr
     };
   }
 
+  // Store embedding for future similarity searches (fire and forget)
+  if (queryEmbedding) {
+    storeEmbedding('screening', `screening-${Date.now()}`, embeddingText, queryEmbedding).catch(() => {});
+  }
+
   // Fallback: ML-only
   return buildMLFallback(ctx, mlBase, fee, validation, webResearch, crmContext);
 }
@@ -209,11 +235,12 @@ async function runClaudeAnalysis(
   mlBase: ReturnType<typeof computeMLBaseScores>,
   fee: ReturnType<typeof calculateLehmanFee>,
   webResearch: WebResearchResult | null,
-  crmContext: CRMContext
+  crmContext: CRMContext,
+  similarEntities: SimilarEntity[] = []
 ): Promise<AIScreeningResult | null> {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
-  // Build enriched context
+  // Build enriched context from all intelligence layers
   let enrichedContext = '';
 
   if (webResearch) {
@@ -226,50 +253,103 @@ Key People: ${webResearch.keyPeople}
 Clinical Pipeline: ${webResearch.clinicalPipeline}`;
   }
 
-  if (crmContext.similarCompanies.length > 0 || crmContext.existingContacts.length > 0) {
-    enrichedContext += '\n\nCRM CONTEXT (from Ambrosia\'s internal database):';
+  if (crmContext.existingContacts.length > 0 || crmContext.similarCompanies.length > 0 || crmContext.relatedDeals.length > 0) {
+    enrichedContext += '\n\nINTERNAL CRM DATA:';
     if (crmContext.existingContacts.length > 0) {
-      enrichedContext += `\nExisting contacts at this company: ${crmContext.existingContacts.map(c => `${c.name} (${c.title}, ${c.relationship})`).join(', ')}`;
+      enrichedContext += `\nExisting contacts at this company: ${crmContext.existingContacts.map(c => `${c.name} (${c.title}, relationship: ${c.relationship})`).join(', ')}`;
     }
     if (crmContext.similarCompanies.length > 0) {
-      enrichedContext += `\nSimilar companies in CRM: ${crmContext.similarCompanies.slice(0, 5).map(c => `${c.name} (${c.type}, score: ${c.score || 'N/A'})`).join(', ')}`;
+      enrichedContext += `\nSimilar companies we track: ${crmContext.similarCompanies.slice(0, 5).map(c => `${c.name} (${c.type}, score: ${c.score || 'N/A'})`).join(', ')}`;
     }
     if (crmContext.relatedDeals.length > 0) {
-      enrichedContext += `\nRelated deals: ${crmContext.relatedDeals.map(d => `${d.title} (${d.stage}, $${d.value}M)`).join(', ')}`;
+      enrichedContext += `\nRelated past/active deals: ${crmContext.relatedDeals.map(d => `${d.title} (${d.stage}, $${d.value}M, ${d.type})`).join(', ')}`;
     }
-    enrichedContext += `\nSector stats: ${crmContext.sectorStats.totalCompanies} companies, ${crmContext.sectorStats.totalDeals} deals tracked`;
+    enrichedContext += `\nPortfolio stats: ${crmContext.sectorStats.totalCompanies} companies, ${crmContext.sectorStats.totalDeals} deals in our CRM`;
+    if (crmContext.sectorStats.avgDealSize) {
+      enrichedContext += `, avg deal size $${Math.round(crmContext.sectorStats.avgDealSize)}M`;
+    }
   }
 
-  const systemPrompt = `You are an elite M&A advisory analyst at Ambrosia Ventures, a boutique life sciences strategy and M&A advisory firm. You advise early-stage biotech (Series A/B/C), pharma, medtech, diagnostics, digital health, healthcare, and nutraceutical companies, as well as their investors (family offices, VCs, PEs).
+  if (similarEntities.length > 0) {
+    enrichedContext += `\n\nSEMANTICALLY SIMILAR PAST OPPORTUNITIES (from our embedding index):`;
+    for (const entity of similarEntities) {
+      enrichedContext += `\n- ${entity.name} (${entity.type}, ${Math.round(entity.similarity * 100)}% similar): ${entity.context}`;
+    }
+  }
 
-Analyze an inbound opportunity with the precision of a Goldman Sachs MD evaluating a pitch.
+  const systemPrompt = `You are a senior M&A advisory partner at Ambrosia Ventures, a boutique life sciences strategy and M&A advisory firm. Ambrosia advises early-stage life sciences companies (Series A through C, with occasional growth and public company mandates) across biotech, pharma, medtech, diagnostics, digital health, healthcare services, and nutraceuticals. Ambrosia also works with investors including family offices, VCs, and PEs.
 
-ML MODEL BASE SCORES (statistical priors — adjust ±2 based on your deeper analysis):
+You are evaluating an inbound advisory opportunity. Your assessment will be presented to the partnership.
+
+ANALYTICAL FRAMEWORK — Use chain-of-thought reasoning:
+
+STEP 1: UNDERSTAND THE OPPORTUNITY
+- What does this company actually do? What stage are they at?
+- What specific advisory need are they expressing (or implying)?
+- What type of engagement would this be? (M&A, Licensing, Partnership, Fundraising, Strategic)
+
+STEP 2: ASSESS STRATEGIC FIT (score 1-5)
+- How well does this align with Ambrosia's core expertise?
+- Do we have relevant sector and therapeutic area knowledge?
+- Is this the type of client (stage, size, complexity) where we add the most value?
+- Consider: what would a competing advisor (Lazard, Centerview, Piper Sandler) offer that we couldn't?
+
+STEP 3: EVALUATE FEE POTENTIAL (score 1-5)
+- Modified Lehman formula gives base fee of ${formatFee(fee.base)} (range: ${formatFee(fee.low)}-${formatFee(fee.high)})
+- Is the deal size realistic? Is the fee worth the partner time investment?
+- Should this be retainer-heavy or success-fee-heavy?
+
+STEP 4: ESTIMATE WIN PROBABILITY (score 1-5)
+- How warm is the referral? Inbound > warm intro > conference > cold
+- Do we have existing relationships that give us an edge?
+- Are we likely competing against other advisors?
+- What is the decision-maker's likely selection criteria?
+
+STEP 5: ASSESS EXECUTION RISK (score 1-5, higher = lower risk)
+- Do we have bandwidth to take this on?
+- Is the timeline realistic or compressed?
+- Is the deal structure standard or novel/complex?
+- What could go wrong during execution?
+
+STEP 6: EVALUATE STRATEGIC VALUE (score 1-5)
+- Even if the fee is modest, does this open a new sector or build a marquee credential?
+- Is there cross-sell potential or repeat business likelihood?
+- Would winning this strengthen our market position?
+
+STEP 7: CONSIDER THE CONTRARIAN VIEW
+- What is the strongest argument AGAINST pursuing this opportunity?
+- What assumption in the above analysis is most likely wrong?
+- Factor this into your confidence scores.
+
+STEP 8: SYNTHESIZE
+- Sum dimension scores for overall (5-25)
+- Determine recommendation: 20+ pursue aggressively, 15-19 pursue selectively, 10-14 monitor, <10 pass
+- Draft a 2-3 sentence executive summary suitable for a partner meeting
+
+ML MODEL BASE SCORES (statistical priors from our calibrated model — you may adjust ±2 based on your deeper analysis):
 - Strategic Fit: ${mlBase.strategicFit}/5
 - Fee Potential: ${mlBase.feePotential}/5
 - Win Probability: ${mlBase.winProbability}/5
-- Execution Risk: ${mlBase.executionRisk}/5 (higher = lower risk)
+- Execution Risk: ${mlBase.executionRisk}/5
 - Strategic Value: ${mlBase.strategicValue}/5
 
-Fee (Modified Lehman): base=${formatFee(fee.base)}, range=${formatFee(fee.low)}-${formatFee(fee.high)}
-
-Respond ONLY with valid JSON:
+Respond ONLY with valid JSON (no markdown, no commentary outside the JSON):
 {
-  "overallScore": <5-25>,
+  "overallScore": <number 5-25>,
   "engagementType": "<M&A Advisory | Licensing Advisory | Partnership Advisory | Fundraising Advisory | Strategic Advisory>",
-  "engagementTypeRationale": "<1 sentence>",
-  "executiveSummary": "<2-3 sentences — partner meeting quality>",
+  "engagementTypeRationale": "<1 sentence explaining why this engagement type>",
+  "executiveSummary": "<2-3 sentences — the quality you'd present in a Monday morning partner meeting>",
   "dimensions": {
-    "strategicFit": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] },
-    "feePotential": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"], "estimatedFee": "${formatFee(fee.low)} – ${formatFee(fee.high)}" },
-    "winProbability": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] },
-    "executionRisk": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] },
-    "strategicValue": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2 sentences>", "keyFactors": ["<f1>", "<f2>"] }
+    "strategicFit": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2-3 sentences with specific reasoning>", "keyFactors": ["<factor>", "<factor>"] },
+    "feePotential": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2-3 sentences>", "keyFactors": ["<factor>", "<factor>"], "estimatedFee": "${formatFee(fee.low)} – ${formatFee(fee.high)}" },
+    "winProbability": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2-3 sentences>", "keyFactors": ["<factor>", "<factor>"] },
+    "executionRisk": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2-3 sentences>", "keyFactors": ["<factor>", "<factor>"] },
+    "strategicValue": { "score": <1-5>, "confidence": <0.0-1.0>, "rationale": "<2-3 sentences>", "keyFactors": ["<factor>", "<factor>"] }
   },
-  "suggestedNextSteps": ["<step1>", "<step2>", "<step3>", "<step4>"],
-  "riskFactors": ["<risk1>", "<risk2>"],
-  "competitiveInsights": ["<insight1>", "<insight2>"],
-  "keyQuestions": ["<question1>", "<question2>"]
+  "suggestedNextSteps": ["<specific, actionable step>", "<step>", "<step>", "<step>"],
+  "riskFactors": ["<specific risk with context>", "<risk>"],
+  "competitiveInsights": ["<insight about the competitive dynamics of this opportunity>", "<insight>"],
+  "keyQuestions": ["<specific question the team should investigate before proceeding>", "<question>"]
 }`;
 
   const userPrompt = `OPPORTUNITY SCREENING:
