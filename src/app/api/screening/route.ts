@@ -11,6 +11,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // RBAC: Screening is available to all roles
+    // Fee details in the result are visible to all (read-only)
+    // Fee management (create/edit/delete) is partner/admin only (handled by RLS)
+
     const rateLimit = checkRateLimit(user.id, 'screening');
     if (!rateLimit.allowed) {
       return NextResponse.json(
