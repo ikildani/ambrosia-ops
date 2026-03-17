@@ -1,52 +1,36 @@
 // ---------------------------------------------------------------------------
 // Opportunity Screening Engine
-// Structured framework for evaluating inbound M&A advisory mandates
+// AI-driven assessment: user provides context, engine infers scores
 // ---------------------------------------------------------------------------
 
-export interface ScreeningInput {
-  // Strategic Fit
-  therapyAreaAlignment: 'core' | 'adjacent' | 'outside';
-  dealTypeExperience: 'extensive' | 'some' | 'none';
-  clientProfile: 'ideal' | 'good' | 'marginal';
-
-  // Fee Potential
-  estimatedDealSize: number; // in millions USD
-  retainerLikelihood: 'yes' | 'no';
-  successFeeProbability: 'high' | 'medium' | 'low';
-
-  // Win Probability
-  relationshipWithDecisionMaker: 'strong' | 'moderate' | 'none';
-  competitiveSituation: 'sole_source' | 'limited' | 'bakeoff';
-  referralQuality: 'board_member' | 'partner_referral' | 'direct' | 'cold';
-
-  // Execution Risk
-  teamCapacity: 'available' | 'manageable' | 'stretched';
-  complexity: 'straightforward' | 'moderate' | 'novel';
-  timeline: 'comfortable' | 'tight' | 'aggressive';
-
-  // Strategic Value
-  opensNewTA: boolean;
-  marqueeClient: boolean;
-  crossSellPotential: boolean;
-  relationshipBuilding: boolean;
-  repeatBusinessLikely: boolean;
+export interface OpportunityContext {
+  companyName: string;
+  sector: string;       // biotech, pharma, medtech, diagnostics, digital_health, healthcare, nutraceuticals
+  therapyArea: string;  // optional — from THERAPY_AREAS
+  companyStage: string; // seed, series_a, series_b, series_c, growth, public
+  dealSize: number;     // estimated deal size in millions USD
+  description: string;  // what the company does, what they need
+  referralSource: string; // how you heard about this opportunity
+  knownContacts: string;  // any existing contacts or relationships
+  urgency: string;      // any timeline pressure or catalysts
+  additionalNotes: string;
 }
 
 export interface DimensionScore {
   score: number;
   max: 5;
   rationale: string;
-  estimatedFee?: string;
 }
 
 export interface ScreeningResult {
-  score: number;
+  score: number; // 5-25
   recommendation: 'pursue_aggressively' | 'pursue_selectively' | 'monitor' | 'pass';
   recommendationLabel: string;
   recommendationColor: string;
+  engagementType: string; // what type of mandate this would be
   dimensions: {
     strategicFit: DimensionScore;
-    feePotential: DimensionScore;
+    feePotential: DimensionScore & { estimatedFee: string };
     winProbability: DimensionScore;
     executionRisk: DimensionScore;
     strategicValue: DimensionScore;
@@ -57,218 +41,275 @@ export interface ScreeningResult {
 }
 
 // ---------------------------------------------------------------------------
-// Score maps
+// Ambrosia's core expertise — used to assess strategic fit
 // ---------------------------------------------------------------------------
 
-const TA_ALIGNMENT_SCORES: Record<string, number> = {
-  core: 5,
-  adjacent: 3,
-  outside: 1,
-};
+const CORE_SECTORS = ['biotech', 'pharma'];
+const ADJACENT_SECTORS = ['medtech', 'diagnostics', 'digital_health'];
+const EXTENDED_SECTORS = ['healthcare', 'nutraceuticals'];
 
-const DEAL_EXPERIENCE_SCORES: Record<string, number> = {
-  extensive: 5,
-  some: 3,
-  none: 1,
-};
+const SWEET_SPOT_STAGES = ['series_a', 'series_b', 'series_c'];
+const GOOD_STAGES = ['growth', 'seed'];
 
-const CLIENT_PROFILE_SCORES: Record<string, number> = {
-  ideal: 5,
-  good: 3,
-  marginal: 1,
-};
+// Keywords that signal specific engagement types
+const MA_SIGNALS = ['acquisition', 'acquire', 'sell', 'sale', 'exit', 'buyout', 'merger', 'divest', 'spin-off', 'carve-out'];
+const LICENSING_SIGNALS = ['license', 'licensing', 'out-license', 'in-license', 'rights', 'territory'];
+const PARTNERSHIP_SIGNALS = ['partner', 'partnership', 'co-develop', 'collaboration', 'alliance', 'joint venture'];
+const FUNDRAISING_SIGNALS = ['fundrais', 'raise', 'series', 'round', 'capital', 'investor', 'financing', 'ipo'];
+const STRATEGY_SIGNALS = ['strategy', 'strategic', 'assessment', 'review', 'advisory', 'consult', 'roadmap', 'positioning'];
 
-const SUCCESS_FEE_SCORES: Record<string, number> = {
-  high: 5,
-  medium: 3,
-  low: 1,
-};
+// Keywords that signal relationship warmth
+const WARM_REFERRAL_SIGNALS = ['board', 'introduced', 'referred', 'former colleague', 'partner referral', 'existing relationship'];
+const DIRECT_SIGNALS = ['reached out', 'direct', 'conference', 'met at', 'inbound', 'contacted us'];
 
-const RELATIONSHIP_SCORES: Record<string, number> = {
-  strong: 5,
-  moderate: 3,
-  none: 1,
-};
-
-const COMPETITIVE_SCORES: Record<string, number> = {
-  sole_source: 5,
-  limited: 3,
-  bakeoff: 1,
-};
-
-const REFERRAL_SCORES: Record<string, number> = {
-  board_member: 5,
-  partner_referral: 4,
-  direct: 2,
-  cold: 1,
-};
-
-const CAPACITY_SCORES: Record<string, number> = {
-  available: 5,
-  manageable: 3,
-  stretched: 1,
-};
-
-const COMPLEXITY_SCORES: Record<string, number> = {
-  straightforward: 5,
-  moderate: 3,
-  novel: 1,
-};
-
-const TIMELINE_SCORES: Record<string, number> = {
-  comfortable: 5,
-  tight: 3,
-  aggressive: 1,
-};
+// Risk signals
+const URGENCY_SIGNALS = ['urgent', 'immediately', 'asap', 'compressed', 'tight timeline', 'quickly'];
+const COMPLEXITY_SIGNALS = ['complex', 'novel', 'unprecedented', 'cross-border', 'multi-party', 'restructuring'];
 
 // ---------------------------------------------------------------------------
 // Modified Lehman formula
 // ---------------------------------------------------------------------------
 
-function calculateLehmanFee(dealSizeM: number): number {
-  if (dealSizeM <= 0) return 0;
-
+function calculateLehmanFee(dealSizeM: number): { low: number; high: number } {
   let fee = 0;
   const size = dealSizeM;
 
-  // First $10M at 5%
-  fee += Math.min(size, 10) * 0.05;
-  if (size <= 10) return fee;
+  if (size <= 10) fee = size * 0.05;
+  else if (size <= 50) fee = 0.5 + (size - 10) * 0.04;
+  else if (size <= 100) fee = 0.5 + 1.6 + (size - 50) * 0.03;
+  else if (size <= 250) fee = 0.5 + 1.6 + 1.5 + (size - 100) * 0.02;
+  else fee = 0.5 + 1.6 + 1.5 + 3.0 + (size - 250) * 0.01;
 
-  // $10M–$50M at 4%
-  fee += Math.min(size - 10, 40) * 0.04;
-  if (size <= 50) return fee;
-
-  // $50M–$100M at 3%
-  fee += Math.min(size - 50, 50) * 0.03;
-  if (size <= 100) return fee;
-
-  // $100M–$250M at 2%
-  fee += Math.min(size - 100, 150) * 0.02;
-  if (size <= 250) return fee;
-
-  // $250M+ at 1%
-  fee += (size - 250) * 0.01;
-
-  return fee;
+  return {
+    low: Math.round(fee * 0.7 * 10) / 10,
+    high: Math.round(fee * 1.3 * 10) / 10,
+  };
 }
 
-function formatFee(feeM: number): string {
-  if (feeM >= 1) {
-    return `$${feeM.toFixed(1)}M`;
+function formatFee(m: number): string {
+  if (m >= 1) return `$${m.toFixed(1)}M`;
+  return `$${Math.round(m * 1000)}K`;
+}
+
+// ---------------------------------------------------------------------------
+// AI Inference Engine
+// ---------------------------------------------------------------------------
+
+function containsAny(text: string, keywords: string[]): boolean {
+  const lower = text.toLowerCase();
+  return keywords.some(k => lower.includes(k));
+}
+
+function inferEngagementType(ctx: OpportunityContext): string {
+  const allText = `${ctx.description} ${ctx.additionalNotes} ${ctx.urgency}`.toLowerCase();
+
+  const scores = [
+    { type: 'M&A Advisory', score: MA_SIGNALS.filter(s => allText.includes(s)).length * 3 },
+    { type: 'Licensing Advisory', score: LICENSING_SIGNALS.filter(s => allText.includes(s)).length * 3 },
+    { type: 'Partnership Advisory', score: PARTNERSHIP_SIGNALS.filter(s => allText.includes(s)).length * 3 },
+    { type: 'Fundraising Advisory', score: FUNDRAISING_SIGNALS.filter(s => allText.includes(s)).length * 3 },
+    { type: 'Strategic Advisory', score: STRATEGY_SIGNALS.filter(s => allText.includes(s)).length * 3 },
+  ];
+
+  // Stage-based inference
+  if (['seed', 'series_a', 'series_b'].includes(ctx.companyStage)) {
+    scores.find(s => s.type === 'Fundraising Advisory')!.score += 2;
   }
-  return `$${(feeM * 1000).toFixed(0)}K`;
+  if (['growth', 'public'].includes(ctx.companyStage)) {
+    scores.find(s => s.type === 'M&A Advisory')!.score += 2;
+  }
+  if (ctx.dealSize > 200) {
+    scores.find(s => s.type === 'M&A Advisory')!.score += 2;
+  }
+
+  scores.sort((a, b) => b.score - a.score);
+
+  if (scores[0].score === 0) return 'Strategic Advisory';
+  return scores[0].type;
+}
+
+function inferStrategicFit(ctx: OpportunityContext): DimensionScore {
+  let score = 0;
+  const reasons: string[] = [];
+
+  // Sector alignment
+  if (CORE_SECTORS.includes(ctx.sector)) {
+    score += 2;
+    reasons.push(`${ctx.sector} is a core sector for Ambrosia`);
+  } else if (ADJACENT_SECTORS.includes(ctx.sector)) {
+    score += 1;
+    reasons.push(`${ctx.sector} is adjacent to our core expertise`);
+  } else if (EXTENDED_SECTORS.includes(ctx.sector)) {
+    score += 0.5;
+    reasons.push(`${ctx.sector} is outside primary focus but within life sciences`);
+  }
+
+  // Stage alignment
+  if (SWEET_SPOT_STAGES.includes(ctx.companyStage)) {
+    score += 2;
+    reasons.push(`${ctx.companyStage.replace('_', ' ')} is in our sweet spot`);
+  } else if (GOOD_STAGES.includes(ctx.companyStage)) {
+    score += 1;
+    reasons.push(`${ctx.companyStage} stage is workable`);
+  } else {
+    score += 0.5;
+    reasons.push('Company stage is outside typical range');
+  }
+
+  // Therapy area alignment
+  if (ctx.therapyArea) {
+    score += 1;
+    reasons.push(`Active in ${ctx.therapyArea}`);
+  }
+
+  return {
+    score: Math.min(Math.round(score), 5),
+    max: 5,
+    rationale: reasons.join('. ') + '.',
+  };
+}
+
+function inferFeePotential(ctx: OpportunityContext): DimensionScore & { estimatedFee: string } {
+  const fee = calculateLehmanFee(ctx.dealSize);
+  let score = 0;
+  const reasons: string[] = [];
+
+  if (ctx.dealSize >= 500) { score = 5; reasons.push('Large transaction with significant fee potential'); }
+  else if (ctx.dealSize >= 200) { score = 4; reasons.push('Meaningful deal size with strong fee upside'); }
+  else if (ctx.dealSize >= 100) { score = 3; reasons.push('Mid-size transaction with moderate fee potential'); }
+  else if (ctx.dealSize >= 50) { score = 2; reasons.push('Smaller deal — fee may require retainer supplement'); }
+  else { score = 1; reasons.push('Small deal size — retainer-driven economics'); }
+
+  if (ctx.dealSize >= 50) {
+    reasons.push(`Estimated success fee: ${formatFee(fee.low)} – ${formatFee(fee.high)}`);
+  }
+
+  return {
+    score: Math.min(score, 5),
+    max: 5,
+    rationale: reasons.join('. ') + '.',
+    estimatedFee: `${formatFee(fee.low)} – ${formatFee(fee.high)}`,
+  };
+}
+
+function inferWinProbability(ctx: OpportunityContext): DimensionScore {
+  let score = 1;
+  const reasons: string[] = [];
+  const allText = `${ctx.referralSource} ${ctx.knownContacts} ${ctx.description}`.toLowerCase();
+
+  if (containsAny(allText, WARM_REFERRAL_SIGNALS)) {
+    score += 2;
+    reasons.push('Warm referral increases win probability');
+  } else if (containsAny(allText, DIRECT_SIGNALS)) {
+    score += 1;
+    reasons.push('Direct contact — moderate conversion likelihood');
+  } else {
+    reasons.push('Cold or unknown referral source — lower conversion expected');
+  }
+
+  if (ctx.knownContacts.trim().length > 10) {
+    score += 1;
+    reasons.push('Existing contacts at the company improve access');
+  }
+
+  // Inbound signals are strong
+  if (allText.includes('inbound') || allText.includes('contacted us') || allText.includes('reached out to us')) {
+    score += 1;
+    reasons.push('Inbound interest signals high intent');
+  }
+
+  return {
+    score: Math.min(Math.round(score), 5),
+    max: 5,
+    rationale: reasons.join('. ') + '.',
+  };
+}
+
+function inferExecutionRisk(ctx: OpportunityContext): DimensionScore {
+  let score = 4; // start optimistic (low risk = high score)
+  const reasons: string[] = [];
+  const allText = `${ctx.description} ${ctx.urgency} ${ctx.additionalNotes}`.toLowerCase();
+
+  if (containsAny(allText, URGENCY_SIGNALS)) {
+    score -= 1;
+    reasons.push('Compressed timeline increases execution risk');
+  }
+
+  if (containsAny(allText, COMPLEXITY_SIGNALS)) {
+    score -= 1;
+    reasons.push('Deal complexity adds execution challenges');
+  }
+
+  if (ctx.dealSize > 500) {
+    score -= 0.5;
+    reasons.push('Large deal size requires senior bandwidth');
+  }
+
+  if (reasons.length === 0) {
+    reasons.push('No significant execution risk factors identified');
+  }
+
+  return {
+    score: Math.max(Math.min(Math.round(score), 5), 1),
+    max: 5,
+    rationale: reasons.join('. ') + '.',
+  };
+}
+
+function inferStrategicValue(ctx: OpportunityContext): DimensionScore {
+  let score = 1;
+  const reasons: string[] = [];
+  const allText = `${ctx.description} ${ctx.additionalNotes}`.toLowerCase();
+
+  // New sector/TA expansion
+  if (ADJACENT_SECTORS.includes(ctx.sector) || EXTENDED_SECTORS.includes(ctx.sector)) {
+    score += 1;
+    reasons.push('Could expand our sector coverage');
+  }
+
+  // Large or notable company
+  if (ctx.dealSize > 300 || allText.includes('marquee') || allText.includes('well-known') || allText.includes('leading')) {
+    score += 1;
+    reasons.push('Potential marquee client for the portfolio');
+  }
+
+  // Cross-sell potential
+  if (allText.includes('multiple') || allText.includes('ongoing') || allText.includes('long-term') || allText.includes('additional')) {
+    score += 1;
+    reasons.push('Cross-sell potential for future engagements');
+  }
+
+  // Relationship building
+  if (allText.includes('investor') || allText.includes('fund') || allText.includes('family office')) {
+    score += 1;
+    reasons.push('Opportunity to build valuable investor relationships');
+  }
+
+  if (reasons.length === 0) {
+    reasons.push('Standard engagement — no exceptional strategic value signals');
+  }
+
+  return {
+    score: Math.min(Math.round(score), 5),
+    max: 5,
+    rationale: reasons.join('. ') + '.',
+  };
 }
 
 // ---------------------------------------------------------------------------
-// Recommendation mapping
+// Main screening function
 // ---------------------------------------------------------------------------
 
-const NEXT_STEPS: Record<string, string[]> = {
-  pursue_aggressively: [
-    'Assign senior partner within 24 hours',
-    'Prepare credential deck',
-    'Schedule management meeting this week',
-    'Draft engagement letter',
-  ],
-  pursue_selectively: [
-    'Prepare preliminary analysis',
-    'Schedule introductory call',
-    'Assess team capacity before committing',
-  ],
-  monitor: [
-    "Add to pipeline as 'Watching'",
-    'Set reminder to revisit in 30 days',
-    'Maintain relationship contact',
-  ],
-  pass: [
-    'Draft polite decline note',
-    'Offer referral to trusted firm if appropriate',
-    'Log for future reference',
-  ],
-};
+export function screenOpportunity(ctx: OpportunityContext): ScreeningResult {
+  const strategicFit = inferStrategicFit(ctx);
+  const feePotential = inferFeePotential(ctx);
+  const winProbability = inferWinProbability(ctx);
+  const executionRisk = inferExecutionRisk(ctx);
+  const strategicValue = inferStrategicValue(ctx);
 
-// ---------------------------------------------------------------------------
-// Core screening function
-// ---------------------------------------------------------------------------
+  const totalScore = strategicFit.score + feePotential.score + winProbability.score + executionRisk.score + strategicValue.score;
 
-export function screenOpportunity(input: ScreeningInput): ScreeningResult {
-  // 1. Strategic Fit (average of 3 sub-scores, mapped to 1–5)
-  const sfRaw =
-    (TA_ALIGNMENT_SCORES[input.therapyAreaAlignment] +
-      DEAL_EXPERIENCE_SCORES[input.dealTypeExperience] +
-      CLIENT_PROFILE_SCORES[input.clientProfile]) /
-    3;
-  const strategicFitScore = Math.round(sfRaw);
-
-  const sfRationale = buildStrategicFitRationale(input);
-
-  // 2. Fee Potential
-  const lehmanFee = calculateLehmanFee(input.estimatedDealSize);
-  const retainerAdd =
-    input.retainerLikelihood === 'yes'
-      ? input.estimatedDealSize >= 100
-        ? 0.15
-        : input.estimatedDealSize >= 50
-          ? 0.1
-          : 0.05
-      : 0;
-
-  // Score fee potential based on total expected fee
-  const totalExpectedFee = lehmanFee + retainerAdd;
-  let feeScore: number;
-  if (totalExpectedFee >= 5) feeScore = 5;
-  else if (totalExpectedFee >= 2) feeScore = 4;
-  else if (totalExpectedFee >= 0.8) feeScore = 3;
-  else if (totalExpectedFee >= 0.3) feeScore = 2;
-  else feeScore = 1;
-
-  // Adjust for success fee probability
-  const successFeeAdj = SUCCESS_FEE_SCORES[input.successFeeProbability];
-  feeScore = Math.round((feeScore + successFeeAdj) / 2);
-  feeScore = Math.min(5, Math.max(1, feeScore));
-
-  const feeRationale = buildFeeRationale(input, lehmanFee, retainerAdd);
-
-  // Fee range
-  const lowFee = lehmanFee * 0.7 + (input.retainerLikelihood === 'yes' ? 0.05 : 0);
-  const highFee = lehmanFee * 1.3 + (input.retainerLikelihood === 'yes' ? 0.15 : 0);
-
-  // 3. Win Probability
-  const wpRaw =
-    (RELATIONSHIP_SCORES[input.relationshipWithDecisionMaker] +
-      COMPETITIVE_SCORES[input.competitiveSituation] +
-      REFERRAL_SCORES[input.referralQuality]) /
-    3;
-  const winProbScore = Math.round(wpRaw);
-
-  const wpRationale = buildWinProbRationale(input);
-
-  // 4. Execution Risk (higher score = lower risk = better)
-  const erRaw =
-    (CAPACITY_SCORES[input.teamCapacity] +
-      COMPLEXITY_SCORES[input.complexity] +
-      TIMELINE_SCORES[input.timeline]) /
-    3;
-  const executionRiskScore = Math.round(erRaw);
-
-  const erRationale = buildExecRiskRationale(input);
-
-  // 5. Strategic Value (count of true booleans, capped at 5)
-  const svCount = [
-    input.opensNewTA,
-    input.marqueeClient,
-    input.crossSellPotential,
-    input.relationshipBuilding,
-    input.repeatBusinessLikely,
-  ].filter(Boolean).length;
-  const strategicValueScore = Math.min(5, Math.max(1, svCount));
-
-  const svRationale = buildStrategicValueRationale(input, svCount);
-
-  // Total score
-  const totalScore =
-    strategicFitScore + feeScore + winProbScore + executionRiskScore + strategicValueScore;
+  const engagementType = inferEngagementType(ctx);
 
   // Recommendation
   let recommendation: ScreeningResult['recommendation'];
@@ -293,141 +334,60 @@ export function screenOpportunity(input: ScreeningInput): ScreeningResult {
     recommendationColor = '#f87171';
   }
 
+  // Next steps
+  const nextSteps: Record<string, string[]> = {
+    pursue_aggressively: [
+      'Assign senior partner within 24 hours',
+      `Prepare ${engagementType.toLowerCase()} credential deck`,
+      'Schedule management meeting this week',
+      'Draft engagement letter with fee proposal',
+    ],
+    pursue_selectively: [
+      'Prepare preliminary analysis',
+      'Schedule introductory call within the week',
+      'Assess team capacity before committing',
+    ],
+    monitor: [
+      "Add to pipeline as 'Watching'",
+      'Set reminder to revisit in 30 days',
+      'Maintain relationship contact',
+    ],
+    pass: [
+      'Draft polite decline note',
+      'Offer referral to trusted firm if appropriate',
+      'Log for future reference',
+    ],
+  };
+
   // Risk factors
-  const riskFactors: string[] = [];
-  if (input.competitiveSituation === 'bakeoff') {
-    riskFactors.push('Competitive pitch process — higher business development cost');
+  const risks: string[] = [];
+  const allText = `${ctx.description} ${ctx.urgency} ${ctx.additionalNotes}`.toLowerCase();
+
+  if (containsAny(allText, URGENCY_SIGNALS)) risks.push('Compressed timeline may affect deliverable quality');
+  if (containsAny(allText, COMPLEXITY_SIGNALS)) risks.push('Novel deal structure requires additional research and preparation');
+  if (winProbability.score <= 2) risks.push('Weak relationship with decision-maker — longer sales cycle expected');
+  if (executionRisk.score <= 2) risks.push('Multiple execution risk factors identified — monitor closely');
+  if (!CORE_SECTORS.includes(ctx.sector) && !ADJACENT_SECTORS.includes(ctx.sector)) {
+    risks.push('Outside core sector — may require external expertise');
   }
-  if (input.teamCapacity === 'stretched') {
-    riskFactors.push('Team capacity constraints may affect deliverable quality');
-  }
-  if (input.timeline === 'aggressive') {
-    riskFactors.push('Compressed timeline increases execution risk');
-  }
-  if (input.complexity === 'novel') {
-    riskFactors.push('Novel deal structure requires additional research and preparation');
-  }
-  if (input.relationshipWithDecisionMaker === 'none') {
-    riskFactors.push(
-      'No existing relationship with decision-maker — longer sales cycle expected'
-    );
-  }
+
+  const fee = calculateLehmanFee(ctx.dealSize);
 
   return {
     score: totalScore,
     recommendation,
     recommendationLabel,
     recommendationColor,
+    engagementType,
     dimensions: {
-      strategicFit: { score: strategicFitScore, max: 5, rationale: sfRationale },
-      feePotential: {
-        score: feeScore,
-        max: 5,
-        rationale: feeRationale,
-        estimatedFee: formatFee(lehmanFee),
-      },
-      winProbability: { score: winProbScore, max: 5, rationale: wpRationale },
-      executionRisk: { score: executionRiskScore, max: 5, rationale: erRationale },
-      strategicValue: { score: strategicValueScore, max: 5, rationale: svRationale },
+      strategicFit,
+      feePotential,
+      winProbability,
+      executionRisk,
+      strategicValue,
     },
-    suggestedNextSteps: NEXT_STEPS[recommendation],
-    estimatedFeeRange: { low: formatFee(lowFee), high: formatFee(highFee) },
-    riskFactors,
+    suggestedNextSteps: nextSteps[recommendation],
+    estimatedFeeRange: { low: formatFee(fee.low), high: formatFee(fee.high) },
+    riskFactors: risks,
   };
-}
-
-// ---------------------------------------------------------------------------
-// Rationale builders
-// ---------------------------------------------------------------------------
-
-function buildStrategicFitRationale(input: ScreeningInput): string {
-  const parts: string[] = [];
-
-  if (input.therapyAreaAlignment === 'core') parts.push('Core therapy area with deep expertise');
-  else if (input.therapyAreaAlignment === 'adjacent')
-    parts.push('Adjacent TA with transferable knowledge');
-  else parts.push('Outside core competencies');
-
-  if (input.dealTypeExperience === 'extensive') parts.push('extensive deal-type track record');
-  else if (input.dealTypeExperience === 'some') parts.push('some relevant experience');
-  else parts.push('limited deal-type experience');
-
-  if (input.clientProfile === 'ideal') parts.push('ideal client profile');
-  else if (input.clientProfile === 'good') parts.push('good client fit');
-  else parts.push('marginal client alignment');
-
-  return parts.join('; ') + '.';
-}
-
-function buildFeeRationale(
-  input: ScreeningInput,
-  lehmanFee: number,
-  retainerAdd: number
-): string {
-  const parts: string[] = [];
-
-  parts.push(`${formatFee(input.estimatedDealSize)} deal size`);
-  parts.push(`Lehman fee: ${formatFee(lehmanFee)}`);
-
-  if (input.retainerLikelihood === 'yes')
-    parts.push(`retainer likely (+${formatFee(retainerAdd)})`);
-  else parts.push('no retainer expected');
-
-  if (input.successFeeProbability === 'high') parts.push('high probability of success fee');
-  else if (input.successFeeProbability === 'medium') parts.push('moderate success fee outlook');
-  else parts.push('low success fee probability');
-
-  return parts.join('; ') + '.';
-}
-
-function buildWinProbRationale(input: ScreeningInput): string {
-  const parts: string[] = [];
-
-  if (input.relationshipWithDecisionMaker === 'strong')
-    parts.push('Strong existing DM relationship');
-  else if (input.relationshipWithDecisionMaker === 'moderate')
-    parts.push('Moderate DM relationship');
-  else parts.push('No existing DM relationship');
-
-  if (input.competitiveSituation === 'sole_source') parts.push('sole-source engagement');
-  else if (input.competitiveSituation === 'limited') parts.push('limited competition');
-  else parts.push('competitive bake-off');
-
-  if (input.referralQuality === 'board_member') parts.push('board member referral');
-  else if (input.referralQuality === 'partner_referral') parts.push('partner referral');
-  else if (input.referralQuality === 'direct') parts.push('direct outreach');
-  else parts.push('cold inbound');
-
-  return parts.join('; ') + '.';
-}
-
-function buildExecRiskRationale(input: ScreeningInput): string {
-  const parts: string[] = [];
-
-  if (input.teamCapacity === 'available') parts.push('Team has available capacity');
-  else if (input.teamCapacity === 'manageable') parts.push('Manageable with current workload');
-  else parts.push('Team is stretched thin');
-
-  if (input.complexity === 'straightforward') parts.push('straightforward deal structure');
-  else if (input.complexity === 'moderate') parts.push('moderate complexity');
-  else parts.push('novel/complex deal structure');
-
-  if (input.timeline === 'comfortable') parts.push('comfortable timeline');
-  else if (input.timeline === 'tight') parts.push('tight but feasible timeline');
-  else parts.push('aggressive timeline');
-
-  return parts.join('; ') + '.';
-}
-
-function buildStrategicValueRationale(input: ScreeningInput, count: number): string {
-  if (count === 0) return 'No additional strategic value identified.';
-
-  const parts: string[] = [];
-  if (input.opensNewTA) parts.push('opens new therapy area');
-  if (input.marqueeClient) parts.push('marquee client');
-  if (input.crossSellPotential) parts.push('cross-sell potential');
-  if (input.relationshipBuilding) parts.push('relationship building opportunity');
-  if (input.repeatBusinessLikely) parts.push('repeat business likely');
-
-  return `Strategic upside: ${parts.join(', ')}.`;
 }

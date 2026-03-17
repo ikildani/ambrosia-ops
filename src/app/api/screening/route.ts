@@ -1,88 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { screenOpportunity, type ScreeningInput } from '@/lib/scoring/opportunity-screening';
-
-interface ScreeningRequestBody {
-  // Context (not scored)
-  opportunityName?: string;
-  companyName?: string;
-  therapyArea?: string;
-  dealType?: string;
-  estimatedDealSize?: number;
-
-  // Screening inputs
-  screening: ScreeningInput;
-}
+import { screenOpportunity, type OpportunityContext } from '@/lib/scoring/opportunity-screening';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as ScreeningRequestBody;
+    const body = (await request.json()) as OpportunityContext;
 
     if (!body || typeof body !== 'object') {
-      return NextResponse.json(
-        { error: 'Request body must be a valid object' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Request body must be a valid object' }, { status: 400 });
     }
 
-    if (!body.screening || typeof body.screening !== 'object') {
-      return NextResponse.json(
-        { error: 'screening object is required' },
-        { status: 400 }
-      );
+    if (!body.companyName || !body.sector || !body.description) {
+      return NextResponse.json({ error: 'companyName, sector, and description are required' }, { status: 400 });
     }
 
-    const { screening } = body;
-
-    // Validate required fields
-    const requiredFields: (keyof ScreeningInput)[] = [
-      'therapyAreaAlignment',
-      'dealTypeExperience',
-      'clientProfile',
-      'estimatedDealSize',
-      'retainerLikelihood',
-      'successFeeProbability',
-      'relationshipWithDecisionMaker',
-      'competitiveSituation',
-      'referralQuality',
-      'teamCapacity',
-      'complexity',
-      'timeline',
-    ];
-
-    for (const field of requiredFields) {
-      if (screening[field] === undefined || screening[field] === null) {
-        return NextResponse.json(
-          { error: `Missing required field: ${field}` },
-          { status: 400 }
-        );
-      }
-    }
-
-    if (typeof screening.estimatedDealSize !== 'number' || screening.estimatedDealSize < 0) {
-      return NextResponse.json(
-        { error: 'estimatedDealSize must be a non-negative number (in millions USD)' },
-        { status: 400 }
-      );
-    }
-
-    const result = screenOpportunity(screening);
+    const result = screenOpportunity(body);
 
     return NextResponse.json({
       context: {
-        opportunityName: body.opportunityName || null,
-        companyName: body.companyName || null,
-        therapyArea: body.therapyArea || null,
-        dealType: body.dealType || null,
-        estimatedDealSize: body.estimatedDealSize || screening.estimatedDealSize,
+        companyName: body.companyName,
+        sector: body.sector,
+        dealSize: body.dealSize,
       },
       result,
       screenedAt: new Date().toISOString(),
     });
   } catch (error) {
     console.error('[Screening API] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to screen opportunity' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to screen opportunity' }, { status: 500 });
   }
 }
