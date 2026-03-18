@@ -135,7 +135,7 @@ function OnboardingWizard() {
       </div>
 
       {/* Steps */}
-      <div className="max-w-lg mx-auto space-y-4">
+      <div className="max-w-xl mx-auto space-y-4">
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
           const isExpanded = expandedStep === step.id;
@@ -187,7 +187,7 @@ function OnboardingWizard() {
 
               {/* Expanded content */}
               {isExpanded && !isComplete && (
-                <div className="px-5 pb-5" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '68px' }}>
+                <div className="px-5 pb-5" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '56px' }}>
                   <p className="text-[13px] leading-relaxed mb-5" style={{ color: '#64748b' }}>
                     {step.description}
                   </p>

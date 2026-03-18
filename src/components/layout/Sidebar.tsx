@@ -107,7 +107,7 @@ export function Sidebar() {
               const isActive =
                 !item.external &&
                 (pathname === item.href ||
-                (item.href !== '/dashboard' && pathname.startsWith(item.href)));
+                (item.href.split('/').length > 2 && pathname.startsWith(item.href)));
 
               return (
                 <Link

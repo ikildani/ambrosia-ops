@@ -190,32 +190,7 @@ interface RecentReport {
   author: string;
 }
 
-const MOCK_RECENT_REPORTS: RecentReport[] = [
-  {
-    id: 'r1',
-    title: 'NeuroGen Therapeutics — Advisory Intelligence Report',
-    company: 'NeuroGen Therapeutics',
-    analyses: ['market_sizing', 'competitive_landscape', 'deal_valuation'],
-    date: '2026-03-13T14:30:00Z',
-    author: 'Sarah Chen',
-  },
-  {
-    id: 'r2',
-    title: 'PharmaLink Oncology — Full Landscape Analysis',
-    company: 'PharmaLink Oncology',
-    analyses: ['market_sizing', 'clinical_pipeline', 'regulatory_pathway', 'pricing_intelligence'],
-    date: '2026-03-11T09:15:00Z',
-    author: 'James Rivera',
-  },
-  {
-    id: 'r3',
-    title: 'RarePath Sciences — Deal Thesis Package',
-    company: 'RarePath Sciences',
-    analyses: ['deal_valuation', 'sensitivity_analysis', 'partner_discovery'],
-    date: '2026-03-08T16:45:00Z',
-    author: 'Michael Torres',
-  },
-];
+const MOCK_RECENT_REPORTS: RecentReport[] = [];
 
 /* ══════════════════════════════════════════════════════════════════
    MOCK REPORT SECTIONS

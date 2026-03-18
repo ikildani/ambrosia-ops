@@ -115,7 +115,7 @@ export default function OpportunityScreeningPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* LEFT: Input Form */}
         <div>
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-6" style={{ color: '#475569' }}>
@@ -286,7 +286,7 @@ export default function OpportunityScreeningPage() {
           )}
 
           {!result && !analyzing && (
-            <div className="flex flex-col items-center justify-center h-full text-center" style={{ minHeight: '400px' }}>
+            <div className="flex flex-col items-center justify-center h-full text-center px-4 overflow-hidden" style={{ minHeight: '400px' }}>
               <Sparkles className="w-10 h-10 mb-4" style={{ color: '#1e293b' }} />
               <p className="text-[15px] font-medium mb-2" style={{ color: '#334155' }}>AI Assessment</p>
               <p className="text-[13px] max-w-xs" style={{ color: '#1e293b' }}>

@@ -62,74 +62,7 @@ interface KnowledgeEntry {
   tags: string[];
 }
 
-const mockEntries: KnowledgeEntry[] = [
-  {
-    id: '1',
-    title: 'How to Run Due Diligence',
-    description:
-      'Step-by-step framework for conducting thorough due diligence on biotech targets. Covers scientific assessment, IP review, commercial viability, regulatory pathway, and management evaluation with scoring rubrics.',
-    category: 'playbook',
-    author: 'Issa Kildani',
-    updated_at: '2w ago',
-    version: 3,
-    tags: ['due diligence', 'framework', 'process'],
-  },
-  {
-    id: '2',
-    title: 'Oncology ADC Landscape — Sector Primer',
-    description:
-      'Comprehensive overview of the antibody-drug conjugate landscape in oncology. Covers approved products, clinical-stage assets, key technology platforms, competitive dynamics, and investment thesis considerations.',
-    category: 'primer',
-    author: 'Alex Rivera',
-    updated_at: '1w ago',
-    version: 1,
-    tags: ['oncology', 'ADC', 'competitive landscape'],
-  },
-  {
-    id: '3',
-    title: 'Engagement Letter Template',
-    description:
-      'Standard engagement letter template for advisory mandates. Includes fee structure options, exclusivity clauses, termination provisions, and indemnification language reviewed by outside counsel.',
-    category: 'template',
-    author: 'Issa Kildani',
-    updated_at: '3w ago',
-    version: 2,
-    tags: ['legal', 'engagement', 'advisory'],
-  },
-  {
-    id: '4',
-    title: 'CIM Structure & Best Practices',
-    description:
-      'Template and guidelines for creating Confidential Information Memorandums. Covers executive summary, company overview, market opportunity, financial projections, and management team sections.',
-    category: 'template',
-    author: 'Jordan Lee',
-    updated_at: '1mo ago',
-    version: 1,
-    tags: ['CIM', 'sell-side', 'documentation'],
-  },
-  {
-    id: '5',
-    title: 'Project Falcon Post-Mortem',
-    description:
-      'Retrospective analysis of a successfully closed oncology deal. Key takeaways on timeline management, buyer engagement strategy, and valuation negotiation tactics that led to a 15% premium over initial offer.',
-    category: 'lesson',
-    author: 'Dr. Maya Patel',
-    updated_at: '2w ago',
-    version: 1,
-    tags: ['oncology', 'won deal', 'post-mortem'],
-  },
-  {
-    id: '6',
-    title: 'Negotiation Framework: Licensing Deals',
-    description:
-      'Structured approach to negotiating licensing agreements in biopharma. Covers upfront payments, milestones, royalty tiers, territory rights, co-development options, and common deal-breakers with resolution strategies.',
-    category: 'playbook',
-    author: 'Alex Rivera',
-    updated_at: '1w ago',
-    version: 5,
-    tags: ['licensing', 'negotiation', 'deal structure'],
-  },
-];
+const mockEntries: KnowledgeEntry[] = [];
 
 /* -------------------------------------------------- */
 /* PAGE COMPONENT                                      */

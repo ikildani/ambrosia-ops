@@ -10,7 +10,7 @@ export function Topbar() {
         <input
           type="text"
           placeholder="Search companies, contacts, deals..."
-          className="input pl-10 py-2.5 bg-navy-800 border-transparent focus:border-teal-500"
+          className="input pl-12 py-2.5 bg-navy-800 border-transparent focus:border-teal-500"
         />
       </div>
 
