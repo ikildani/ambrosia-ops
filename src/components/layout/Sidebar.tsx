@@ -90,7 +90,7 @@ export function Sidebar() {
           <img
             src="/logo-reversed.png"
             alt="Ambrosia Ventures"
-            className="h-7 w-auto"
+            className="h-8 w-auto"
           />
           <span className="badge badge-teal text-[10px] font-semibold tracking-wider">
             OPS
