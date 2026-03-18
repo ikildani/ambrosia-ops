@@ -14,6 +14,7 @@ import {
   Shield,
   Briefcase,
   Loader2,
+  Upload,
 } from 'lucide-react';
 import { THERAPY_AREAS } from '@/lib/data/therapy-areas';
 import type { AIScreeningResult, OpportunityContext } from '@/lib/ai/opportunity-analyzer';
@@ -115,198 +116,211 @@ export default function OpportunityScreeningPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* LEFT: Input Form */}
-        <div>
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-6" style={{ color: '#475569' }}>
-            Opportunity Context
-          </h2>
+      <div className="max-w-2xl">
+        {/* Input Form */}
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-6" style={{ color: '#475569' }}>
+          Opportunity Context
+        </h2>
 
-          <div className="space-y-6">
-            {/* Company Name */}
-            <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Name *</label>
-              <input
-                type="text"
-                value={form.companyName}
-                onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))}
-                placeholder="Enter company name"
-                className="input"
-              />
+        <div className="space-y-6">
+          {/* Company Name */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Name *</label>
+            <input
+              type="text"
+              value={form.companyName}
+              onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))}
+              placeholder="Enter company name"
+              className="input"
+            />
+          </div>
+
+          {/* Sector */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Sector *</label>
+            <div className="flex flex-wrap gap-2">
+              {SECTORS.map(s => (
+                <button key={s.id} type="button"
+                  onClick={() => setForm(f => ({ ...f, sector: s.id }))}
+                  className="px-3.5 py-2 rounded-lg text-[12px] font-medium transition-all"
+                  style={{
+                    background: form.sector === s.id ? 'rgba(95,212,227,0.12)' : '#0d1b2e',
+                    border: `1px solid ${form.sector === s.id ? 'rgba(95,212,227,0.3)' : 'rgba(100,116,139,0.1)'}`,
+                    color: form.sector === s.id ? '#5fd4e3' : '#94a3b8',
+                  }}>
+                  {s.label}
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Sector */}
+          {/* Stage + Deal Size */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Sector *</label>
-              <div className="flex flex-wrap gap-2">
-                {SECTORS.map(s => (
-                  <button key={s.id} type="button"
-                    onClick={() => setForm(f => ({ ...f, sector: s.id }))}
-                    className="px-3.5 py-2 rounded-lg text-[12px] font-medium transition-all"
-                    style={{
-                      background: form.sector === s.id ? 'rgba(95,212,227,0.12)' : '#0d1b2e',
-                      border: `1px solid ${form.sector === s.id ? 'rgba(95,212,227,0.3)' : 'rgba(100,116,139,0.1)'}`,
-                      color: form.sector === s.id ? '#5fd4e3' : '#94a3b8',
-                    }}>
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Stage + Deal Size */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Stage</label>
-                <select
-                  value={form.companyStage}
-                  onChange={e => setForm(f => ({ ...f, companyStage: e.target.value }))}
-                  className="input"
-                >
-                  <option value="">Select stage</option>
-                  {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Estimated Deal Size ($M)</label>
-                <input
-                  type="number"
-                  value={form.dealSize || ''}
-                  onChange={e => setForm(f => ({ ...f, dealSize: parseFloat(e.target.value) || 0 }))}
-                  placeholder="e.g., 200"
-                  className="input"
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-            </div>
-
-            {/* Therapy Area */}
-            <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
-                Therapy Area <span style={{ color: '#334155' }}>(optional)</span>
-              </label>
+              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Stage</label>
               <select
-                value={form.therapyArea}
-                onChange={e => setForm(f => ({ ...f, therapyArea: e.target.value }))}
+                value={form.companyStage}
+                onChange={e => setForm(f => ({ ...f, companyStage: e.target.value }))}
                 className="input"
               >
-                <option value="">Select if applicable</option>
-                {THERAPY_AREAS.map(ta => <option key={ta.id} value={ta.id}>{ta.label}</option>)}
+                <option value="">Select stage</option>
+                {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
               </select>
             </div>
-
-            {/* Description */}
             <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
-                What does this company do and what do they need? *
-              </label>
-              <textarea
-                value={form.description}
-                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                placeholder="Describe the company, their situation, and what advisory services they might need..."
-                className="input"
-                style={{ minHeight: '120px', resize: 'vertical' }}
-              />
-            </div>
-
-            {/* Referral Source */}
-            <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>How did you hear about this opportunity?</label>
+              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Estimated Deal Size ($M)</label>
               <input
-                type="text"
-                value={form.referralSource}
-                onChange={e => setForm(f => ({ ...f, referralSource: e.target.value }))}
-                placeholder="e.g., Board member referral, met at JPM, inbound inquiry..."
+                type="number"
+                value={form.dealSize || ''}
+                onChange={e => setForm(f => ({ ...f, dealSize: parseFloat(e.target.value) || 0 }))}
+                placeholder="e.g., 200"
                 className="input"
+                style={{ fontFamily: 'var(--font-mono)' }}
               />
             </div>
-
-            {/* Known Contacts */}
-            <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Existing contacts or relationships</label>
-              <input
-                type="text"
-                value={form.knownContacts}
-                onChange={e => setForm(f => ({ ...f, knownContacts: e.target.value }))}
-                placeholder="e.g., Know the CEO from prior deal, introduced by partner at Apex..."
-                className="input"
-              />
-            </div>
-
-            {/* Urgency */}
-            <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Timeline or urgency</label>
-              <input
-                type="text"
-                value={form.urgency}
-                onChange={e => setForm(f => ({ ...f, urgency: e.target.value }))}
-                placeholder="e.g., Looking to close by Q2, no rush, urgent — need advisor ASAP..."
-                className="input"
-              />
-            </div>
-
-            {/* Additional Notes */}
-            <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Additional notes</label>
-              <textarea
-                value={form.additionalNotes}
-                onChange={e => setForm(f => ({ ...f, additionalNotes: e.target.value }))}
-                placeholder="Anything else relevant — competitive dynamics, strategic context..."
-                className="input"
-                style={{ minHeight: '80px', resize: 'vertical' }}
-              />
-            </div>
-
-            {/* Analyze Button */}
-            <button
-              onClick={handleAnalyze}
-              disabled={!canAnalyze || analyzing}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-[14px] font-semibold transition-all"
-              style={{
-                background: canAnalyze ? 'linear-gradient(135deg, #5fd4e3, #9499d1)' : '#1e293b',
-                color: canAnalyze ? '#04080f' : '#475569',
-                opacity: analyzing ? 0.7 : 1,
-              }}
-            >
-              {analyzing ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing opportunity...</>
-              ) : (
-                <><Sparkles className="w-4 h-4" /> Analyze Opportunity</>
-              )}
-            </button>
           </div>
+
+          {/* Therapy Area */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
+              Therapy Area <span style={{ color: '#334155' }}>(optional)</span>
+            </label>
+            <select
+              value={form.therapyArea}
+              onChange={e => setForm(f => ({ ...f, therapyArea: e.target.value }))}
+              className="input"
+            >
+              <option value="">Select if applicable</option>
+              {THERAPY_AREAS.map(ta => <option key={ta.id} value={ta.id}>{ta.label}</option>)}
+            </select>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
+              What does this company do and what do they need? *
+            </label>
+            <textarea
+              value={form.description}
+              onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              placeholder="Describe the company, their situation, and what advisory services they might need..."
+              className="input"
+              style={{ minHeight: '120px', resize: 'vertical' }}
+            />
+          </div>
+
+          {/* Referral Source */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>How did you hear about this opportunity?</label>
+            <input
+              type="text"
+              value={form.referralSource}
+              onChange={e => setForm(f => ({ ...f, referralSource: e.target.value }))}
+              placeholder="e.g., Board member referral, met at JPM, inbound inquiry..."
+              className="input"
+            />
+          </div>
+
+          {/* Known Contacts */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Existing contacts or relationships</label>
+            <input
+              type="text"
+              value={form.knownContacts}
+              onChange={e => setForm(f => ({ ...f, knownContacts: e.target.value }))}
+              placeholder="e.g., Know the CEO from prior deal, introduced by partner at Apex..."
+              className="input"
+            />
+          </div>
+
+          {/* Urgency */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Timeline or urgency</label>
+            <input
+              type="text"
+              value={form.urgency}
+              onChange={e => setForm(f => ({ ...f, urgency: e.target.value }))}
+              placeholder="e.g., Looking to close by Q2, no rush, urgent — need advisor ASAP..."
+              className="input"
+            />
+          </div>
+
+          {/* Additional Notes */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Additional notes</label>
+            <textarea
+              value={form.additionalNotes}
+              onChange={e => setForm(f => ({ ...f, additionalNotes: e.target.value }))}
+              placeholder="Anything else relevant — competitive dynamics, strategic context..."
+              className="input"
+              style={{ minHeight: '80px', resize: 'vertical' }}
+            />
+          </div>
+
+          {/* Document Upload */}
+          <div>
+            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
+              Attach materials <span style={{ color: '#334155' }}>(optional)</span>
+            </label>
+            <div
+              className="rounded-xl flex items-center justify-center py-8 cursor-pointer transition-colors"
+              style={{
+                border: '1px dashed rgba(100,116,139,0.2)',
+                background: 'rgba(13,27,46,0.3)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.2)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.2)'; }}
+            >
+              <div className="text-center">
+                <Upload className="w-5 h-5 mx-auto mb-2" style={{ color: '#475569' }} />
+                <p className="text-[13px]" style={{ color: '#475569' }}>
+                  Drop a pitch deck, CIM, or other materials here
+                </p>
+                <p className="text-[11px] mt-1" style={{ color: '#334155' }}>
+                  PDF, PPTX, DOCX up to 25MB
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Analyze Button */}
+          <button
+            onClick={handleAnalyze}
+            disabled={!canAnalyze || analyzing}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-[14px] font-semibold transition-all"
+            style={{
+              background: canAnalyze ? 'linear-gradient(135deg, #5fd4e3, #9499d1)' : '#1e293b',
+              color: canAnalyze ? '#04080f' : '#475569',
+              opacity: analyzing ? 0.7 : 1,
+            }}
+          >
+            {analyzing ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing opportunity...</>
+            ) : (
+              <><Sparkles className="w-4 h-4" /> Analyze Opportunity</>
+            )}
+          </button>
         </div>
 
-        {/* RIGHT: AI Assessment */}
-        <div>
-          {error && (
-            <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)' }}>
-              <p className="text-[13px]" style={{ color: '#f87171' }}>{error}</p>
-            </div>
-          )}
+        {/* AI Assessment — appears below form after analysis */}
+        {error && (
+          <div className="rounded-xl p-4 mt-8 mb-6" style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)' }}>
+            <p className="text-[13px]" style={{ color: '#f87171' }}>{error}</p>
+          </div>
+        )}
 
-          {!result && !analyzing && (
-            <div className="flex flex-col items-center justify-center h-full text-center px-4 overflow-hidden" style={{ minHeight: '400px' }}>
-              <Sparkles className="w-10 h-10 mb-4" style={{ color: '#1e293b' }} />
-              <p className="text-[15px] font-medium mb-2" style={{ color: '#334155' }}>AI Assessment</p>
-              <p className="text-[13px] max-w-xs" style={{ color: '#1e293b' }}>
-                Fill in the opportunity context and click Analyze. Our engine will score strategic fit, fee potential, win probability, execution risk, and strategic value.
-              </p>
+        {analyzing && (
+          <div className="flex flex-col items-center justify-center text-center mt-12 mb-8" style={{ minHeight: '200px' }}>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'rgba(95,212,227,0.06)', border: '1px solid rgba(95,212,227,0.1)' }}>
+              <Sparkles className="w-7 h-7 animate-pulse" style={{ color: '#5fd4e3' }} />
             </div>
-          )}
+            <p className="text-[15px] font-medium mb-2" style={{ color: '#e2e8f0' }}>Analyzing opportunity...</p>
+            <p className="text-[13px]" style={{ color: '#475569' }}>Evaluating strategic fit, fee potential, and win probability</p>
+          </div>
+        )}
 
-          {analyzing && (
-            <div className="flex flex-col items-center justify-center h-full text-center" style={{ minHeight: '400px' }}>
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ background: 'rgba(95,212,227,0.06)', border: '1px solid rgba(95,212,227,0.1)' }}>
-                <Sparkles className="w-7 h-7 animate-pulse" style={{ color: '#5fd4e3' }} />
-              </div>
-              <p className="text-[15px] font-medium mb-2" style={{ color: '#e2e8f0' }}>Analyzing opportunity...</p>
-              <p className="text-[13px]" style={{ color: '#475569' }}>Evaluating strategic fit, fee potential, and win probability</p>
-            </div>
-          )}
-
-          {result && (
-            <div style={{ animation: 'slideUp 0.5s ease-out' }}>
+        {result && (
+          <div className="mt-10 pt-10" style={{ borderTop: '1px solid rgba(100,116,139,0.08)', animation: 'slideUp 0.5s ease-out' }}>
               <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-6" style={{ color: '#475569' }}>
                 AI Assessment
               </h2>
@@ -470,7 +484,6 @@ export default function OpportunityScreeningPage() {
               </div>
             </div>
           )}
-        </div>
       </div>
     </div>
   );

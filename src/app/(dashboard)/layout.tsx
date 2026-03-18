@@ -5,9 +5,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <>
       <Sidebar />
-      <div className="dashboard-layout">
+      <div style={{ marginLeft: '260px', minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, background: '#04080f' }}>
         <Topbar />
-        <main className="page-content">
+        <main style={{ flex: 1, padding: '48px 56px', maxWidth: '1440px', width: '100%' }}>
           {children}
         </main>
       </div>
