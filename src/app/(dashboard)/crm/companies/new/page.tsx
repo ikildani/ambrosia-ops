@@ -952,7 +952,7 @@ export default function NewCompanyPage() {
 
   function renderStep2() {
     return (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
         <div>
           <StepHeading>Company profile</StepHeading>
           <StepSubheading>
@@ -962,12 +962,12 @@ export default function NewCompanyPage() {
           </StepSubheading>
         </div>
 
-        <div className="space-y-7">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
           {/* Stage (only biotech/pharma) */}
           {isBiotechPharma && (
             <div>
               <FieldLabel>Funding Stage</FieldLabel>
-              <div className="flex flex-wrap gap-2.5 mt-1">
+              <div className="flex flex-wrap" style={{ gap: '10px', marginTop: '12px' }}>
                 {COMPANY_STAGES.map(s => (
                   <PillButton
                     key={s.id}
@@ -1002,7 +1002,7 @@ export default function NewCompanyPage() {
           {/* Employee Range */}
           <div>
             <FieldLabel>Team Size</FieldLabel>
-            <div className="flex flex-wrap gap-2.5 mt-1">
+            <div className="flex flex-wrap" style={{ gap: '10px', marginTop: '12px' }}>
               {EMPLOYEE_RANGES.map(r => (
                 <PillButton
                   key={r.id}
@@ -1050,17 +1050,17 @@ export default function NewCompanyPage() {
 
   function renderStep3() {
     return (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
         <div>
           <StepHeading>Therapeutic focus</StepHeading>
           <StepSubheading>What areas of medicine is this company working in? Select all that apply.</StepSubheading>
         </div>
 
-        <div className="space-y-7">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
           {/* Therapy Areas Grid */}
           <div>
             <FieldLabel>Therapy Areas</FieldLabel>
-            <div className="grid grid-cols-3 gap-2 mt-1">
+            <div className="grid grid-cols-3" style={{ gap: '10px', marginTop: '12px' }}>
               {THERAPY_AREAS.map(ta => (
                 <button
                   key={ta.id}
@@ -1105,7 +1105,7 @@ export default function NewCompanyPage() {
           {/* Lead Asset Phase */}
           <div>
             <FieldLabel optional>Lead Asset Phase</FieldLabel>
-            <div className="flex flex-wrap gap-2.5 mt-1">
+            <div className="flex flex-wrap" style={{ gap: '10px', marginTop: '12px' }}>
               {LEAD_ASSET_PHASES.map(p => (
                 <PillButton
                   key={p.id}
@@ -1137,7 +1137,7 @@ export default function NewCompanyPage() {
 
   function renderStep4() {
     return (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
         <div>
           <StepHeading>Your relationship</StepHeading>
           <StepSubheading>Understanding how you know this company helps us gauge outreach strategy.</StepSubheading>
@@ -1149,11 +1149,11 @@ export default function NewCompanyPage() {
           )}
         </div>
 
-        <div className="space-y-7">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
           {/* Relationship Source */}
           <div>
             <FieldLabel>How do you know this company?</FieldLabel>
-            <div className="grid grid-cols-1 gap-2.5 mt-1">
+            <div className="grid grid-cols-1" style={{ gap: '10px', marginTop: '12px' }}>
               {RELATIONSHIP_SOURCES.map(rs => (
                 <button
                   key={rs.id}
@@ -1188,7 +1188,7 @@ export default function NewCompanyPage() {
           {/* Existing Contacts */}
           <div>
             <FieldLabel>Do you have existing contacts there?</FieldLabel>
-            <div className="flex gap-4 mt-1">
+            <div className="flex" style={{ gap: '16px', marginTop: '12px' }}>
               {[
                 { id: 'yes', label: 'Yes' },
                 { id: 'no', label: 'Not Yet' },
@@ -1226,7 +1226,7 @@ export default function NewCompanyPage() {
 
   function renderStep5() {
     return (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
         <div>
           <StepHeading>Advisory opportunity</StepHeading>
           <StepSubheading>Assess the potential for an advisory engagement with this company.</StepSubheading>
@@ -1238,11 +1238,11 @@ export default function NewCompanyPage() {
           )}
         </div>
 
-        <div className="space-y-7">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
           {/* Services Needed */}
           <div>
             <FieldLabel>What services might they need?</FieldLabel>
-            <div className="grid grid-cols-2 gap-2.5 mt-1">
+            <div className="grid grid-cols-2" style={{ gap: '14px', marginTop: '12px' }}>
               {SERVICES.map(s => (
                 <MultiPillButton
                   key={s.id}
@@ -1258,7 +1258,7 @@ export default function NewCompanyPage() {
           {/* Deal Signals */}
           <div>
             <FieldLabel>Deal readiness signals</FieldLabel>
-            <div className="grid grid-cols-2 gap-2.5 mt-1">
+            <div className="grid grid-cols-2" style={{ gap: '14px', marginTop: '12px' }}>
               {DEAL_SIGNALS.map(ds => (
                 <MultiPillButton
                   key={ds.id}
@@ -1274,7 +1274,7 @@ export default function NewCompanyPage() {
           {/* Catalysts */}
           <div>
             <FieldLabel>Upcoming catalysts?</FieldLabel>
-            <div className="flex gap-4 mt-1">
+            <div className="flex" style={{ gap: '16px', marginTop: '12px' }}>
               <PillButton
                 selected={form.has_catalysts}
                 onClick={() => update('has_catalysts', true)}
@@ -1294,7 +1294,7 @@ export default function NewCompanyPage() {
               </PillButton>
             </div>
             {form.has_catalysts && (
-              <div className="mt-3 animate-[slideUp_0.3s_ease-out]">
+              <div style={{ marginTop: '12px' }} className="animate-[slideUp_0.3s_ease-out]">
                 <input
                   type="text"
                   value={form.catalyst_description}
@@ -1310,7 +1310,7 @@ export default function NewCompanyPage() {
           {/* Market Position */}
           <div>
             <FieldLabel>Market position</FieldLabel>
-            <div className="flex flex-wrap gap-2.5 mt-1">
+            <div className="flex flex-wrap" style={{ gap: '10px', marginTop: '12px' }}>
               {MARKET_POSITIONS.map(mp => (
                 <PillButton
                   key={mp.id}
@@ -1327,7 +1327,7 @@ export default function NewCompanyPage() {
           {/* News Sentiment */}
           <div>
             <FieldLabel>Recent news sentiment</FieldLabel>
-            <div className="flex flex-wrap gap-2.5 mt-1">
+            <div className="flex flex-wrap" style={{ gap: '10px', marginTop: '12px' }}>
               {NEWS_SENTIMENTS.map(ns => (
                 <PillButton
                   key={ns.id}
@@ -1347,7 +1347,7 @@ export default function NewCompanyPage() {
 
   function renderStep6() {
     return (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
         <div className="text-center">
           <StepHeading>Company Score</StepHeading>
           <StepSubheading>
@@ -1356,11 +1356,11 @@ export default function NewCompanyPage() {
         </div>
 
         {/* Score Ring */}
-        <div className="py-4">
+        <div style={{ paddingTop: '16px', paddingBottom: '16px' }}>
           <ScoreRing score={animatedScore} color={score.bucketColor} />
 
           {/* Bucket Badge */}
-          <div className="flex justify-center mt-5">
+          <div className="flex justify-center" style={{ marginTop: '20px' }}>
             <span
               className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium"
               style={{
@@ -1376,8 +1376,8 @@ export default function NewCompanyPage() {
         </div>
 
         {/* Score Breakdown */}
-        <div className="rounded-xl border border-slate-700/40 bg-navy-800/50 p-6 space-y-5">
-          <h3 className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 mb-5">Score Breakdown</h3>
+        <div className="rounded-xl border border-slate-700/40 bg-navy-800/50" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <h3 className="text-[11px] font-semibold tracking-widest uppercase text-slate-500" style={{ marginBottom: '4px' }}>Score Breakdown</h3>
           <ScoreBar label="Company Fit" value={score.breakdown.companyFit} max={25} />
           <ScoreBar label="Relationship" value={score.breakdown.relationship} max={25} />
           <ScoreBar label="Market Timing" value={score.breakdown.marketTiming} max={25} />
