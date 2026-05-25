@@ -76,7 +76,7 @@ function OnboardingWizard() {
 
   return (
     <div style={{ animation: 'fadeIn 0.8s ease-out' }}>
-      <div className="text-center mb-20" style={{ animation: 'slideUp 0.6s ease-out' }}>
+      <div className="text-center mb-24" style={{ animation: 'slideUp 0.6s ease-out' }}>
         <div className="flex justify-center mb-10 pt-4">
           <img src="/icon-white.png" alt="" className="w-16 h-auto opacity-40" />
         </div>
@@ -91,12 +91,12 @@ function OnboardingWizard() {
         }}>
           Welcome to Ambrosia Ops
         </h1>
-        <p className="mt-4 max-w-md mx-auto leading-relaxed" style={{ fontSize: '15px', color: '#64748b' }}>
+        <p className="mt-6 max-w-md mx-auto leading-relaxed" style={{ fontSize: '15px', color: '#64748b' }}>
           Your team&apos;s command center for mandates, relationships, and market intelligence.
           Let&apos;s get you set up in four steps.
         </p>
 
-        <div className="flex items-center justify-center gap-2 mt-8">
+        <div className="flex items-center justify-center gap-3 mt-10">
           {WIZARD_STEPS.map((step) => (
             <div
               key={step.id}
@@ -112,7 +112,7 @@ function OnboardingWizard() {
         </div>
       </div>
 
-      <div className="max-w-xl mx-auto space-y-4">
+      <div className="max-w-2xl mx-auto space-y-5">
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
           const isExpanded = expandedStep === step.id;
@@ -129,11 +129,11 @@ function OnboardingWizard() {
               }}
             >
               <button
-                className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors"
+                className="w-full flex items-center gap-5 px-7 py-6 text-left transition-colors"
                 onClick={() => setExpandedStep(isExpanded ? null : step.id)}
               >
                 <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{
                     background: isComplete ? `${step.accent}12` : 'rgba(100,116,139,0.06)',
                     border: `1px solid ${isComplete ? `${step.accent}25` : 'rgba(100,116,139,0.1)'}`,
@@ -162,21 +162,21 @@ function OnboardingWizard() {
               </button>
 
               {isExpanded && !isComplete && (
-                <div className="px-5 pb-5" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '56px' }}>
-                  <p className="text-[13px] leading-relaxed mb-5" style={{ color: '#64748b' }}>
+                <div className="px-7 pb-7" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '68px' }}>
+                  <p className="text-[13px] leading-relaxed mb-7" style={{ color: '#64748b' }}>
                     {step.description}
                   </p>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <Link
                       href={step.href}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-semibold transition-all"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-[13px] font-semibold transition-all"
                       style={{ background: step.accent, color: '#04080f' }}
                     >
                       <Icon className="w-4 h-4" />
                       {step.cta}
                     </Link>
                     <button
-                      className="text-[12px] font-medium transition-colors px-3 py-2.5"
+                      className="text-[12px] font-medium transition-colors px-4 py-3"
                       style={{ color: '#475569' }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -201,7 +201,7 @@ function OnboardingWizard() {
         })}
       </div>
 
-      <div className="text-center mt-14" style={{ animation: 'slideUp 0.5s ease-out 800ms both' }}>
+      <div className="text-center mt-16" style={{ animation: 'slideUp 0.5s ease-out 800ms both' }}>
         <p className="text-[12px]" style={{ color: '#334155' }}>
           You can always access these steps from Settings.
         </p>

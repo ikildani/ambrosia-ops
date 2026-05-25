@@ -190,7 +190,40 @@ interface RecentReport {
   author: string;
 }
 
-const MOCK_RECENT_REPORTS: RecentReport[] = [];
+const MOCK_RECENT_REPORTS: RecentReport[] = [
+  {
+    id: 'rpt-1',
+    title: 'NeuroGen Therapeutics — Full Advisory Report',
+    company: 'NeuroGen Therapeutics',
+    analyses: ['market_sizing', 'competitive_landscape', 'deal_valuation', 'clinical_pipeline'],
+    date: new Date(Date.now() - 2 * 86400000).toISOString(),
+    author: 'Issa K.',
+  },
+  {
+    id: 'rpt-2',
+    title: 'PharmaLink Oncology — Competitive & Valuation',
+    company: 'PharmaLink Oncology',
+    analyses: ['competitive_landscape', 'deal_valuation', 'sensitivity_analysis'],
+    date: new Date(Date.now() - 5 * 86400000).toISOString(),
+    author: 'Issa K.',
+  },
+  {
+    id: 'rpt-3',
+    title: 'RarePath Sciences — Market Sizing Deep Dive',
+    company: 'RarePath Sciences',
+    analyses: ['market_sizing', 'regulatory_pathway', 'pricing_intelligence'],
+    date: new Date(Date.now() - 8 * 86400000).toISOString(),
+    author: 'Issa K.',
+  },
+  {
+    id: 'rpt-4',
+    title: 'CardioVista — Partner Discovery & Pipeline',
+    company: 'CardioVista',
+    analyses: ['partner_discovery', 'clinical_pipeline'],
+    date: new Date(Date.now() - 12 * 86400000).toISOString(),
+    author: 'Issa K.',
+  },
+];
 
 /* ══════════════════════════════════════════════════════════════════
    MOCK REPORT SECTIONS
@@ -200,11 +233,11 @@ function getMockReportSection(analysisId: string, companyName: string) {
   const sections: Record<string, { metrics: Record<string, string>; content: string }> = {
     market_sizing: {
       metrics: { 'TAM': '$14.2B', 'SAM': '$4.8B', 'SOM (Y5)': '$1.2B', 'Patient Pop.': '2.4M', 'CAGR': '12.3%' },
-      content: `The total addressable market for ${companyName}'s lead indication is estimated at $14.2B globally, with the serviceable addressable market at $4.8B across the US and EU5. Patient funnel analysis indicates approximately 2.4M diagnosed patients with a treatment-seeking rate of 67%. Geographic breakdown shows 58% US, 28% EU5, 14% ROW.`,
+      content: `The total addressable market for ${companyName}'s lead indication is estimated at $14.2B globally (2026), growing at a 12.3% CAGR driven by increasing diagnosis rates and expanded treatment paradigms. The serviceable addressable market across the US and EU5 is $4.8B, with SOM projected at $1.2B by Year 5 post-launch assuming 18% peak market share. Patient funnel analysis: 2.4M diagnosed patients globally, 67% treatment-seeking rate, 42% eligible for novel therapies. Geographic split: 58% US ($2.8B), 28% EU5 ($1.3B), 14% ROW ($670M). Key growth drivers include biomarker-driven patient selection, combination therapy adoption, and line-of-therapy expansion.`,
     },
     competitive_landscape: {
       metrics: { 'Competitors': '12', 'Phase 3+': '4', 'White Space': 'Moderate', 'Differentiation': 'Strong' },
-      content: `The competitive landscape includes 12 active programs across all clinical stages. Four competitors have Phase 3 or approved assets. White space analysis reveals moderate opportunity in combination therapy approaches. ${companyName}'s mechanism of action provides strong differentiation vs. current standard of care.`,
+      content: `The competitive landscape includes 12 active programs across all clinical stages, with 4 assets in Phase 3 or approved. Direct competitors: Vertex ($VRTX) — approved, $2.1B peak sales; Regeneron ($REGN) — Phase 3, readout Q4 2026; BioMarin ($BMRN) — Phase 2, differentiated MOA. White space analysis reveals moderate opportunity in combination therapy approaches and biomarker-selected subpopulations. ${companyName}'s mechanism of action provides strong differentiation vs. current SOC on efficacy (OR 2.4 vs 1.8 for SOC) with a favorable safety profile. Key competitive risk: Regeneron Phase 3 readout could redefine the treatment landscape if primary endpoint is met.`,
     },
     regulatory_pathway: {
       metrics: { 'Primary Path': '505(b)(2)', 'Designation': 'Fast Track', 'Est. Timeline': '24 mo', 'Risk Level': 'Moderate' },
@@ -212,7 +245,7 @@ function getMockReportSection(analysisId: string, companyName: string) {
     },
     deal_valuation: {
       metrics: { 'Upfront': '$180M', 'Milestones': '$750M', 'Royalties': '12-18%', 'Total Value': '$930M' },
-      content: `Based on 8 comparable transactions in the last 24 months, expected deal terms include an upfront payment of $180M (median), development and commercial milestones totaling $750M, and tiered royalties of 12-18% on net sales. Total potential deal value of $930M.`,
+      content: `Based on 8 comparable transactions in the last 24 months (median disclosed value: $930M), expected deal structure for ${companyName}: upfront payment of $180M (median; range $120M-$280M), development milestones of $450M across Phase 3 initiation, NDA filing, and approval, commercial milestones of $300M tied to revenue thresholds ($500M, $1B, $2B cumulative net sales), and tiered royalties of 12-18% on net sales. Upfront-to-total ratio of 19% is consistent with Phase 2 assets in this therapeutic area. Lehman fee estimate: $4.2M-$6.8M (retainer + success).`,
     },
     sensitivity_analysis: {
       metrics: { 'Base NPV': '$2.1B', 'Bull Case': '$3.8B', 'Bear Case': '$680M', 'Prob. Adj.': '$1.4B' },
@@ -1385,21 +1418,21 @@ export default function IntelligencePage() {
                 {MOCK_RECENT_REPORTS.map((report, i) => (
                   <div
                     key={report.id}
-                    className="px-5 py-4 cursor-pointer transition-all"
+                    className="px-6 py-5 cursor-pointer transition-all"
                     style={{
                       borderBottom: i < MOCK_RECENT_REPORTS.length - 1 ? '1px solid rgba(100,116,139,0.04)' : 'none',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = '#0a1628'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                   >
-                    <p className="text-[13px] font-medium mb-1.5 leading-snug" style={{ color: '#cbd5e1' }}>
+                    <p className="text-[13px] font-medium mb-2 leading-snug" style={{ color: '#cbd5e1' }}>
                       {report.title}
                     </p>
-                    <div className="flex flex-wrap gap-1.5 mb-2">
+                    <div className="flex flex-wrap gap-2 mb-3">
                       {report.analyses.map(id => (
                         <span
                           key={id}
-                          className="px-2 py-0.5 rounded text-[9px] font-medium"
+                          className="px-2.5 py-1 rounded text-[9px] font-medium"
                           style={{ background: 'rgba(100,116,139,0.08)', color: '#475569' }}
                         >
                           {getAnalysisName(id)}
