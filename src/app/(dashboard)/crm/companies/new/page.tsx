@@ -683,37 +683,43 @@ export default function NewCompanyPage() {
     const payload: Record<string, unknown> = {
       name: form.name,
       type: form.type,
-      website: form.website || undefined,
-      hq_city: form.hq_city || undefined,
-      hq_country: form.hq_country || undefined,
-      stage: form.stage || undefined,
-      founded_year: form.founded_year ? parseInt(form.founded_year, 10) : undefined,
-      employee_count_range: form.employee_range || undefined,
-      total_funding: form.total_funding || undefined,
-      last_funding_date: form.last_funding_date || undefined,
-      therapy_areas: form.therapy_areas.length > 0 ? form.therapy_areas : undefined,
-      lead_asset: form.lead_asset || undefined,
-      lead_asset_phase: form.lead_asset_phase || undefined,
-      indications: form.indications || undefined,
-      relationship_source: form.relationship_source || undefined,
-      has_contacts: form.has_contacts === 'yes',
-      relationship_owner: form.relationship_owner || undefined,
-      services_needed: form.services_needed.length > 0 ? form.services_needed : undefined,
-      deal_signals: form.deal_signals.length > 0 ? form.deal_signals : undefined,
-      has_catalysts: form.has_catalysts,
-      catalyst_description: form.catalyst_description || undefined,
-      market_position: form.market_position || undefined,
-      news_sentiment: form.news_sentiment || undefined,
-      description: form.description || undefined,
-      score: score.total,
-      score_bucket: score.bucket,
-      score_breakdown: score.breakdown,
+      website: form.website || null,
+      hq_city: form.hq_city || null,
+      hq_country: form.hq_country || null,
+      stage: form.stage || null,
+      founded_year: form.founded_year ? parseInt(form.founded_year, 10) : null,
+      employee_count_range: form.employee_range || null,
+      total_funding: form.total_funding ? parseFloat(form.total_funding.replace(/[^0-9.]/g, '')) || null : null,
+      last_funding_date: form.last_funding_date || null,
+      therapy_areas: form.therapy_areas.length > 0 ? form.therapy_areas : [],
+      lead_asset: form.lead_asset || null,
+      lead_asset_phase: form.lead_asset_phase || null,
+      indications: form.indications ? form.indications.split(',').map(s => s.trim()).filter(Boolean) : [],
+      description: form.description || null,
+      notes: [
+        form.services_needed.length > 0 ? `Services needed: ${form.services_needed.join(', ')}` : '',
+        form.deal_signals.length > 0 ? `Deal signals: ${form.deal_signals.join(', ')}` : '',
+        form.has_catalysts && form.catalyst_description ? `Catalysts: ${form.catalyst_description}` : '',
+        form.market_position ? `Market position: ${form.market_position}` : '',
+        form.news_sentiment ? `News sentiment: ${form.news_sentiment}` : '',
+        form.relationship_source ? `Relationship source: ${form.relationship_source}` : '',
+      ].filter(Boolean).join('\n') || null,
+      tags: [
+        ...(form.services_needed || []),
+        form.market_position || '',
+        form.news_sentiment || '',
+      ].filter(Boolean),
+      targeting_score: score.total,
+      targeting_signals: {
+        bucket: score.bucket,
+        breakdown: score.breakdown,
+        services_needed: form.services_needed,
+        deal_signals: form.deal_signals,
+        has_catalysts: form.has_catalysts,
+        market_position: form.market_position,
+        news_sentiment: form.news_sentiment,
+      },
     };
-
-    // Remove undefined values
-    for (const key of Object.keys(payload)) {
-      if (payload[key] === undefined) delete payload[key];
-    }
 
     try {
       const res = await fetch('/api/organizations', {

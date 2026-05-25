@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
       .from('organizations')
-      .insert(body)
+      .insert({ ...body, created_by: user.id })
       .select()
       .single();
 
