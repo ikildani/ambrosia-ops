@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -362,7 +363,9 @@ export default function KnowledgeBasePage() {
               style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
               className="animate-[slideUp_0.4s_ease-out]"
             >
-              <EntryCard entry={entry} />
+              <Link href={`/knowledge/${entry.id}`}>
+                <EntryCard entry={entry} />
+              </Link>
             </div>
           ))}
         </div>
