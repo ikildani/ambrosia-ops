@@ -304,69 +304,82 @@ export default function KnowledgeBasePage() {
       />
 
       {/* Category Stats */}
-      <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '48px' }}>
         {(Object.keys(CATEGORY_META) as KnowledgeCategory[]).map((cat) => {
           const meta = CATEGORY_META[cat];
           const Icon = meta.icon;
           const count = knowledgeEntries.filter((e) => e.category === cat).length;
+          const isActive = activeTab === cat;
           return (
             <button
               key={cat}
               type="button"
-              className="text-left"
               onClick={() => setActiveTab(cat)}
+              style={{
+                textAlign: 'left',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+              }}
             >
-              <Card className="flex items-center gap-3 cursor-pointer transition-all duration-200 hover:border-teal-500/20">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy-800 border border-subtle">
-                  <Icon className="h-4 w-4 text-teal-400" />
-                </div>
+              <div style={{
+                background: '#07101e',
+                border: `1px solid ${isActive ? 'rgba(95,212,227,0.2)' : 'rgba(100,116,139,0.15)'}`,
+                borderRadius: '14px',
+                padding: '28px 32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s ease',
+              }}>
                 <div>
-                  <p className="font-mono text-lg font-semibold text-slate-100 tabular-nums">{count}</p>
-                  <p className="text-[11px] text-slate-500">{meta.label}s</p>
+                  <p style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#64748b', marginBottom: '8px' }}>{meta.label}s</p>
+                  <p style={{ fontFamily: 'var(--font-mono)', fontSize: '28px', fontWeight: 600, color: '#f0f4f8' }}>{count}</p>
                 </div>
-              </Card>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#0d1b2e', border: '1px solid rgba(100,116,139,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon style={{ width: '20px', height: '20px', color: '#00c9a7' }} />
+                </div>
+              </div>
             </button>
           );
         })}
       </div>
 
-      {/* Filter Tabs */}
-      <div className="mb-8">
+      {/* Filter + Search */}
+      <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '14px', padding: '28px 32px', marginBottom: '40px' }}>
+        <div className="relative" style={{ marginBottom: '20px' }}>
+          <Search className="absolute top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#475569', left: '18px' }} />
+          <input
+            type="text"
+            className="input"
+            placeholder="Search knowledge base..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ paddingLeft: '46px', width: '100%' }}
+          />
+        </div>
         <Tabs tabs={categoryTabs} activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-10">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-        <input
-          type="text"
-          className="input pl-10"
-          placeholder="Search knowledge base..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
       </div>
 
       {/* Content Grid or No-Results */}
       {filtered.length === 0 ? (
-        <Card className="flex flex-col items-center justify-center py-20 text-center">
-          <Search className="mb-5 h-8 w-8 text-slate-600" />
-          <p className="text-sm text-slate-400 leading-relaxed">
+        <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '14px', padding: '80px 32px', textAlign: 'center' }}>
+          <Search style={{ width: '32px', height: '32px', color: '#334155', margin: '0 auto 20px' }} />
+          <p style={{ fontSize: '15px', color: '#94a3b8', lineHeight: 1.7 }}>
             No entries match your search. Try different keywords or filters.
           </p>
-        </Card>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-7 lg:grid-cols-2 xl:grid-cols-3">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           {filtered.map((entry, i) => (
-            <div
+            <Link
               key={entry.id}
-              style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
-              className="animate-[slideUp_0.4s_ease-out]"
+              href={`/knowledge/${entry.id}`}
+              style={{ textDecoration: 'none', animation: `slideUp 0.4s ease-out ${i * 60}ms both` }}
             >
-              <Link href={`/knowledge/${entry.id}`}>
-                <EntryCard entry={entry} />
-              </Link>
-            </div>
+              <EntryCard entry={entry} />
+            </Link>
           ))}
         </div>
       )}
@@ -383,48 +396,69 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
   const Icon = meta.icon;
 
   return (
-    <Card className="group relative cursor-pointer transition-all duration-200 hover:border-teal-500/20 hover:shadow-[var(--shadow-card-hover)]">
-      {/* Category icon + badge */}
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy-800 border border-subtle">
-            <Icon className="h-4 w-4 text-teal-400" />
+    <div style={{
+      background: '#07101e',
+      border: '1px solid rgba(100,116,139,0.1)',
+      borderRadius: '14px',
+      padding: '32px',
+      cursor: 'pointer',
+      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    className="group hover:!border-teal-500/20"
+    onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,201,167,0.2)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.4)'; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.1)'; e.currentTarget.style.boxShadow = 'none'; }}
+    >
+      {/* Category icon + badge + read time */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#0d1b2e', border: '1px solid rgba(100,116,139,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon style={{ width: '18px', height: '18px', color: '#00c9a7' }} />
           </div>
           <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
         </div>
-        <span className="font-mono text-[11px] text-slate-500">{entry.readTime}</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#475569' }}>{entry.readTime}</span>
       </div>
 
       {/* Title */}
-      <h3 className="mb-3 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors leading-snug">
+      <h3 style={{ fontSize: '17px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1.35, marginBottom: '14px', transition: 'color 0.2s ease' }}
+        className="group-hover:!text-teal-300"
+      >
         {entry.title}
       </h3>
 
       {/* Description preview */}
-      <p className="mb-5 line-clamp-3 text-sm leading-relaxed text-slate-400">
+      <p style={{ fontSize: '14px', lineHeight: 1.7, color: '#64748b', marginBottom: '24px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', flex: 1 }}>
         {entry.description}
       </p>
 
       {/* Tags */}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {entry.tags.map((tag) => (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
+        {entry.tags.slice(0, 4).map((tag) => (
           <span
             key={tag}
-            className="rounded bg-navy-800 px-2.5 py-1 text-[10px] text-slate-500"
+            style={{ background: '#0d1b2e', padding: '5px 12px', borderRadius: '6px', fontSize: '11px', color: '#64748b', letterSpacing: '0.02em' }}
           >
             {tag}
           </span>
         ))}
+        {entry.tags.length > 4 && (
+          <span style={{ padding: '5px 8px', fontSize: '11px', color: '#475569' }}>
+            +{entry.tags.length - 4}
+          </span>
+        )}
       </div>
 
       {/* Author + date */}
-      <div className="flex items-center gap-2 border-t border-subtle pt-4 text-xs text-slate-500">
-        <User className="h-3 w-3" />
-        <span className="font-medium text-slate-400">{entry.author}</span>
-        <span className="text-slate-600">|</span>
-        <Clock className="h-3 w-3" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', borderTop: '1px solid rgba(100,116,139,0.08)', paddingTop: '20px', fontSize: '13px', color: '#475569' }}>
+        <User style={{ width: '14px', height: '14px' }} />
+        <span style={{ fontWeight: 500, color: '#94a3b8' }}>{entry.author}</span>
+        <span style={{ color: '#1e293b' }}>|</span>
+        <Clock style={{ width: '14px', height: '14px' }} />
         <span>{entry.lastUpdated}</span>
       </div>
-    </Card>
+    </div>
   );
 }
