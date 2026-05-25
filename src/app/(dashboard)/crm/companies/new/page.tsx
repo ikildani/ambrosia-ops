@@ -985,8 +985,8 @@ export default function NewCompanyPage() {
           {/* Founded Year */}
           <div>
             <FieldLabel optional>Founded Year</FieldLabel>
-            <div className="relative max-w-[200px]">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <div className="relative" style={{ maxWidth: '220px' }}>
+              <Calendar className="absolute top-1/2 -translate-y-1/2 w-4 h-4" style={{ left: '18px', color: '#475569' }} />
               <input
                 type="number"
                 value={form.founded_year}
@@ -994,7 +994,8 @@ export default function NewCompanyPage() {
                 placeholder="e.g., 2019"
                 min={1800}
                 max={new Date().getFullYear()}
-                className="input pl-10 font-mono tabular-nums"
+                className="input"
+                style={{ paddingLeft: '46px', width: '100%', fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums' }}
               />
             </div>
           </div>
@@ -1018,14 +1019,15 @@ export default function NewCompanyPage() {
           {/* Total Funding */}
           <div>
             <FieldLabel optional>Total Funding Raised</FieldLabel>
-            <div className="relative max-w-[300px]">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <div className="relative" style={{ maxWidth: '320px' }}>
+              <DollarSign className="absolute top-1/2 -translate-y-1/2 w-4 h-4" style={{ left: '18px', color: '#475569' }} />
               <input
                 type="text"
                 value={form.total_funding}
                 onChange={e => update('total_funding', e.target.value)}
                 placeholder="e.g., 45M"
-                className="input pl-10 font-mono"
+                className="input"
+                style={{ paddingLeft: '46px', width: '100%', fontFamily: 'var(--font-mono)' }}
               />
             </div>
           </div>
@@ -1033,13 +1035,14 @@ export default function NewCompanyPage() {
           {/* Last Funding Date */}
           <div>
             <FieldLabel optional>Last Funding Date</FieldLabel>
-            <div className="relative max-w-[220px]">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <div className="relative" style={{ maxWidth: '240px' }}>
+              <Calendar className="absolute top-1/2 -translate-y-1/2 w-4 h-4" style={{ left: '18px', color: '#475569' }} />
               <input
                 type="date"
                 value={form.last_funding_date}
                 onChange={e => update('last_funding_date', e.target.value)}
-                className="input pl-10 font-mono text-slate-300"
+                className="input"
+                style={{ paddingLeft: '46px', width: '100%', fontFamily: 'var(--font-mono)', color: '#cbd5e1' }}
               />
             </div>
           </div>
@@ -1211,7 +1214,8 @@ export default function NewCompanyPage() {
             <select
               value={form.relationship_owner}
               onChange={e => update('relationship_owner', e.target.value)}
-              className="input appearance-none pr-10 max-w-[320px]"
+              className="input"
+              style={{ maxWidth: '360px', width: '100%' }}
             >
               <option value="" disabled>Select team member</option>
               {TEAM_MEMBERS.map(tm => (
@@ -1376,8 +1380,8 @@ export default function NewCompanyPage() {
         </div>
 
         {/* Score Breakdown */}
-        <div className="rounded-xl border border-slate-700/40 bg-navy-800/50" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <h3 className="text-[11px] font-semibold tracking-widest uppercase text-slate-500" style={{ marginBottom: '4px' }}>Score Breakdown</h3>
+        <div style={{ borderRadius: '14px', border: '1px solid rgba(51,65,85,0.4)', background: 'rgba(13,27,46,0.5)', padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <h3 style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: '4px' }}>Score Breakdown</h3>
           <ScoreBar label="Company Fit" value={score.breakdown.companyFit} max={25} />
           <ScoreBar label="Relationship" value={score.breakdown.relationship} max={25} />
           <ScoreBar label="Market Timing" value={score.breakdown.marketTiming} max={25} />
@@ -1385,12 +1389,12 @@ export default function NewCompanyPage() {
         </div>
 
         {/* Suggested Action */}
-        <div className="rounded-xl border border-teal-500/20 bg-teal-500/5 p-5">
-          <div className="flex items-start gap-3">
-            <Target className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5" />
+        <div style={{ borderRadius: '14px', border: '1px solid rgba(0,201,167,0.15)', background: 'rgba(0,201,167,0.04)', padding: '24px 28px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+            <Target style={{ width: '20px', height: '20px', color: '#00c9a7', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <p className="text-[11px] font-semibold tracking-widest uppercase text-teal-400/80 mb-1">Suggested Action</p>
-              <p className="text-sm text-slate-300 leading-relaxed">{score.action}</p>
+              <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(0,201,167,0.7)', marginBottom: '8px' }}>Suggested Action</p>
+              <p style={{ fontSize: '15px', color: '#cbd5e1', lineHeight: 1.7 }}>{score.action}</p>
             </div>
           </div>
         </div>
@@ -1405,7 +1409,8 @@ export default function NewCompanyPage() {
             value={form.description}
             onChange={e => update('description', e.target.value)}
             placeholder="Any additional context or notes about this company..."
-            className="input min-h-[100px] w-full resize-y"
+            className="input"
+            style={{ minHeight: '120px', width: '100%', resize: 'vertical', lineHeight: 1.7 }}
           />
         </div>
 
