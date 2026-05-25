@@ -213,6 +213,9 @@ export default function CompanyDetailPage({
   const [activities, setActivities] = useState<ActivityType[]>([]);
   const [documents, setDocuments] = useState<DocumentType[]>([]);
   const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [activityForm, setActivityForm] = useState({ activity_type: 'note', subject: '', body: '' });
+  const [savingActivity, setSavingActivity] = useState(false);
 
   useEffect(() => {
     async function loadCompany() {
@@ -361,7 +364,7 @@ export default function CompanyDetailPage({
               <Edit className="w-4 h-4" />
               Edit
             </Button>
-            <Button size="sm">
+            <Button size="sm" onClick={() => setShowActivityModal(true)}>
               <Plus className="w-4 h-4" />
               Add Activity
             </Button>
@@ -904,10 +907,20 @@ export default function CompanyDetailPage({
               </div>
             </div>
 
-            <Button variant="ghost" size="sm" disabled className="flex-shrink-0 mt-1">
-              <ExternalLink className="w-3.5 h-3.5" />
-              Fetch from Terrain
-            </Button>
+            <div className="flex flex-col gap-2 flex-shrink-0 mt-1">
+              <a href={`https://terrain.ambrosiaventures.co${company.therapy_areas[0] ? `?ta=${company.therapy_areas[0]}` : ''}`} target="_blank" rel="noopener noreferrer">
+                <Button variant="ghost" size="sm" className="w-full">
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Open in Terrain
+                </Button>
+              </a>
+              <a href={`https://calculator.ambrosiaventures.co${company.therapy_areas[0] ? `?ta=${company.therapy_areas[0]}` : ''}`} target="_blank" rel="noopener noreferrer">
+                <Button variant="ghost" size="sm" className="w-full">
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Open in Benchmarker
+                </Button>
+              </a>
+            </div>
           </div>
 
           {/* Placeholder grid — hints at the data that would appear */}
@@ -927,6 +940,61 @@ export default function CompanyDetailPage({
           </div>
         </Card>
       </div>
+
+      {/* ================================================================
+          ADD ACTIVITY MODAL
+          ================================================================ */}
+      {showActivityModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,8,15,0.8)', backdropFilter: 'blur(4px)' }} onClick={() => setShowActivityModal(false)} />
+          <div style={{ position: 'relative', background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '16px', padding: '36px 40px', width: '520px', maxHeight: '80vh', overflow: 'auto' }}>
+            <h2 style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#f0f4f8', marginBottom: '8px' }}>Log Activity</h2>
+            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '32px' }}>Record an interaction with {company?.name}</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Activity Type</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                  {['email', 'meeting', 'call', 'note', 'intro_made'].map(type => (
+                    <button key={type} type="button" onClick={() => setActivityForm(f => ({ ...f, activity_type: type }))}
+                      style={{ padding: '10px 18px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, border: 'none', cursor: 'pointer', background: activityForm.activity_type === type ? 'rgba(95,212,227,0.12)' : '#0d1b2e', outline: `1px solid ${activityForm.activity_type === type ? 'rgba(95,212,227,0.3)' : 'rgba(100,116,139,0.1)'}`, color: activityForm.activity_type === type ? '#5fd4e3' : '#94a3b8' }}>
+                      {type.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Subject</label>
+                <input type="text" className="input" style={{ width: '100%' }} placeholder="Brief description..." value={activityForm.subject} onChange={e => setActivityForm(f => ({ ...f, subject: e.target.value }))} />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Notes <span style={{ color: '#475569', fontWeight: 400 }}>(optional)</span></label>
+                <textarea className="input" style={{ width: '100%', minHeight: '100px', resize: 'vertical', lineHeight: 1.7 }} placeholder="Details about the interaction..." value={activityForm.body} onChange={e => setActivityForm(f => ({ ...f, body: e.target.value }))} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '36px' }}>
+              <button onClick={() => setShowActivityModal(false)} style={{ padding: '12px 24px', borderRadius: '10px', fontSize: '14px', fontWeight: 500, border: '1px solid rgba(100,116,139,0.15)', background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}>Cancel</button>
+              <button disabled={!activityForm.subject.trim() || savingActivity} onClick={async () => {
+                setSavingActivity(true);
+                try {
+                  const res = await fetch('/api/activities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity_type: activityForm.activity_type, subject: activityForm.subject, body: activityForm.body || null, organization_id: id, occurred_at: new Date().toISOString(), team_member_id: id }) });
+                  if (res.ok) {
+                    const { data } = await res.json();
+                    setActivities(prev => [data, ...prev]);
+                    setShowActivityModal(false);
+                    setActivityForm({ activity_type: 'note', subject: '', body: '' });
+                  }
+                } catch { /* network error — silently handled */ } finally { setSavingActivity(false); }
+              }} style={{ padding: '12px 28px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, border: 'none', background: (!activityForm.subject.trim() || savingActivity) ? '#1e293b' : 'linear-gradient(135deg, #5fd4e3, #9499d1)', color: (!activityForm.subject.trim() || savingActivity) ? '#475569' : '#04080f', cursor: (!activityForm.subject.trim() || savingActivity) ? 'not-allowed' : 'pointer', opacity: (!activityForm.subject.trim() || savingActivity) ? 0.4 : 1 }}>
+                {savingActivity ? 'Saving...' : 'Log Activity'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
