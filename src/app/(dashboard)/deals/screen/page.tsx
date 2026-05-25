@@ -116,36 +116,46 @@ export default function OpportunityScreeningPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl">
+      <div style={{ maxWidth: '720px' }}>
         {/* Input Form */}
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-6" style={{ color: '#475569' }}>
-          Opportunity Context
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+          <div style={{ width: '4px', height: '24px', borderRadius: '2px', background: 'linear-gradient(180deg, #5fd4e3, #9499d1)' }} />
+          <h2 style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569' }}>
+            Opportunity Context
+          </h2>
+        </div>
 
-        <div className="space-y-6">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {/* Company Name */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Name *</label>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Company Name *</label>
             <input
               type="text"
               value={form.companyName}
               onChange={e => setForm(f => ({ ...f, companyName: e.target.value }))}
               placeholder="Enter company name"
               className="input"
+              style={{ width: '100%' }}
             />
           </div>
 
           {/* Sector */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Sector *</label>
-            <div className="flex flex-wrap gap-2">
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '14px' }}>Sector *</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {SECTORS.map(s => (
                 <button key={s.id} type="button"
                   onClick={() => setForm(f => ({ ...f, sector: s.id }))}
-                  className="px-3.5 py-2 rounded-lg text-[12px] font-medium transition-all"
                   style={{
+                    padding: '10px 18px',
+                    borderRadius: '10px',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                     background: form.sector === s.id ? 'rgba(95,212,227,0.12)' : '#0d1b2e',
-                    border: `1px solid ${form.sector === s.id ? 'rgba(95,212,227,0.3)' : 'rgba(100,116,139,0.1)'}`,
+                    outline: `1px solid ${form.sector === s.id ? 'rgba(95,212,227,0.3)' : 'rgba(100,116,139,0.1)'}`,
                     color: form.sector === s.id ? '#5fd4e3' : '#94a3b8',
                   }}>
                   {s.label}
@@ -155,40 +165,42 @@ export default function OpportunityScreeningPage() {
           </div>
 
           {/* Stage + Deal Size */}
-          <div className="grid grid-cols-2 gap-5">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Stage</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Company Stage</label>
               <select
                 value={form.companyStage}
                 onChange={e => setForm(f => ({ ...f, companyStage: e.target.value }))}
                 className="input"
+                style={{ width: '100%' }}
               >
                 <option value="">Select stage</option>
                 {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Estimated Deal Size ($M)</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Estimated Deal Size ($M)</label>
               <input
                 type="number"
                 value={form.dealSize || ''}
                 onChange={e => setForm(f => ({ ...f, dealSize: parseFloat(e.target.value) || 0 }))}
                 placeholder="e.g., 200"
                 className="input"
-                style={{ fontFamily: 'var(--font-mono)' }}
+                style={{ fontFamily: 'var(--font-mono)', width: '100%' }}
               />
             </div>
           </div>
 
           {/* Therapy Area */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
-              Therapy Area <span style={{ color: '#334155' }}>(optional)</span>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>
+              Therapy Area <span style={{ color: '#475569', fontWeight: 400 }}>(optional)</span>
             </label>
             <select
               value={form.therapyArea}
               onChange={e => setForm(f => ({ ...f, therapyArea: e.target.value }))}
               className="input"
+              style={{ width: '100%' }}
             >
               <option value="">Select if applicable</option>
               {THERAPY_AREAS.map(ta => <option key={ta.id} value={ta.id}>{ta.label}</option>)}
@@ -197,7 +209,7 @@ export default function OpportunityScreeningPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>
               What does this company do and what do they need? *
             </label>
             <textarea
@@ -205,43 +217,46 @@ export default function OpportunityScreeningPage() {
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Describe the company, their situation, and what advisory services they might need..."
               className="input"
-              style={{ minHeight: '120px', resize: 'vertical' }}
+              style={{ minHeight: '140px', resize: 'vertical', width: '100%', lineHeight: 1.7 }}
             />
           </div>
 
           {/* Referral Source */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>How did you hear about this opportunity?</label>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>How did you hear about this opportunity?</label>
             <input
               type="text"
               value={form.referralSource}
               onChange={e => setForm(f => ({ ...f, referralSource: e.target.value }))}
               placeholder="e.g., Board member referral, met at JPM, inbound inquiry..."
               className="input"
+              style={{ width: '100%' }}
             />
           </div>
 
           {/* Known Contacts */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Existing contacts or relationships</label>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Existing contacts or relationships</label>
             <input
               type="text"
               value={form.knownContacts}
               onChange={e => setForm(f => ({ ...f, knownContacts: e.target.value }))}
               placeholder="e.g., Know the CEO from prior deal, introduced by partner at Apex..."
               className="input"
+              style={{ width: '100%' }}
             />
           </div>
 
           {/* Urgency */}
           <div>
-            <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Timeline or urgency</label>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#94a3b8', marginBottom: '12px' }}>Timeline or urgency</label>
             <input
               type="text"
               value={form.urgency}
               onChange={e => setForm(f => ({ ...f, urgency: e.target.value }))}
               placeholder="e.g., Looking to close by Q2, no rush, urgent — need advisor ASAP..."
               className="input"
+              style={{ width: '100%' }}
             />
           </div>
 

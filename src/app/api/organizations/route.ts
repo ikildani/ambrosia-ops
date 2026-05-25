@@ -79,9 +79,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const validTypes = ['biotech', 'pharma', 'family_office', 'angel', 'vc', 'pe', 'cro', 'advisory', 'other'];
+    const typeMap: Record<string, string> = {
+      medtech: 'other',
+      diagnostics: 'other',
+      digital_health: 'other',
+      healthcare: 'other',
+      nutraceuticals: 'other',
+    };
+    const dbType = validTypes.includes(body.type) ? body.type : (typeMap[body.type] || 'other');
+
+    const { created_by: _cb, ...insertBody } = { ...body, type: dbType };
+
     const { data, error } = await supabase
       .from('organizations')
-      .insert({ ...body, created_by: user.id })
+      .insert(insertBody)
       .select()
       .single();
 
