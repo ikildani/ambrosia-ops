@@ -218,15 +218,15 @@ export default function CompaniesPage() {
           { label: 'Recently Added', value: organizations.filter((c) => daysSince(c.created_at) <= 7).length, icon: Clock },
         ].map((stat) => (
           <Card variant="stat" key={stat.label}>
-            <div className="flex items-start gap-4">
-              <div style={{ padding: '10px', borderRadius: '10px', background: '#0d1b2e' }}>
-                <stat.icon className="w-5 h-5 text-slate-400" />
-              </div>
+            <div className="flex items-center justify-between">
               <div>
-                <p className="label">{stat.label}</p>
-                <p className="font-mono text-2xl text-slate-100" style={{ marginTop: '6px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#64748b', marginBottom: '8px' }}>{stat.label}</p>
+                <p className="font-mono text-2xl text-slate-100">
                   {isLoading ? '—' : stat.value}
                 </p>
+              </div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#0d1b2e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <stat.icon className="w-5 h-5 text-slate-400" />
               </div>
             </div>
           </Card>
@@ -234,47 +234,53 @@ export default function CompaniesPage() {
       </div>
 
       {/* Filter / Search Bar */}
-      <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '12px', padding: '24px 28px', marginBottom: '40px' }}>
-        <div className="flex flex-col lg:flex-row lg:items-center" style={{ gap: '20px' }}>
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" style={{ left: '18px' }} />
-            <input
-              type="text"
-              placeholder="Search companies..."
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="input w-full"
-              style={{ paddingLeft: '46px' }}
-            />
-          </div>
+      <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '14px', padding: '28px 32px', marginBottom: '40px' }}>
+        {/* Row 1: Search */}
+        <div className="relative" style={{ marginBottom: '20px' }}>
+          <Search className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" style={{ left: '18px' }} />
+          <input
+            type="text"
+            placeholder="Search companies..."
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="input w-full"
+            style={{ paddingLeft: '46px' }}
+          />
+        </div>
 
-          <div className="overflow-x-auto -mx-1 px-1">
+        {/* Row 2: Tabs + Filters */}
+        <div className="flex flex-col lg:flex-row lg:items-center" style={{ gap: '16px' }}>
+          <div className="flex-1 overflow-x-auto">
             <Tabs tabs={orgTypeTabs} activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
 
-          <select
-            value={therapyArea}
-            onChange={(e) => handleTherapyArea(e.target.value)}
-            className="input w-full lg:w-48"
-          >
-            {therapyAreaOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center" style={{ gap: '12px' }}>
+            <select
+              value={therapyArea}
+              onChange={(e) => handleTherapyArea(e.target.value)}
+              className="input"
+              style={{ width: '180px' }}
+            >
+              {therapyAreaOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
 
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="input w-full lg:w-44"
-          >
-            {sortOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="input"
+              style={{ width: '170px' }}
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

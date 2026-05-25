@@ -112,7 +112,7 @@ function OnboardingWizard() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto space-y-5">
+      <div style={{ maxWidth: '720px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
           const isExpanded = expandedStep === step.id;
@@ -121,63 +121,95 @@ function OnboardingWizard() {
           return (
             <div
               key={step.id}
-              className="rounded-xl transition-all duration-300"
               style={{
+                borderRadius: '16px',
                 background: isExpanded ? '#0a1628' : '#07101e',
                 border: `1px solid ${isExpanded ? 'rgba(95,212,227,0.12)' : 'rgba(100,116,139,0.08)'}`,
                 animation: `slideUp 0.5s ease-out ${200 + i * 80}ms both`,
+                transition: 'all 0.3s ease',
               }}
             >
               <button
-                className="w-full flex items-center gap-5 px-7 py-6 text-left transition-colors"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '20px',
+                  padding: isExpanded ? '28px 32px 0 32px' : '24px 32px',
+                  textAlign: 'left',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
                 onClick={() => setExpandedStep(isExpanded ? null : step.id)}
               >
                 <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
                     background: isComplete ? `${step.accent}12` : 'rgba(100,116,139,0.06)',
                     border: `1px solid ${isComplete ? `${step.accent}25` : 'rgba(100,116,139,0.1)'}`,
                   }}
                 >
                   {isComplete ? (
-                    <CheckCircle2 className="w-4 h-4" style={{ color: step.accent }} />
+                    <CheckCircle2 className="w-5 h-5" style={{ color: step.accent }} />
                   ) : (
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, color: '#475569' }}>
                       {step.number}
                     </span>
                   )}
                 </div>
 
-                <p className="flex-1 text-[14px] font-medium" style={{
+                <p style={{
+                  flex: 1,
+                  fontSize: '16px',
+                  fontWeight: 500,
                   color: isComplete ? '#64748b' : '#e2e8f0',
                   textDecoration: isComplete ? 'line-through' : 'none',
+                  letterSpacing: '0.01em',
                 }}>
                   {step.title}
                 </p>
 
                 <ChevronDown
-                  className="w-4 h-4 flex-shrink-0 transition-transform duration-200"
-                  style={{ color: '#475569', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}
+                  className="w-4 h-4 flex-shrink-0"
+                  style={{ color: '#475569', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}
                 />
               </button>
 
               {isExpanded && !isComplete && (
-                <div className="px-7 pb-7" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '68px' }}>
-                  <p className="text-[13px] leading-relaxed mb-7" style={{ color: '#64748b' }}>
+                <div style={{ animation: 'fadeIn 0.3s ease-out', padding: '20px 32px 32px 100px' }}>
+                  <p style={{ fontSize: '14px', lineHeight: 1.75, color: '#64748b', marginBottom: '28px', letterSpacing: '0.01em' }}>
                     {step.description}
                   </p>
-                  <div className="flex items-center gap-4">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <Link
                       href={step.href}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-[13px] font-semibold transition-all"
-                      style={{ background: step.accent, color: '#04080f' }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '14px 28px',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        background: step.accent,
+                        color: '#04080f',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease',
+                      }}
                     >
                       <Icon className="w-4 h-4" />
                       {step.cta}
                     </Link>
                     <button
-                      className="text-[12px] font-medium transition-colors px-4 py-3"
-                      style={{ color: '#475569' }}
+                      style={{ fontSize: '13px', fontWeight: 500, color: '#475569', padding: '14px 16px', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         setCompletedSteps(prev => [...prev, step.id]);
