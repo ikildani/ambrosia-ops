@@ -169,32 +169,32 @@ export default function DealsPage() {
           {deals.length > 0 && (
             <div className="grid grid-cols-4 gap-px bg-navy-700/50 rounded-xl overflow-hidden border border-subtle mb-10">
               <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
-                <span className="label mb-1.5 flex items-center gap-1.5">
+                <span className="label flex items-center gap-2" style={{ marginBottom: '10px' }}>
                   <DollarSign className="w-3 h-3" /> Total Pipeline
                 </span>
-                <span className="font-mono text-xl text-teal-400">
+                <span className="font-mono text-2xl text-teal-400">
                   {formatCurrency(metrics.totalPipelineValue, true)}
                 </span>
               </div>
               <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
-                <span className="label mb-1.5 flex items-center gap-1.5">
+                <span className="label flex items-center gap-2" style={{ marginBottom: '10px' }}>
                   <Target className="w-3 h-3" /> Active Engagements
                 </span>
-                <span className="font-mono text-xl text-slate-100">{metrics.activeCount}</span>
+                <span className="font-mono text-2xl text-slate-100">{metrics.activeCount}</span>
               </div>
               <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
-                <span className="label mb-1.5 flex items-center gap-1.5">
+                <span className="label flex items-center gap-2" style={{ marginBottom: '10px' }}>
                   <Activity className="w-3 h-3" /> Avg Deal Size
                 </span>
-                <span className="font-mono text-xl text-slate-100">
+                <span className="font-mono text-2xl text-slate-100">
                   {formatCurrency(metrics.avgDealSize, true)}
                 </span>
               </div>
               <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
-                <span className="label mb-1.5 flex items-center gap-1.5">
+                <span className="label flex items-center gap-2" style={{ marginBottom: '10px' }}>
                   <TrendingUp className="w-3 h-3" /> Win Rate
                 </span>
-                <span className="font-mono text-xl text-signal-green">{metrics.winRate}%</span>
+                <span className="font-mono text-2xl text-signal-green">{metrics.winRate}%</span>
               </div>
             </div>
           )}

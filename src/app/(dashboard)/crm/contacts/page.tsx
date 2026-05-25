@@ -187,7 +187,7 @@ export default function ContactsPage() {
       />
 
       {/* Stats Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
         {[
           { label: 'Total Contacts', value: pagination?.total ?? 0, icon: Users },
           { label: 'Warm Intros', value: contacts.filter((c) => c.relationship_strength === 'warm_intro').length, icon: Handshake },
@@ -195,13 +195,13 @@ export default function ContactsPage() {
           { label: 'Needs Follow-up', value: contacts.filter((c) => !c.last_contacted_at || daysSince(c.last_contacted_at) > 30).length, icon: AlertCircle },
         ].map((stat) => (
           <Card variant="stat" key={stat.label}>
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-md bg-navy-800">
-                <stat.icon className="w-4 h-4 text-slate-400" />
+            <div className="flex items-start gap-4">
+              <div style={{ padding: '10px', borderRadius: '10px', background: '#0d1b2e' }}>
+                <stat.icon className="w-5 h-5 text-slate-400" />
               </div>
               <div>
                 <p className="label">{stat.label}</p>
-                <p className="font-mono text-xl text-slate-100 mt-0.5">
+                <p className="font-mono text-2xl text-slate-100" style={{ marginTop: '6px' }}>
                   {isLoading ? '—' : stat.value}
                 </p>
               </div>
@@ -211,16 +211,17 @@ export default function ContactsPage() {
       </div>
 
       {/* Filter / Search Bar */}
-      <Card className="mb-10 !bg-navy-900">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+      <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '12px', padding: '24px 28px', marginBottom: '40px' }}>
+        <div className="flex flex-col lg:flex-row lg:items-center" style={{ gap: '20px' }}>
           <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" style={{ left: '18px' }} />
             <input
               type="text"
               placeholder="Search by name, title, or company..."
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
-              className="input pl-9 py-2 text-sm w-full"
+              className="input w-full"
+              style={{ paddingLeft: '46px' }}
             />
           </div>
 
@@ -231,7 +232,7 @@ export default function ContactsPage() {
           <select
             value={relFilter}
             onChange={(e) => setRelFilter(e.target.value)}
-            className="input py-2 text-sm w-full lg:w-44"
+            className="input w-full lg:w-48"
           >
             {relationshipFilterOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -243,7 +244,7 @@ export default function ContactsPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="input py-2 text-sm w-full lg:w-48"
+            className="input w-full lg:w-52"
           >
             {sortOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -252,7 +253,7 @@ export default function ContactsPage() {
             ))}
           </select>
         </div>
-      </Card>
+      </div>
 
       {/* Loading State */}
       {isLoading && (
@@ -287,14 +288,14 @@ export default function ContactsPage() {
 
       {/* Empty State */}
       {!isLoading && !error && sorted.length === 0 && (
-        <div className="relative rounded-xl border border-subtle overflow-hidden">
+        <div className="relative rounded-2xl border border-subtle overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-teal-900/10 via-transparent to-navy-950 pointer-events-none" />
-          <div className="relative flex flex-col items-center justify-center py-24 px-6 text-center">
-            <div className="p-4 rounded-2xl bg-navy-800/60 mb-5">
-              <Users className="w-12 h-12 text-slate-500" />
+          <div className="relative flex flex-col items-center justify-center py-32 px-8 text-center">
+            <div style={{ padding: '20px', borderRadius: '20px', background: 'rgba(13,27,46,0.6)', marginBottom: '28px' }}>
+              <Users className="w-14 h-14 text-slate-500" />
             </div>
-            <h3 className="font-display text-xl text-slate-100 mb-2">No contacts yet</h3>
-            <p className="text-sm text-slate-400 max-w-md mb-8 leading-relaxed">
+            <h3 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#f0f4f8', marginBottom: '12px' }}>No contacts yet</h3>
+            <p style={{ fontSize: '15px', color: '#94a3b8', maxWidth: '480px', marginBottom: '36px', lineHeight: 1.7 }}>
               Build your network by adding the people behind the companies you work with —
               founders, investors, operators, and advisors.
             </p>

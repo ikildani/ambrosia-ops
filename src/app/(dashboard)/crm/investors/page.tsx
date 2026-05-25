@@ -59,17 +59,17 @@ export default function InvestorsPage() {
       />
 
       {/* Stats strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {stats.map((stat) => (
           <Card key={stat.label} variant="stat">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-1">
+                <p style={{ fontSize: '12px', fontWeight: 500, color: '#64748b', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px' }}>
                   {stat.label}
                 </p>
                 <p className="font-mono text-2xl text-slate-100">{stat.value}</p>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-navy-800 flex items-center justify-center">
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#0d1b2e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <stat.icon className="w-5 h-5 text-teal-500" />
               </div>
             </div>
@@ -79,14 +79,19 @@ export default function InvestorsPage() {
 
       {/* Investor cards */}
       {investors.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <Building2 className="w-12 h-12 mb-5" style={{ color: '#334155' }} />
-          <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
-            No investors yet
-          </h2>
-          <p className="mt-2 text-[14px]" style={{ color: '#64748b' }}>
-            Add your first investor to start tracking thesis alignment and check sizes.
-          </p>
+        <div className="relative rounded-2xl border border-subtle overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-900/10 via-transparent to-navy-950 pointer-events-none" />
+          <div className="relative flex flex-col items-center justify-center py-32 px-8 text-center">
+            <div style={{ padding: '20px', borderRadius: '20px', background: 'rgba(13,27,46,0.6)', marginBottom: '28px' }}>
+              <Building2 className="w-14 h-14 text-slate-500" />
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#f0f4f8', marginBottom: '12px' }}>
+              No investors yet
+            </h2>
+            <p style={{ fontSize: '15px', color: '#94a3b8', maxWidth: '480px', lineHeight: 1.7 }}>
+              Add your first investor to start tracking thesis alignment and check sizes.
+            </p>
+          </div>
         </div>
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7">
