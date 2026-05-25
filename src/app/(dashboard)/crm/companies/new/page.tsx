@@ -342,24 +342,38 @@ function MultiPillButton({
 
 function StepHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2
-      className="text-3xl font-normal text-slate-100 tracking-tight mb-2"
-      style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}
-    >
+    <h2 style={{
+      fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+      fontSize: '32px',
+      fontWeight: 600,
+      color: '#f0f4f8',
+      letterSpacing: '-0.01em',
+      lineHeight: 1.2,
+      marginBottom: '10px',
+    }}>
       {children}
     </h2>
   );
 }
 
 function StepSubheading({ children }: { children: React.ReactNode }) {
-  return <p className="text-slate-400 text-[14px] leading-relaxed">{children}</p>;
+  return <p style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.7, letterSpacing: '0.01em' }}>{children}</p>;
 }
 
 function FieldLabel({ children, optional }: { children: React.ReactNode; optional?: boolean }) {
   return (
-    <label className="input-label flex items-center gap-2">
+    <label style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontSize: '13px',
+      fontWeight: 500,
+      color: '#94a3b8',
+      marginBottom: '12px',
+      letterSpacing: '0.02em',
+    }}>
       {children}
-      {optional && <span className="text-slate-600 text-[10px] font-normal tracking-normal normal-case">Optional</span>}
+      {optional && <span style={{ fontSize: '12px', fontWeight: 400, color: '#475569', letterSpacing: '0.01em' }}>Optional</span>}
     </label>
   );
 }
@@ -749,13 +763,13 @@ export default function NewCompanyPage() {
 
   function renderStep1() {
     return (
-      <div className="space-y-8">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
         <div>
           <StepHeading>Who is this company?</StepHeading>
           <StepSubheading>Let&apos;s start with the basics. Tell us about the organization you&apos;re adding.</StepSubheading>
         </div>
 
-        <div className="space-y-7">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
           {/* Company Name */}
           <div>
             <FieldLabel>Company Name</FieldLabel>
@@ -764,8 +778,8 @@ export default function NewCompanyPage() {
               value={form.name}
               onChange={e => update('name', e.target.value)}
               placeholder="Enter company name..."
-              className="input text-lg py-3.5 px-4"
-              style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '20px' }}
+              className="input"
+              style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '20px', padding: '16px 20px', width: '100%' }}
               autoFocus
             />
             {form.name.trim().length >= 3 && (
@@ -794,7 +808,7 @@ export default function NewCompanyPage() {
           {/* Company Type */}
           <div>
             <FieldLabel>Company Type</FieldLabel>
-            <div className="flex flex-wrap gap-2.5 mt-1">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {ORG_TYPES.map(t => (
                 <PillButton
                   key={t.id}
@@ -812,13 +826,14 @@ export default function NewCompanyPage() {
           <div>
             <FieldLabel optional>Website</FieldLabel>
             <div className="relative">
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Globe className="absolute top-1/2 -translate-y-1/2 w-4 h-4" style={{ left: '18px', color: '#475569' }} />
               <input
                 type="url"
                 value={form.website}
                 onChange={e => update('website', e.target.value)}
                 placeholder="https://example.com"
-                className="input pl-10"
+                className="input"
+                style={{ paddingLeft: '46px', width: '100%' }}
               />
             </div>
           </div>
@@ -826,15 +841,16 @@ export default function NewCompanyPage() {
           {/* HQ Location */}
           <div>
             <FieldLabel optional>Headquarters</FieldLabel>
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <MapPin className="absolute top-1/2 -translate-y-1/2 w-4 h-4" style={{ left: '18px', color: '#475569' }} />
                 <input
                   type="text"
                   value={form.hq_city}
                   onChange={e => update('hq_city', e.target.value)}
                   placeholder="City"
-                  className="input pl-10"
+                  className="input"
+                  style={{ paddingLeft: '46px', width: '100%' }}
                 />
               </div>
               <input
