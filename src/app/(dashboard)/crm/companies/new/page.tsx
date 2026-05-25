@@ -589,6 +589,8 @@ export default function NewCompanyPage() {
   const [animKey, setAnimKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [enriching, setEnriching] = useState(false);
+  const [enriched, setEnriched] = useState(false);
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
 
   const isBiotechPharma = form.type === 'biotech' || form.type === 'pharma';
@@ -782,25 +784,106 @@ export default function NewCompanyPage() {
               style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '20px', padding: '16px 20px', width: '100%' }}
               autoFocus
             />
-            {form.name.trim().length >= 3 && (
-              <div
-                className="mt-3 rounded-lg border border-dashed border-slate-700/60 bg-navy-800/30 px-4 py-3 animate-[fadeIn_0.4s_ease-out]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Search className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-[12px] text-slate-500">
-                      Auto-enrichment available — We can pull company data from public sources automatically.
+            {form.name.trim().length >= 3 && !enriched && (
+              <div style={{
+                marginTop: '16px',
+                borderRadius: '12px',
+                border: '1px solid rgba(95,212,227,0.15)',
+                background: 'rgba(10,22,40,0.8)',
+                padding: '18px 24px',
+                animation: 'fadeIn 0.4s ease-out',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Sparkles style={{ width: '16px', height: '16px', color: '#5fd4e3' }} />
+                    <span style={{ fontSize: '14px', color: '#94a3b8' }}>
+                      {enriching ? 'Researching company...' : 'Auto-enrich — Pull company data from public sources'}
                     </span>
                   </div>
                   <button
                     type="button"
-                    disabled
-                    className="btn btn-sm text-[11px] text-slate-600 border border-slate-700/40 bg-navy-800/50 cursor-not-allowed opacity-50"
+                    disabled={enriching}
+                    onClick={async () => {
+                      setEnriching(true);
+                      try {
+                        const res = await fetch('/api/enrichment', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ companyName: form.name, companyType: form.type }),
+                        });
+                        if (res.ok) {
+                          const { data } = await res.json();
+                          setForm(prev => ({
+                            ...prev,
+                            website: data.website || prev.website,
+                            hq_city: data.hq_city || prev.hq_city,
+                            hq_country: data.hq_country || prev.hq_country,
+                            stage: data.stage || prev.stage,
+                            founded_year: data.founded_year ? String(data.founded_year) : prev.founded_year,
+                            employee_range: data.employee_range || prev.employee_range,
+                            total_funding: data.total_funding ? String(data.total_funding) : prev.total_funding,
+                            last_funding_date: data.last_funding_date || prev.last_funding_date,
+                            lead_asset: data.lead_asset || prev.lead_asset,
+                            lead_asset_phase: data.lead_asset_phase || prev.lead_asset_phase,
+                            therapy_areas: data.therapy_areas?.length > 0 ? data.therapy_areas : prev.therapy_areas,
+                            indications: data.indications?.join(', ') || prev.indications,
+                            description: data.description || prev.description,
+                            has_catalysts: data.has_catalysts ?? prev.has_catalysts,
+                            catalyst_description: data.catalyst_description || prev.catalyst_description,
+                            market_position: data.market_position || prev.market_position,
+                            news_sentiment: data.news_sentiment || prev.news_sentiment,
+                          }));
+                          setEnriched(true);
+                        }
+                      } catch {
+                        // silently fail
+                      }
+                      setEnriching(false);
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      border: 'none',
+                      cursor: enriching ? 'wait' : 'pointer',
+                      background: enriching ? 'rgba(95,212,227,0.08)' : 'linear-gradient(135deg, #5fd4e3, #9499d1)',
+                      color: enriching ? '#5fd4e3' : '#04080f',
+                      transition: 'all 0.2s ease',
+                    }}
                   >
-                    Coming Soon
+                    {enriching ? (
+                      <>
+                        <span style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }}>⟳</span>
+                        Enriching...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles style={{ width: '14px', height: '14px' }} />
+                        Auto-Enrich
+                      </>
+                    )}
                   </button>
                 </div>
+              </div>
+            )}
+            {enriched && (
+              <div style={{
+                marginTop: '16px',
+                borderRadius: '12px',
+                border: '1px solid rgba(52,211,153,0.15)',
+                background: 'rgba(52,211,153,0.04)',
+                padding: '14px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                animation: 'fadeIn 0.4s ease-out',
+              }}>
+                <Check style={{ width: '16px', height: '16px', color: '#34d399' }} />
+                <span style={{ fontSize: '14px', color: '#34d399' }}>Company data enriched from public sources. Review and continue.</span>
               </div>
             )}
           </div>
