@@ -286,24 +286,24 @@ function PopulatedDashboard({
     <>
       <div className="flex items-end justify-between mb-14">
         <div>
-          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.12em', color: '#5fd4e3', textTransform: 'uppercase' }}>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '0.14em', color: '#5fd4e3', textTransform: 'uppercase' }}>
             {date}
           </p>
           <h1 style={{
             fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
-            fontSize: '38px', fontWeight: 600, color: '#f0f4f8', letterSpacing: '-0.01em', lineHeight: 1.15, marginTop: '6px',
+            fontSize: '42px', fontWeight: 600, color: '#f0f4f8', letterSpacing: '-0.01em', lineHeight: 1.15, marginTop: '10px',
           }}>
             {greeting}
           </h1>
         </div>
-        <Link href="/deals/new" className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-semibold transition-all"
+        <Link href="/deals/new" className="flex items-center gap-2.5 px-6 py-3 rounded-lg text-[14px] font-semibold transition-all"
           style={{ background: 'linear-gradient(135deg, #5fd4e3, #9499d1)', color: '#04080f' }}>
           <Plus className="w-4 h-4" /> New Mandate
         </Link>
       </div>
 
       {/* Headline Metrics */}
-      <div className="grid grid-cols-4 gap-12 mb-16" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
+      <div className="grid grid-cols-4 gap-14 mb-20" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
         {[
           { label: 'Active Mandates', value: String(activeDeals.length), delta: `${orgCount} companies tracked`, deltaColor: '#5fd4e3' },
           { label: 'Pipeline Value', value: formatCurrency(totalValue, true), delta: `${activeDeals.length} active`, deltaColor: '#34d399' },
@@ -311,16 +311,16 @@ function PopulatedDashboard({
           { label: 'Total Deals', value: String(deals.length), delta: `${closedDeals.length} resolved`, deltaColor: '#94a3b8' },
         ].map((m, i) => (
           <div key={m.label}>
-            <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: '10px' }}>
+            <p style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#475569', marginBottom: '14px' }}>
               {m.label}
             </p>
             <p style={{
               fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
-              fontSize: '42px', fontWeight: 600, color: i === 1 ? '#5fd4e3' : '#f0f4f8', lineHeight: 1,
+              fontSize: '46px', fontWeight: 600, color: i === 1 ? '#5fd4e3' : '#f0f4f8', lineHeight: 1,
             }}>
               {m.value}
             </p>
-            <p className="flex items-center gap-1 mt-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: m.deltaColor }}>
+            <p className="flex items-center gap-1.5 mt-3" style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: m.deltaColor }}>
               {m.deltaColor === '#34d399' && <TrendingUp className="w-3 h-3" />}
               {m.delta}
             </p>
@@ -329,31 +329,31 @@ function PopulatedDashboard({
       </div>
 
       {/* Mandate Pipeline */}
-      <div className="mb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+      <div className="mb-20">
+        <div className="flex items-center justify-between mb-8">
+          <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '28px', fontWeight: 600, color: '#e2e8f0' }}>
             Mandate Pipeline
           </h2>
-          <Link href="/deals" className="flex items-center gap-1.5 text-[12px] font-medium transition-colors" style={{ color: '#64748b' }}
+          <Link href="/deals" className="flex items-center gap-2 text-[13px] font-medium transition-colors" style={{ color: '#64748b' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#5fd4e3'; }}
             onMouseLeave={e => { e.currentTarget.style.color = '#64748b'; }}>
             Full pipeline <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-5">
           {stageData.map((stage, i) => (
-            <div key={stage.id} className="flex-1 relative group rounded-xl px-5 py-5 transition-all duration-300"
-              style={{ background: '#07101e', border: `1px solid ${stage.color}12`, animation: `slideUp 0.4s ease-out ${i * 50}ms both`, padding: '24px' }}
+            <div key={stage.id} className="flex-1 relative group rounded-xl transition-all duration-300"
+              style={{ background: '#07101e', border: `1px solid ${stage.color}12`, animation: `slideUp 0.4s ease-out ${i * 50}ms both`, padding: '28px' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = `${stage.color}30`; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = `${stage.color}12`; }}>
               <div className="absolute top-0 left-5 right-5 h-[2px] rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: stage.color }} />
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-[6px] h-[6px] rounded-full" style={{ background: stage.color }} />
-                <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#64748b' }}>{stage.label}</span>
+              <div className="flex items-center gap-2.5 mb-5">
+                <div className="w-[7px] h-[7px] rounded-full" style={{ background: stage.color }} />
+                <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#64748b' }}>{stage.label}</span>
               </div>
-              <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: '34px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1 }}>{stage.count}</p>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#475569', marginTop: '4px' }}>
+              <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: '38px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1 }}>{stage.count}</p>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: '#475569', marginTop: '8px' }}>
                 {formatCurrency(stage.value, true)}
               </p>
               {i < stageData.length - 1 && <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 z-10"><ChevronRight className="w-3 h-3" style={{ color: '#1e293b' }} /></div>}
@@ -363,9 +363,9 @@ function PopulatedDashboard({
       </div>
 
       {/* Two-Column: Mandates + Activity */}
-      <div className="grid grid-cols-2 gap-10">
+      <div className="grid grid-cols-2 gap-12">
         <div>
-          <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0', marginBottom: '20px' }}>
+          <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '28px', fontWeight: 600, color: '#e2e8f0', marginBottom: '28px' }}>
             Active Mandates
           </h2>
           <div className="space-y-4">
@@ -379,16 +379,16 @@ function PopulatedDashboard({
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.12)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; }}>
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    {m.priority === 'critical' && <Flame className="w-3.5 h-3.5" style={{ color: '#f87171' }} />}
-                    {m.priority === 'high' && <Flame className="w-3.5 h-3.5" style={{ color: '#fbbf24' }} />}
-                    <span className="text-[15px] font-medium group-hover:text-[#5fd4e3] transition-colors" style={{ color: '#f0f4f8' }}>{m.title}</span>
-                    <span className="px-2 py-[2px] rounded text-[9px] font-semibold uppercase tracking-wider" style={{ background: `${m.stageColor}12`, color: m.stageColor }}>{m.stage}</span>
+                  <div className="flex items-center gap-3 mb-2">
+                    {m.priority === 'critical' && <Flame className="w-4 h-4" style={{ color: '#f87171' }} />}
+                    {m.priority === 'high' && <Flame className="w-4 h-4" style={{ color: '#fbbf24' }} />}
+                    <span className="text-[16px] font-medium group-hover:text-[#5fd4e3] transition-colors" style={{ color: '#f0f4f8' }}>{m.title}</span>
+                    <span className="px-2.5 py-1 rounded text-[10px] font-semibold uppercase tracking-wider" style={{ background: `${m.stageColor}12`, color: m.stageColor }}>{m.stage}</span>
                   </div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-[12px]" style={{ color: '#64748b' }}>{m.company}</span>
+                  <div className="flex items-center gap-4 mt-2">
+                    <span className="text-[13px]" style={{ color: '#64748b' }}>{m.company}</span>
                     <span style={{ color: '#1e293b' }}>·</span>
-                    <span className="text-[11px] uppercase tracking-wider" style={{ color: '#475569' }}>{m.dealType}</span>
+                    <span className="text-[12px] uppercase tracking-wider" style={{ color: '#475569' }}>{m.dealType}</span>
                   </div>
                 </div>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', fontWeight: 600, color: '#5fd4e3' }}>
@@ -401,8 +401,8 @@ function PopulatedDashboard({
 
         <div className="space-y-10">
           <div>
-            <div className="flex items-center gap-3 mb-5">
-              <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>Team Activity</h2>
+            <div className="flex items-center gap-3 mb-7">
+              <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '28px', fontWeight: 600, color: '#e2e8f0' }}>Team Activity</h2>
               <span className="relative flex h-[5px] w-[5px]">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: '#5fd4e3' }} />
                 <span className="relative inline-flex rounded-full h-[5px] w-[5px]" style={{ background: '#5fd4e3' }} />
@@ -413,11 +413,11 @@ function PopulatedDashboard({
                 <p className="text-sm text-slate-500 py-8 text-center">No recent activity</p>
               )}
               {recentActivity.map((item, i) => (
-                <div key={item.id} className="flex items-start gap-3 py-3 group cursor-pointer" style={{ animation: `slideUp 0.3s ease-out ${300 + i * 50}ms both` }}>
-                  <div className="w-[6px] h-[6px] rounded-full flex-shrink-0 mt-[7px]" style={{ background: item.accent ? '#5fd4e3' : '#334155' }} />
+                <div key={item.id} className="flex items-start gap-4 py-4 group cursor-pointer" style={{ animation: `slideUp 0.3s ease-out ${300 + i * 50}ms both` }}>
+                  <div className="w-[7px] h-[7px] rounded-full flex-shrink-0 mt-[8px]" style={{ background: item.accent ? '#5fd4e3' : '#334155' }} />
                   <div className="flex-1">
-                    <p className="text-[13px] leading-relaxed group-hover:text-slate-100 transition-colors" style={{ color: '#94a3b8' }}>{item.text}</p>
-                    <p className="mt-1" style={{ fontSize: '11px', color: '#334155' }}>{item.time}</p>
+                    <p className="text-[14px] leading-relaxed group-hover:text-slate-100 transition-colors" style={{ color: '#94a3b8' }}>{item.text}</p>
+                    <p className="mt-2" style={{ fontSize: '12px', color: '#475569' }}>{item.time}</p>
                   </div>
                 </div>
               ))}
@@ -426,7 +426,7 @@ function PopulatedDashboard({
 
           <div className="h-px" style={{ background: 'rgba(100,116,139,0.06)' }} />
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             {[
               { label: 'AI Deep Dive', href: '/intelligence', icon: Sparkles, color: '#5fd4e3' },
               { label: 'Add Company', href: '/crm/companies/new', icon: Building2, color: '#9499d1' },
@@ -435,12 +435,12 @@ function PopulatedDashboard({
               const Icon = action.icon;
               return (
                 <Link key={action.label} href={action.href}
-                  className="flex flex-col items-center gap-2 rounded-xl py-4 transition-all duration-200"
+                  className="flex flex-col items-center gap-3 rounded-xl py-6 transition-all duration-200"
                   style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = `${action.color}25`; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; }}>
                   <Icon className="w-5 h-5" style={{ color: action.color }} />
-                  <span className="text-[11px] font-medium" style={{ color: '#64748b' }}>{action.label}</span>
+                  <span className="text-[13px] font-medium" style={{ color: '#64748b' }}>{action.label}</span>
                 </Link>
               );
             })}
