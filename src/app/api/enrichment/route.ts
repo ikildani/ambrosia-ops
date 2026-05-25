@@ -16,91 +16,79 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Company name is required' }, { status: 400 });
     }
 
-    const perplexityKey = process.env.PERPLEXITY_API_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    const perplexityKey = process.env.PERPLEXITY_API_KEY;
 
-    if (!perplexityKey || !anthropicKey) {
+    if (!anthropicKey) {
       return NextResponse.json({ error: 'Enrichment service not configured' }, { status: 503 });
     }
 
-    const perplexityRes = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${perplexityKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'sonar',
-        messages: [
-          {
-            role: 'user',
-            content: `Research this company thoroughly for M&A advisory evaluation. Return ONLY factual, verifiable information with specific numbers, dates, and names.
+    let rawResearch = '';
+    let citations: string[] = [];
 
-Company: ${companyName}
-${companyType ? `Sector: ${companyType}` : ''}
-
-I need:
-1. Company overview — what they do, year founded, headquarters city and country, approximate employee count
-2. Total funding raised and last funding round details (amount, date, lead investors)
-3. Lead product/asset name and its clinical development phase
-4. Key therapy areas and indications
-5. Recent news from the last 6 months — any deals, partnerships, clinical readouts, or regulatory events
-6. Competitive landscape — who are their main competitors
-7. Any upcoming catalysts (clinical data readouts, regulatory decisions, conference presentations)
-8. Market sentiment — is the company viewed positively or facing challenges
-
-Be specific with dollar amounts, dates, and names. If information is not available, say "Not found" for that field.`,
+    if (perplexityKey) {
+      try {
+        const perplexityRes = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${perplexityKey}`,
+            'Content-Type': 'application/json',
           },
-        ],
-        max_tokens: 2000,
-        temperature: 0.1,
-      }),
-    });
-
-    if (!perplexityRes.ok) {
-      console.error('[Enrichment] Perplexity API error:', perplexityRes.status);
-      return NextResponse.json({ error: 'Research service unavailable' }, { status: 502 });
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [{
+              role: 'user',
+              content: `Research this company for M&A advisory: ${companyName}${companyType ? ` (${companyType})` : ''}. Include: overview, founding year, HQ, employees, funding, lead asset, therapy areas, recent news, competitors, upcoming catalysts, market sentiment. Be specific with numbers and dates.`,
+            }],
+            max_tokens: 2000,
+            temperature: 0.1,
+          }),
+        });
+        if (perplexityRes.ok) {
+          const data = await perplexityRes.json();
+          rawResearch = data.choices?.[0]?.message?.content || '';
+          citations = data.citations || [];
+        }
+      } catch {
+        // fall through to Claude-only
+      }
     }
-
-    const perplexityData = await perplexityRes.json();
-    const rawResearch = perplexityData.choices?.[0]?.message?.content || '';
-    const citations = perplexityData.citations || [];
 
     const anthropic = new Anthropic({ apiKey: anthropicKey });
 
     const parseResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      system: 'You are a data extraction assistant. Parse unstructured company research into a structured JSON object. Return ONLY valid JSON with no explanation or markdown.',
+      max_tokens: 2000,
+      system: 'You are a life sciences company research assistant. Return ONLY valid JSON with no explanation, markdown, or code fences.',
       messages: [{
         role: 'user',
-        content: `Parse this company research into structured fields. Return a JSON object with these exact keys. Use null for any field where the information was not found or is uncertain.
-
-Research data:
-${rawResearch}
-
-Required JSON structure:
+        content: rawResearch
+          ? `Parse this company research into structured fields. Return a JSON object. Use null for unknown fields.\n\nResearch:\n${rawResearch}`
+          : `Research the company "${companyName}"${companyType ? ` (sector: ${companyType})` : ''} using your training data. Return a structured JSON object with everything you know. Use null for fields you're uncertain about.`,
+      }, {
+        role: 'user',
+        content: `Return this exact JSON structure:
 {
-  "website": "string or null — company website URL",
+  "website": "string or null",
   "hq_city": "string or null",
   "hq_country": "string or null",
   "founded_year": "number or null",
-  "employee_range": "string or null — e.g. '51-200', '201-500', '501-1000'",
+  "employee_range": "string or null — e.g. '51-200', '201-500'",
   "stage": "string or null — one of: seed, series_a, series_b, series_c, growth, public",
-  "total_funding": "number or null — total funding in USD (just the number, no currency symbol)",
-  "last_funding_date": "string or null — ISO date format YYYY-MM-DD",
-  "lead_asset": "string or null — name of lead product/drug candidate",
-  "lead_asset_phase": "string or null — e.g. 'Phase 1', 'Phase 2', 'Phase 3', 'Approved', 'Preclinical'",
-  "therapy_areas": ["array of strings — e.g. 'oncology', 'neurology', 'immunology'"],
-  "indications": ["array of strings — specific disease indications"],
-  "description": "string — 2-3 sentence company description",
+  "total_funding": "number or null — USD amount as number",
+  "last_funding_date": "string or null — YYYY-MM-DD",
+  "lead_asset": "string or null",
+  "lead_asset_phase": "string or null — e.g. 'Phase 2', 'Approved'",
+  "therapy_areas": ["lowercase strings — oncology, neurology, etc"],
+  "indications": ["specific disease names"],
+  "description": "2-3 sentence description",
   "has_catalysts": true/false,
-  "catalyst_description": "string or null — describe upcoming catalysts",
-  "market_position": "string or null — one of: 'low', 'moderate', 'high' competition",
-  "news_sentiment": "string or null — one of: 'positive', 'neutral', 'negative'",
-  "recent_news": ["array of strings — recent headlines"],
-  "competitors": ["array of strings — competitor company names"],
-  "key_people": ["array of strings — key executive names and titles"]
+  "catalyst_description": "string or null",
+  "market_position": "low, moderate, or high",
+  "news_sentiment": "positive, neutral, or negative",
+  "recent_news": ["recent headlines"],
+  "competitors": ["competitor names"],
+  "key_people": ["Name — Title"]
 }`,
       }],
     });
