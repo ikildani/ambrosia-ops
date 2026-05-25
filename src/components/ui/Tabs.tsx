@@ -15,13 +15,13 @@ interface TabsProps {
 
 export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
   return (
-    <div className="flex gap-1 border-b border-subtle">
+    <div className="flex gap-2 border-b border-subtle">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
-            'px-5 py-3 text-sm font-medium transition-colors',
+            'px-6 py-3.5 text-sm font-medium transition-colors tracking-wide',
             'border-b-2 -mb-px',
             activeTab === tab.id
               ? 'border-teal-400 text-teal-400'

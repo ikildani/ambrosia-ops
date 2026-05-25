@@ -119,8 +119,18 @@ body {
   color: var(--text-primary);
   font-family: "Sora", system-ui, sans-serif;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
   min-height: 100vh;
+}
+
+p, li, span, td {
+  line-height: 1.75;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 ::selection {
@@ -166,7 +176,7 @@ body {
 
 .label {
   font-family: "Sora", sans-serif;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -203,8 +213,8 @@ body {
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 28px 32px;
+  border-radius: 12px;
+  padding: 32px 36px;
   position: relative;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -224,8 +234,8 @@ body {
 .stat-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 28px 32px;
+  border-radius: 12px;
+  padding: 32px 36px;
   position: relative;
   overflow: hidden;
 }
@@ -254,11 +264,11 @@ body {
   width: 100%;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--text-primary);
   font-family: "Sora", sans-serif;
   font-size: 14px;
-  padding: 12px 16px;
+  padding: 14px 18px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   appearance: none;
@@ -290,12 +300,12 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 9px;
   font-family: "Sora", sans-serif;
   font-size: 14px;
   font-weight: 500;
-  border-radius: 8px;
-  padding: 11px 22px;
+  border-radius: 10px;
+  padding: 12px 24px;
   cursor: pointer;
   border: none;
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
@@ -340,7 +350,7 @@ body {
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
-  padding: 10px 16px;
+  padding: 11px 18px;
 }
 
 .btn-ghost:hover {
@@ -360,7 +370,7 @@ body {
 
 .btn-sm {
   font-size: 13px;
-  padding: 8px 16px;
+  padding: 10px 18px;
 }
 
 .btn-lg {
@@ -378,10 +388,11 @@ body {
   gap: 5px;
   font-size: 11px;
   font-weight: 500;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 100px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
+  line-height: 1.3;
 }
 
 .badge-teal {
@@ -456,7 +467,7 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 14px 18px;
+  padding: 16px 20px;
   text-align: left;
   white-space: nowrap;
   cursor: pointer;
@@ -478,9 +489,10 @@ body {
 }
 
 .data-table tbody td {
-  padding: 14px 18px;
+  padding: 16px 20px;
   color: var(--text-secondary);
   vertical-align: middle;
+  line-height: 1.6;
 }
 
 .data-table tbody td.numeric {
@@ -533,10 +545,10 @@ body {
 .sidebar-section-label {
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 20px 12px 8px;
+  padding: 24px 14px 10px;
   margin-top: 4px;
 }
 
@@ -544,7 +556,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 14px;
+  padding: 12px 16px;
   border-radius: 8px;
   color: var(--text-secondary);
   font-size: 14px;
@@ -552,8 +564,9 @@ body {
   text-decoration: none;
   cursor: pointer;
   transition: all 0.15s ease;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 .sidebar-nav-item:hover {
@@ -607,22 +620,23 @@ body {
 }
 
 .page-header {
-  margin-bottom: 40px;
+  margin-bottom: 44px;
 }
 
 .page-title {
   font-family: "DM Serif Display", serif;
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 400;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .page-subtitle {
   font-size: 15px;
   color: var(--text-secondary);
-  margin-top: 8px;
-  line-height: 1.5;
+  margin-top: 10px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
 }
 
 /* ============================================
