@@ -459,11 +459,11 @@ export default function IntelligencePage() {
   return (
     <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-10" style={{ animation: 'slideUp 0.5s ease-out' }}>
+      <div className="flex items-start justify-between mb-12" style={{ animation: 'slideUp 0.5s ease-out' }}>
         <div>
           <h1 style={{
             fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
-            fontSize: '32px',
+            fontSize: '34px',
             fontWeight: 600,
             color: '#f0f4f8',
             lineHeight: 1.15,
@@ -471,7 +471,7 @@ export default function IntelligencePage() {
           }}>
             Intelligence Workbench
           </h1>
-          <p className="mt-2" style={{ fontSize: '14px', color: '#64748b' }}>
+          <p className="mt-3" style={{ fontSize: '15px', color: '#64748b', lineHeight: 1.5 }}>
             Generate custom advisory reports powered by proprietary data engines
           </p>
         </div>
@@ -492,17 +492,17 @@ export default function IntelligencePage() {
 
       {/* Progress Steps */}
       {currentStep < 4 && (
-        <div className="flex items-center gap-4 mb-10" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
+        <div className="flex items-center gap-5 mb-12" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
           {[
             { step: 1, label: 'Select Subject' },
             { step: 2, label: 'Choose Analyses' },
             { step: 3, label: 'Configure & Generate' },
           ].map((s, i) => (
-            <div key={s.step} className="flex items-center gap-3">
-              {i > 0 && <div className="w-8 h-px" style={{ background: currentStep >= s.step ? 'rgba(95,212,227,0.3)' : '#1e293b' }} />}
-              <div className="flex items-center gap-2.5">
+            <div key={s.step} className="flex items-center gap-4">
+              {i > 0 && <div className="w-12 h-px" style={{ background: currentStep >= s.step ? 'rgba(95,212,227,0.3)' : '#1e293b' }} />}
+              <div className="flex items-center gap-3">
                 <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold transition-all duration-300"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold transition-all duration-300"
                   style={{
                     background: currentStep > s.step
                       ? 'rgba(95,212,227,0.15)'
@@ -516,7 +516,7 @@ export default function IntelligencePage() {
                   {currentStep > s.step ? <Check className="w-3.5 h-3.5" /> : s.step}
                 </div>
                 <span
-                  className="text-[12px] font-medium tracking-wide"
+                  className="text-[13px] font-medium tracking-wide"
                   style={{ color: currentStep >= s.step ? '#94a3b8' : '#334155' }}
                 >
                   {s.label}
@@ -534,18 +534,18 @@ export default function IntelligencePage() {
           {currentStep === 1 && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
               <div className="rounded-xl overflow-hidden" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-                <div className="px-6 py-5 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
-                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '22px', fontWeight: 600, color: '#e2e8f0' }}>
+                <div className="px-8 py-7 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
+                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
                     Select Subject
                   </h2>
-                  <p className="mt-1" style={{ fontSize: '13px', color: '#475569' }}>
+                  <p className="mt-2" style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
                     Search for an existing company or enter a new one
                   </p>
                 </div>
 
-                <div className="p-6">
+                <div className="p-8">
                   {/* Toggle */}
-                  <div className="flex items-center gap-2 mb-6">
+                  <div className="flex items-center gap-3 mb-8">
                     <button
                       onClick={() => { setIsNewCompany(false); setSelectedCompany(null); }}
                       className="px-4 py-2 rounded-lg text-[12px] font-semibold transition-all"
@@ -716,7 +716,7 @@ export default function IntelligencePage() {
                   )}
 
                   {/* Next Button */}
-                  <div className="mt-6 flex justify-end">
+                  <div className="mt-8 flex justify-end">
                     <button
                       onClick={() => setCurrentStep(2)}
                       disabled={!canProceedStep1}
@@ -739,12 +739,12 @@ export default function IntelligencePage() {
           {currentStep === 2 && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
               <div className="rounded-xl overflow-hidden" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-                <div className="px-6 py-5 border-b flex items-center justify-between" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
+                <div className="px-8 py-7 border-b flex items-center justify-between" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
                   <div>
-                    <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '22px', fontWeight: 600, color: '#e2e8f0' }}>
+                    <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
                       Choose Analyses
                     </h2>
-                    <p className="mt-1" style={{ fontSize: '13px', color: '#475569' }}>
+                    <p className="mt-2" style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
                       Select the analyses to include in your report for <span style={{ color: '#5fd4e3' }}>{companyName}</span>
                     </p>
                   </div>
@@ -763,11 +763,11 @@ export default function IntelligencePage() {
                   </button>
                 </div>
 
-                <div className="p-6">
+                <div className="p-8">
                   {/* AI Recommendation Card */}
                   {companyName && (
                     <div
-                      className="rounded-xl p-5 mb-6"
+                      className="rounded-xl p-7 mb-8"
                       style={{
                         background: '#0a1628',
                         border: '2px solid transparent',
@@ -778,16 +778,16 @@ export default function IntelligencePage() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2.5 mb-3">
                             <Sparkles className="w-4 h-4" style={{ color: '#a78bfa' }} />
-                            <span className="text-[13px] font-semibold" style={{ color: '#e2e8f0' }}>
+                            <span className="text-[14px] font-semibold" style={{ color: '#e2e8f0' }}>
                               Recommended for this company
                             </span>
                           </div>
-                          <p className="text-[12px] leading-relaxed mb-3" style={{ color: '#64748b' }}>
+                          <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#64748b' }}>
                             Based on {companyName}&apos;s profile as a {selectedCompany?.stage || 'clinical-stage'} {selectedCompany?.type || newSector || 'company'}{selectedCompany?.therapyArea ? ` in ${therapyAreaLabel(selectedCompany.therapyArea)}` : newTherapyArea ? ` in ${therapyAreaLabel(newTherapyArea)}` : ''}, we recommend these analyses:
                           </p>
-                          <div className="flex flex-wrap gap-2 mb-4">
+                          <div className="flex flex-wrap gap-2.5 mb-5">
                             {getRecommendedAnalyses().map(id => {
                               const analysis = ANALYSIS_TYPES.find(a => a.id === id);
                               if (!analysis) return null;
@@ -827,7 +827,7 @@ export default function IntelligencePage() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {ANALYSIS_TYPES.map((analysis, i) => {
                       const Icon = analysis.icon;
                       const isSelected = selectedAnalyses.has(analysis.id);
@@ -836,7 +836,7 @@ export default function IntelligencePage() {
                         <button
                           key={analysis.id}
                           onClick={() => toggleAnalysis(analysis.id)}
-                          className="relative rounded-xl p-5 text-left transition-all duration-200 group"
+                          className="relative rounded-xl p-6 text-left transition-all duration-200 group"
                           style={{
                             background: isSelected ? '#0a1628' : '#07101e',
                             border: `1px solid ${isSelected ? `${analysis.color}30` : 'rgba(100,116,139,0.06)'}`,
@@ -856,7 +856,7 @@ export default function IntelligencePage() {
                           />
 
                           {/* Check */}
-                          <div className="absolute top-4 right-4">
+                          <div className="absolute top-5 right-5">
                             {isSelected ? (
                               <div
                                 className="w-5 h-5 rounded flex items-center justify-center"
@@ -874,7 +874,7 @@ export default function IntelligencePage() {
 
                           {/* Icon */}
                           <div
-                            className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-all duration-200"
+                            className="w-11 h-11 rounded-lg flex items-center justify-center mb-4 transition-all duration-200"
                             style={{
                               background: `${analysis.color}08`,
                               border: `1px solid ${analysis.color}${isSelected ? '20' : '10'}`,
@@ -884,16 +884,16 @@ export default function IntelligencePage() {
                           </div>
 
                           {/* Text */}
-                          <h3 className="text-[14px] font-medium mb-1.5 pr-6" style={{ color: isSelected ? '#f0f4f8' : '#cbd5e1' }}>
+                          <h3 className="text-[15px] font-medium mb-2.5 pr-8" style={{ color: isSelected ? '#f0f4f8' : '#cbd5e1' }}>
                             {analysis.name}
                           </h3>
-                          <p className="text-[12px] leading-relaxed mb-3" style={{ color: '#475569' }}>
+                          <p className="text-[12px] leading-[1.65] mb-4" style={{ color: '#475569' }}>
                             {analysis.description}
                           </p>
 
                           {/* Data Confidence Indicator */}
                           {CONFIDENCE_LEVELS[analysis.id] && (
-                            <div className="flex items-center gap-1.5 mb-2">
+                            <div className="flex items-center gap-2 mb-3">
                               <div
                                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                                 style={{ background: CONFIDENCE_LEVELS[analysis.id].dotColor }}
@@ -905,7 +905,7 @@ export default function IntelligencePage() {
                           )}
 
                           {/* Time */}
-                          <div className="flex items-center gap-1.5 mb-2">
+                          <div className="flex items-center gap-2 mb-3">
                             <Clock className="w-3 h-3" style={{ color: '#334155' }} />
                             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#334155' }}>
                               {analysis.estimatedTime}
@@ -948,7 +948,7 @@ export default function IntelligencePage() {
                   </div>
 
                   {/* Footer */}
-                  <div className="mt-6 flex items-center justify-between">
+                  <div className="mt-8 flex items-center justify-between">
                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#475569' }}>
                       {selectedAnalyses.size} of {ANALYSIS_TYPES.length} analyses selected
                     </p>
@@ -977,16 +977,16 @@ export default function IntelligencePage() {
           {currentStep === 3 && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
               <div className="rounded-xl overflow-hidden" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-                <div className="px-6 py-5 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
-                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '22px', fontWeight: 600, color: '#e2e8f0' }}>
+                <div className="px-8 py-7 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
+                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
                     Configure & Generate
                   </h2>
-                  <p className="mt-1" style={{ fontSize: '13px', color: '#475569' }}>
+                  <p className="mt-2" style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
                     Final configuration before generating your intelligence report
                   </p>
                 </div>
 
-                <div className="p-6 space-y-7">
+                <div className="p-8 space-y-8">
                   {/* Report Title */}
                   <div>
                     <label className="input-label">Report Title</label>
@@ -1003,12 +1003,12 @@ export default function IntelligencePage() {
                   <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="input-label">Output Format</label>
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         {(['in_app', 'pdf', 'pptx'] as const).map(fmt => (
                           <button
                             key={fmt}
                             onClick={() => setOutputFormat(fmt)}
-                            className="flex-1 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all"
+                            className="flex-1 px-4 py-3 rounded-lg text-[13px] font-semibold transition-all"
                             style={{
                               background: outputFormat === fmt ? 'rgba(95,212,227,0.1)' : 'rgba(100,116,139,0.04)',
                               color: outputFormat === fmt ? '#5fd4e3' : '#475569',
@@ -1022,12 +1022,12 @@ export default function IntelligencePage() {
                     </div>
                     <div>
                       <label className="input-label">Confidentiality Level</label>
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         {(['confidential', 'highly_confidential'] as const).map(level => (
                           <button
                             key={level}
                             onClick={() => setConfidentiality(level)}
-                            className="flex-1 px-3 py-2.5 rounded-lg text-[12px] font-semibold transition-all"
+                            className="flex-1 px-4 py-3 rounded-lg text-[13px] font-semibold transition-all"
                             style={{
                               background: confidentiality === level ? 'rgba(95,212,227,0.1)' : 'rgba(100,116,139,0.04)',
                               color: confidentiality === level ? '#5fd4e3' : '#475569',
@@ -1042,25 +1042,25 @@ export default function IntelligencePage() {
                   </div>
 
                   {/* Summary */}
-                  <div className="rounded-xl p-5" style={{ background: '#0a1628', border: '1px solid rgba(100,116,139,0.06)' }}>
-                    <p className="text-[11px] font-semibold tracking-wider uppercase mb-4" style={{ color: '#475569' }}>Report Summary</p>
-                    <div className="grid grid-cols-3 gap-6">
+                  <div className="rounded-xl p-7" style={{ background: '#0a1628', border: '1px solid rgba(100,116,139,0.06)' }}>
+                    <p className="text-[11px] font-semibold tracking-wider uppercase mb-5" style={{ color: '#475569' }}>Report Summary</p>
+                    <div className="grid grid-cols-3 gap-8">
                       <div>
-                        <p className="text-[11px] mb-1" style={{ color: '#334155' }}>Subject</p>
+                        <p className="text-[11px] mb-2" style={{ color: '#334155' }}>Subject</p>
                         <p className="text-[13px] font-medium" style={{ color: '#e2e8f0' }}>{companyName}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] mb-1" style={{ color: '#334155' }}>Analyses</p>
+                        <p className="text-[11px] mb-2" style={{ color: '#334155' }}>Analyses</p>
                         <p style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: '#5fd4e3' }}>{selectedAnalyses.size} selected</p>
                       </div>
                       <div>
-                        <p className="text-[11px] mb-1" style={{ color: '#334155' }}>Est. Generation Time</p>
+                        <p className="text-[11px] mb-2" style={{ color: '#334155' }}>Est. Generation Time</p>
                         <p style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: '#e2e8f0' }}>~{estimatedTotalTime}s</p>
                       </div>
                     </div>
 
                     {/* Analysis badges */}
-                    <div className="flex flex-wrap gap-2 mt-5 pt-5" style={{ borderTop: '1px solid rgba(100,116,139,0.06)' }}>
+                    <div className="flex flex-wrap gap-2.5 mt-6 pt-6" style={{ borderTop: '1px solid rgba(100,116,139,0.06)' }}>
                       {Array.from(selectedAnalyses).map(id => {
                         const analysis = ANALYSIS_TYPES.find(a => a.id === id);
                         if (!analysis) return null;
@@ -1194,9 +1194,9 @@ export default function IntelligencePage() {
           {currentStep === 4 && generatedReport && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
               {/* Report Header */}
-              <div className="rounded-xl overflow-hidden mb-8" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
+              <div className="rounded-xl overflow-hidden mb-10" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
                 <div
-                  className="px-6 py-6"
+                  className="px-8 py-8"
                   style={{
                     background: 'linear-gradient(135deg, rgba(95,212,227,0.06) 0%, rgba(148,153,209,0.04) 100%)',
                     borderBottom: '1px solid rgba(95,212,227,0.08)',
@@ -1204,8 +1204,8 @@ export default function IntelligencePage() {
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase" style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-[10px] font-semibold tracking-wider uppercase" style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
                           <Check className="w-3 h-3" />
                           Generated
                         </span>
@@ -1222,15 +1222,15 @@ export default function IntelligencePage() {
                       }}>
                         {generatedReport.title}
                       </h2>
-                      <p className="mt-2" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#475569' }}>
+                      <p className="mt-3" style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: '#475569' }}>
                         ID: {generatedReport.reportId} · Generated {new Date(generatedReport.generatedAt).toLocaleString()}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <button
                         onClick={() => { setCurrentStep(3); setGeneratedReport(null); }}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-medium transition-all"
                         style={{ color: '#64748b', background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.08)' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.2)'; e.currentTarget.style.color = '#94a3b8'; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; e.currentTarget.style.color = '#64748b'; }}
@@ -1239,7 +1239,7 @@ export default function IntelligencePage() {
                         Regenerate
                       </button>
                       <button
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-medium transition-all"
                         style={{ color: '#64748b', background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.08)' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.2)'; e.currentTarget.style.color = '#94a3b8'; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; e.currentTarget.style.color = '#64748b'; }}
@@ -1248,7 +1248,7 @@ export default function IntelligencePage() {
                         Export
                       </button>
                       <button
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-medium transition-all"
                         style={{ color: '#64748b', background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.08)' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.2)'; e.currentTarget.style.color = '#94a3b8'; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; e.currentTarget.style.color = '#64748b'; }}
@@ -1257,7 +1257,7 @@ export default function IntelligencePage() {
                         Save to Profile
                       </button>
                       <button
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-medium transition-all"
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px] font-medium transition-all"
                         style={{ color: '#64748b', background: 'rgba(100,116,139,0.06)', border: '1px solid rgba(100,116,139,0.08)' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.2)'; e.currentTarget.style.color = '#94a3b8'; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; e.currentTarget.style.color = '#64748b'; }}
@@ -1272,7 +1272,7 @@ export default function IntelligencePage() {
 
               {/* Report Confidence Badge */}
               <div
-                className="rounded-xl px-5 py-4 mb-8 flex items-center justify-between"
+                className="rounded-xl px-7 py-5 mb-10 flex items-center justify-between"
                 style={{
                   background: '#07101e',
                   border: '1px solid rgba(95,212,227,0.15)',
@@ -1293,7 +1293,7 @@ export default function IntelligencePage() {
               </div>
 
               {/* Report Sections */}
-              <div className="space-y-5">
+              <div className="space-y-8">
                 {generatedReport.sections.map((section, i) => {
                   const analysis = ANALYSIS_TYPES.find(a => a.id === section.type);
                   const Icon = analysis?.icon || FileText;
@@ -1312,10 +1312,10 @@ export default function IntelligencePage() {
                       {/* Section header accent bar */}
                       <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} />
 
-                      <div className="p-6">
-                        <div className="flex items-center gap-4 mb-6">
+                      <div className="p-8">
+                        <div className="flex items-center gap-4 mb-7">
                           <div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center"
+                            className="w-9 h-9 rounded-lg flex items-center justify-center"
                             style={{ background: `${color}10`, border: `1px solid ${color}15` }}
                           >
                             <Icon className="w-4 h-4" style={{ color }} />
@@ -1327,11 +1327,11 @@ export default function IntelligencePage() {
 
                         {/* Metrics Grid */}
                         {Object.keys(section.metrics).length > 0 && (
-                          <div className="grid grid-cols-5 gap-5 mb-6 p-5 rounded-lg" style={{ background: '#0a1628', border: '1px solid rgba(100,116,139,0.04)' }}>
+                          <div className="grid grid-cols-5 gap-6 mb-8 p-6 rounded-xl" style={{ background: '#0a1628', border: '1px solid rgba(100,116,139,0.04)' }}>
                             {Object.entries(section.metrics).map(([key, value]) => (
                               <div key={key}>
-                                <p className="text-[10px] font-medium tracking-wider uppercase mb-1" style={{ color: '#334155' }}>{key}</p>
-                                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '15px', fontWeight: 600, color: '#5fd4e3', lineHeight: 1.2 }}>
+                                <p className="text-[10px] font-medium tracking-wider uppercase mb-2" style={{ color: '#334155' }}>{key}</p>
+                                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', fontWeight: 600, color: '#5fd4e3', lineHeight: 1.2 }}>
                                   {value}
                                 </p>
                               </div>
@@ -1340,7 +1340,7 @@ export default function IntelligencePage() {
                         )}
 
                         {/* Content */}
-                        <p className="text-[13px] leading-relaxed" style={{ color: '#94a3b8' }}>
+                        <p className="text-[14px] leading-[1.75]" style={{ color: '#94a3b8' }}>
                           {section.content}
                         </p>
                       </div>
@@ -1350,7 +1350,7 @@ export default function IntelligencePage() {
               </div>
 
               {/* New Report Button */}
-              <div className="mt-8 flex justify-center">
+              <div className="mt-10 flex justify-center">
                 <button
                   onClick={handleReset}
                   className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-[13px] font-semibold transition-all"
@@ -1364,7 +1364,7 @@ export default function IntelligencePage() {
               </div>
 
               {/* Confidential Footer */}
-              <div className="mt-6 text-center">
+              <div className="mt-8 text-center">
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#334155', lineHeight: 1.6 }}>
                   This report was generated using proprietary Ambrosia Ventures data engines. Confidential — do not distribute.
                 </p>
@@ -1376,8 +1376,8 @@ export default function IntelligencePage() {
         {/* ── SIDEBAR: RECENT REPORTS ── */}
         <div style={{ animation: 'slideUp 0.5s ease-out 200ms both' }}>
           <div className="rounded-xl overflow-hidden sticky top-[76px]" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-            <div className="px-5 py-4 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
-              <h3 className="text-[13px] font-semibold tracking-wide" style={{ color: '#94a3b8' }}>Recent Reports</h3>
+            <div className="px-6 py-5 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
+              <h3 className="text-[14px] font-semibold tracking-wide" style={{ color: '#94a3b8' }}>Recent Reports</h3>
             </div>
 
             {MOCK_RECENT_REPORTS.length > 0 ? (
@@ -1415,12 +1415,12 @@ export default function IntelligencePage() {
                 ))}
               </div>
             ) : (
-              <div className="px-5 py-10 text-center">
-                <Sparkles className="w-8 h-8 mx-auto mb-3" style={{ color: '#1e293b' }} />
-                <p className="text-[14px] font-medium mb-1" style={{ color: '#475569' }}>
+              <div className="px-6 py-12 text-center">
+                <Sparkles className="w-8 h-8 mx-auto mb-4" style={{ color: '#1e293b' }} />
+                <p className="text-[14px] font-medium mb-2" style={{ color: '#475569' }}>
                   Generate your first intelligence report
                 </p>
-                <p className="text-[12px] leading-relaxed" style={{ color: '#334155' }}>
+                <p className="text-[13px] leading-relaxed" style={{ color: '#334155' }}>
                   Select a company and choose which analyses to include. Reports are assembled from proprietary data engines in under 60 seconds.
                 </p>
               </div>
