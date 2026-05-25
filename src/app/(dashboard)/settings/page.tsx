@@ -114,7 +114,7 @@ export default function SettingsPage() {
         subtitle="Manage your account and platform configuration"
       />
 
-      <div className="space-y-6 max-w-3xl">
+      <div className="space-y-8 max-w-3xl">
         {/* -------------------------------------------------- */}
         {/* PROFILE                                             */}
         {/* -------------------------------------------------- */}
@@ -122,7 +122,7 @@ export default function SettingsPage() {
           className="animate-[slideUp_0.4s_ease-out]"
           style={{ animationDelay: '0ms', animationFillMode: 'both' }}
         >
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-4 mb-6">
             <User className="h-5 w-5 text-teal-400" />
             <h2 className="text-base font-medium text-slate-100">Profile</h2>
           </div>
@@ -134,7 +134,7 @@ export default function SettingsPage() {
             </div>
 
             {/* Fields */}
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-5">
               <div>
                 <label className="input-label">Full Name</label>
                 <input type="text" className="input" defaultValue="Issa Kildani" />
@@ -166,12 +166,12 @@ export default function SettingsPage() {
           className="animate-[slideUp_0.4s_ease-out]"
           style={{ animationDelay: '80ms', animationFillMode: 'both' }}
         >
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-4 mb-6">
             <Bell className="h-5 w-5 text-teal-400" />
             <h2 className="text-base font-medium text-slate-100">Notifications</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {notificationSettings.map((setting) => (
               <div
                 key={setting.id}
@@ -212,12 +212,12 @@ export default function SettingsPage() {
           className="animate-[slideUp_0.4s_ease-out]"
           style={{ animationDelay: '160ms', animationFillMode: 'both' }}
         >
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-4 mb-6">
             <Plug className="h-5 w-5 text-teal-400" />
             <h2 className="text-base font-medium text-slate-100">Integrations</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {integrations.map((integration) => {
               const IntIcon = integration.icon;
               return (
@@ -225,7 +225,7 @@ export default function SettingsPage() {
                   key={integration.id}
                   className="flex items-center justify-between gap-4 rounded-lg bg-navy-800/50 border border-subtle px-4 py-3"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-4 min-w-0">
                     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-navy-700 border border-subtle">
                       <IntIcon className="h-4 w-4 text-slate-400" />
                     </div>
@@ -284,12 +284,12 @@ export default function SettingsPage() {
           className="animate-[slideUp_0.4s_ease-out]"
           style={{ animationDelay: '240ms', animationFillMode: 'both' }}
         >
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-4 mb-6">
             <Database className="h-5 w-5 text-teal-400" />
             <h2 className="text-base font-medium text-slate-100">Data Management</h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Button variant="secondary">
               <Download className="h-4 w-4" />
               Export All Data

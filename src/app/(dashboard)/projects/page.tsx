@@ -73,7 +73,7 @@ export default function ProjectsPage() {
       />
 
       {/* Stats Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {[
           { label: 'Total Projects', value: pagination?.total ?? 0, icon: FolderKanban },
           { label: 'Active', value: activeCount, icon: ListTodo },
@@ -96,7 +96,7 @@ export default function ProjectsPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i}>
               <Skeleton className="h-6 w-48 mb-3" />
@@ -137,7 +137,7 @@ export default function ProjectsPage() {
 
       {/* Project Cards */}
       {!isLoading && !error && projects.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
           {projects.map((project) => {
             const status = statusConfig[project.status] ?? statusConfig.planning;
             const remaining = daysRemaining(project.target_end_date);

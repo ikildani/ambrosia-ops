@@ -117,18 +117,18 @@ export default function NewContactPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageHeader title="Add Contact" />
 
-      <Card className="bg-navy-800 p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <Card className="bg-navy-800 p-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {serverError && (
             <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
               {serverError}
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
             <Input
               label="First Name"
               placeholder="Enter first name"
@@ -163,7 +163,7 @@ export default function NewContactPage() {
               {...register('title')}
             />
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label className="input-label">Organization</label>
               <input
                 type="text"
@@ -213,7 +213,7 @@ export default function NewContactPage() {
           </div>
 
           <div>
-            <label className="input-label mb-2 block">Notes</label>
+            <label className="input-label mb-2.5 block">Notes</label>
             <textarea
               className="input min-h-[100px] w-full"
               placeholder="Additional notes about this contact"
@@ -221,7 +221,7 @@ export default function NewContactPage() {
             />
           </div>
 
-          <div className="flex items-center gap-3 pt-4">
+          <div className="flex items-center gap-4 pt-5">
             <Button type="submit" disabled={submitting}>
               {submitting ? 'Creating...' : 'Create Contact'}
             </Button>

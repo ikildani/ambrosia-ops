@@ -72,7 +72,7 @@ export default function TasksPage() {
         subtitle="Track your work across all projects and deals"
       />
 
-      <div className="mb-8">
+      <div className="mb-10">
         <Tabs tabs={filterTabs} activeTab={activeFilter} onTabChange={handleFilterChange} />
       </div>
 
@@ -117,7 +117,7 @@ export default function TasksPage() {
 
       {/* Task list */}
       {!isLoading && !error && tasks.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {tasks.map((task) => {
             const status = statusConfig[task.status] ?? statusConfig.todo;
             const due = dueDateInfo(task.due_date);

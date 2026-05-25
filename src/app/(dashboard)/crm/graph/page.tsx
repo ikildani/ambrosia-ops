@@ -20,13 +20,13 @@ export default function RelationshipGraphPage() {
         </div>
 
         <h2
-          className="text-2xl font-semibold text-slate-100 mb-3"
+          className="text-2xl font-semibold text-slate-100 mb-4"
           style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif' }}
         >
           Relationship Graph
         </h2>
 
-        <p className="max-w-md text-sm leading-relaxed text-slate-500 mb-8">
+        <p className="max-w-md text-sm leading-relaxed text-slate-500 mb-10">
           Your relationship network will visualize here once you add companies
           and contacts to your CRM.
         </p>

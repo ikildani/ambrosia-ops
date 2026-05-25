@@ -284,7 +284,7 @@ function PopulatedDashboard({
 
   return (
     <>
-      <div className="flex items-end justify-between mb-12">
+      <div className="flex items-end justify-between mb-14">
         <div>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.12em', color: '#5fd4e3', textTransform: 'uppercase' }}>
             {date}
@@ -303,7 +303,7 @@ function PopulatedDashboard({
       </div>
 
       {/* Headline Metrics */}
-      <div className="grid grid-cols-4 gap-10 mb-14" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
+      <div className="grid grid-cols-4 gap-12 mb-16" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
         {[
           { label: 'Active Mandates', value: String(activeDeals.length), delta: `${orgCount} companies tracked`, deltaColor: '#5fd4e3' },
           { label: 'Pipeline Value', value: formatCurrency(totalValue, true), delta: `${activeDeals.length} active`, deltaColor: '#34d399' },
@@ -329,7 +329,7 @@ function PopulatedDashboard({
       </div>
 
       {/* Mandate Pipeline */}
-      <div className="mb-14">
+      <div className="mb-16">
         <div className="flex items-center justify-between mb-6">
           <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
             Mandate Pipeline
@@ -341,10 +341,10 @@ function PopulatedDashboard({
           </Link>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           {stageData.map((stage, i) => (
             <div key={stage.id} className="flex-1 relative group rounded-xl px-5 py-5 transition-all duration-300"
-              style={{ background: '#07101e', border: `1px solid ${stage.color}12`, animation: `slideUp 0.4s ease-out ${i * 50}ms both` }}
+              style={{ background: '#07101e', border: `1px solid ${stage.color}12`, animation: `slideUp 0.4s ease-out ${i * 50}ms both`, padding: '24px' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = `${stage.color}30`; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = `${stage.color}12`; }}>
               <div className="absolute top-0 left-5 right-5 h-[2px] rounded-b-full opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: stage.color }} />
@@ -363,18 +363,18 @@ function PopulatedDashboard({
       </div>
 
       {/* Two-Column: Mandates + Activity */}
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 gap-10">
         <div>
           <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0', marginBottom: '20px' }}>
             Active Mandates
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {topMandates.length === 0 && (
               <p className="text-sm text-slate-500 py-8 text-center">No active mandates</p>
             )}
             {topMandates.map((m, i) => (
               <Link key={m.id} href={`/deals/${m.id}`}
-                className="flex items-center justify-between rounded-xl px-6 py-5 transition-all duration-200 group"
+                className="flex items-center justify-between rounded-xl px-7 py-6 transition-all duration-200 group"
                 style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)', animation: `slideUp 0.4s ease-out ${200 + i * 70}ms both` }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(95,212,227,0.12)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; }}>
@@ -399,7 +399,7 @@ function PopulatedDashboard({
           </div>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-10">
           <div>
             <div className="flex items-center gap-3 mb-5">
               <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>Team Activity</h2>
@@ -468,7 +468,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
-        <div className="flex items-end justify-between mb-12">
+        <div className="flex items-end justify-between mb-14">
           <div>
             <Skeleton className="h-3 w-48 mb-3" />
             <Skeleton className="h-10 w-64" />

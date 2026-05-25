@@ -59,7 +59,7 @@ export default function InvestorsPage() {
       />
 
       {/* Stats strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {stats.map((stat) => (
           <Card key={stat.label} variant="stat">
             <div className="flex items-center justify-between">
@@ -80,7 +80,7 @@ export default function InvestorsPage() {
       {/* Investor cards */}
       {investors.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-center">
-          <Building2 className="w-12 h-12 mb-4" style={{ color: '#334155' }} />
+          <Building2 className="w-12 h-12 mb-5" style={{ color: '#334155' }} />
           <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
             No investors yet
           </h2>
@@ -89,14 +89,14 @@ export default function InvestorsPage() {
           </p>
         </div>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-7">
         {investors.map((investor, idx) => (
           <Card
             key={investor.id}
             className="group hover:border-teal-500/20 transition-all duration-200"
             style={{ animation: `slideUp 0.4s ease-out ${idx * 0.06}s both` }}
           >
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {/* Header */}
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
@@ -114,11 +114,11 @@ export default function InvestorsPage() {
               </div>
 
               {/* Therapy area tags */}
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {investor.therapyAreas.map((ta) => (
                   <span
                     key={ta}
-                    className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-navy-800 text-slate-400 border border-subtle"
+                    className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-navy-800 text-slate-400 border border-subtle"
                   >
                     {ta}
                   </span>

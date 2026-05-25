@@ -167,8 +167,8 @@ export default function DealsPage() {
         <>
           {/* Pipeline Value Strip */}
           {deals.length > 0 && (
-            <div className="grid grid-cols-4 gap-px bg-navy-700/50 rounded-lg overflow-hidden border border-subtle mb-8">
-              <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+            <div className="grid grid-cols-4 gap-px bg-navy-700/50 rounded-xl overflow-hidden border border-subtle mb-10">
+              <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
                 <span className="label mb-1.5 flex items-center gap-1.5">
                   <DollarSign className="w-3 h-3" /> Total Pipeline
                 </span>
@@ -176,13 +176,13 @@ export default function DealsPage() {
                   {formatCurrency(metrics.totalPipelineValue, true)}
                 </span>
               </div>
-              <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+              <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
                 <span className="label mb-1.5 flex items-center gap-1.5">
                   <Target className="w-3 h-3" /> Active Engagements
                 </span>
                 <span className="font-mono text-xl text-slate-100">{metrics.activeCount}</span>
               </div>
-              <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+              <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
                 <span className="label mb-1.5 flex items-center gap-1.5">
                   <Activity className="w-3 h-3" /> Avg Deal Size
                 </span>
@@ -190,7 +190,7 @@ export default function DealsPage() {
                   {formatCurrency(metrics.avgDealSize, true)}
                 </span>
               </div>
-              <div className="bg-navy-900 p-6 flex flex-col items-center justify-center">
+              <div className="bg-navy-900 p-7 flex flex-col items-center justify-center">
                 <span className="label mb-1.5 flex items-center gap-1.5">
                   <TrendingUp className="w-3 h-3" /> Win Rate
                 </span>
@@ -201,14 +201,14 @@ export default function DealsPage() {
 
           {/* View Toggle */}
           {deals.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-10">
               <Tabs tabs={viewTabs} activeTab={activeView} onTabChange={setActiveView} />
             </div>
           )}
 
           {/* KANBAN VIEW */}
           {deals.length > 0 && activeView === 'kanban' && (
-            <div className="flex gap-5 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollBehavior: 'smooth' }}>
+            <div className="flex gap-6 overflow-x-auto pb-4 -mx-2 px-2" style={{ scrollBehavior: 'smooth' }}>
               {DEAL_STAGES.map((stage) => {
                 const stageDeals = deals.filter((d) => d.stage === stage.id);
                 const stageValue = stageDeals.reduce((s, d) => s + (d.estimated_value ?? 0), 0);
@@ -219,7 +219,7 @@ export default function DealsPage() {
                     className="flex-shrink-0 rounded-lg bg-navy-900/50 border border-subtle"
                     style={{ minWidth: 280, width: 280 }}
                   >
-                    <div className="flex items-center gap-2 px-3 py-3.5 border-b border-subtle">
+                    <div className="flex items-center gap-2 px-4 py-4 border-b border-subtle">
                       <span className={`w-2 h-2 rounded-full ${STAGE_DOT[stage.id]}`} />
                       <span className="text-xs font-medium text-slate-300 uppercase tracking-wider flex-1">
                         {stage.label}
@@ -232,7 +232,7 @@ export default function DealsPage() {
                       )}
                     </div>
 
-                    <div className="p-3 space-y-3 min-h-[120px]">
+                    <div className="p-4 space-y-4 min-h-[120px]">
                       {stageDeals.length === 0 ? (
                         <div className="text-center py-10">
                           <p className="text-xs text-slate-600">No deals</p>
@@ -243,7 +243,7 @@ export default function DealsPage() {
                           return (
                             <Link key={deal.id} href={`/deals/${deal.id}`} className="block">
                               <div
-                                className={`rounded-md bg-navy-800 border border-subtle p-3 border-l-2 ${PRIORITY_BORDER[deal.priority]} transition-all duration-200 hover:border-teal-500/30 hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer`}
+                                className={`rounded-lg bg-navy-800 border border-subtle p-4 border-l-2 ${PRIORITY_BORDER[deal.priority]} transition-all duration-200 hover:border-teal-500/30 hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <p className="text-sm font-medium text-slate-200 leading-snug">

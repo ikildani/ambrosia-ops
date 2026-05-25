@@ -101,12 +101,12 @@ export default function KnowledgeBasePage() {
       />
 
       {/* Filter Tabs */}
-      <div className="mb-6">
+      <div className="mb-8">
         <Tabs tabs={categoryTabs} activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
       {/* Search */}
-      <div className="relative mb-8">
+      <div className="relative mb-10">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input
           type="text"
@@ -122,13 +122,13 @@ export default function KnowledgeBasePage() {
         <EmptyState />
       ) : filtered.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-20 text-center">
-          <Search className="mb-4 h-8 w-8 text-slate-600" />
+          <Search className="mb-5 h-8 w-8 text-slate-600" />
           <p className="text-sm text-slate-400 leading-relaxed">
             No entries match your search. Try different keywords or filters.
           </p>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-7 lg:grid-cols-2 xl:grid-cols-3">
           {filtered.map((entry, i) => (
             <div
               key={entry.id}
@@ -155,7 +155,7 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
   return (
     <Card className="group relative cursor-pointer transition-all duration-200 hover:border-teal-500/20 hover:shadow-[var(--shadow-card-hover)]">
       {/* Category icon + badge */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-navy-800 border border-subtle">
             <Icon className="h-4 w-4 text-teal-400" />
@@ -171,16 +171,16 @@ function EntryCard({ entry }: { entry: KnowledgeEntry }) {
       </h3>
 
       {/* Description preview */}
-      <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-slate-400">
+      <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-slate-400">
         {entry.description}
       </p>
 
       {/* Tags */}
-      <div className="mb-4 flex flex-wrap gap-1.5">
+      <div className="mb-5 flex flex-wrap gap-2">
         {entry.tags.map((tag) => (
           <span
             key={tag}
-            className="rounded bg-navy-800 px-1.5 py-0.5 text-[10px] text-slate-500"
+            className="rounded bg-navy-800 px-2.5 py-1 text-[10px] text-slate-500"
           >
             {tag}
           </span>

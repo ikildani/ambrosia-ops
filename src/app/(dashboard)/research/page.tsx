@@ -116,11 +116,11 @@ export default function ResearchPage() {
         }
       />
 
-      <div className="mb-6">
+      <div className="mb-8">
         <Tabs tabs={noteTabs} activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
 
-      <div className="relative mb-8">
+      <div className="relative mb-10">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input
           type="text"
@@ -169,7 +169,7 @@ export default function ResearchPage() {
       {/* Notes Grid */}
       {!isLoading && !error && notes.length > 0 && (
         <>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-7 lg:grid-cols-2 xl:grid-cols-3">
             {notes.map((note) => (
               <NoteCard key={note.id} note={note} />
             ))}
@@ -202,22 +202,22 @@ function NoteCard({ note }: { note: ResearchNote }) {
   return (
     <Link href={`/research/${note.id}`} className="block">
       <Card className="group relative cursor-pointer transition-all duration-200 hover:border-teal-500/20 hover:shadow-[var(--shadow-card-hover)]">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
           {note.is_pinned && (
             <Pin className="h-3.5 w-3.5 text-teal-400" />
           )}
         </div>
 
-        <h3 className="mb-3 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors">
+        <h3 className="mb-4 text-base font-medium text-slate-100 group-hover:text-teal-300 transition-colors leading-snug">
           {note.title}
         </h3>
 
-        <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-400">
+        <p className="mb-5 line-clamp-3 text-sm leading-relaxed text-slate-400">
           {note.content}
         </p>
 
-        <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="mb-5 flex flex-wrap items-center gap-2.5">
           {note.ai_generated && (
             <span className="inline-flex items-center gap-1 rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-400 border border-teal-500/20">
               <Sparkles className="h-3 w-3" />
@@ -232,7 +232,7 @@ function NoteCard({ note }: { note: ResearchNote }) {
         </div>
 
         {note.tags.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-1.5">
+          <div className="mb-5 flex flex-wrap gap-2">
             {note.tags.map((tag) => (
               <span
                 key={tag}

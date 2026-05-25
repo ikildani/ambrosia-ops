@@ -492,7 +492,7 @@ export default function IntelligencePage() {
 
       {/* Progress Steps */}
       {currentStep < 4 && (
-        <div className="flex items-center gap-3 mb-10" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
+        <div className="flex items-center gap-4 mb-10" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
           {[
             { step: 1, label: 'Select Subject' },
             { step: 2, label: 'Choose Analyses' },
@@ -527,7 +527,7 @@ export default function IntelligencePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-10">
         {/* ── MAIN CONTENT ── */}
         <div>
           {/* ════════════════ STEP 1: SELECT SUBJECT ════════════════ */}
@@ -573,7 +573,7 @@ export default function IntelligencePage() {
                   {!isNewCompany ? (
                     <div>
                       {/* Search Input */}
-                      <div className="relative mb-4">
+                      <div className="relative mb-5">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#475569' }} />
                         <input
                           type="text"
@@ -660,8 +660,8 @@ export default function IntelligencePage() {
                     </div>
                   ) : (
                     /* New Company Form */
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-5">
+                      <div className="grid grid-cols-2 gap-5">
                         <div>
                           <label className="input-label">Company Name</label>
                           <input
@@ -687,7 +687,7 @@ export default function IntelligencePage() {
                           </select>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-5">
                         <div>
                           <label className="input-label">Therapy Area <span className="text-[11px] font-normal" style={{ color: '#475569' }}>(optional)</span></label>
                           <select
@@ -787,7 +787,7 @@ export default function IntelligencePage() {
                           <p className="text-[12px] leading-relaxed mb-3" style={{ color: '#64748b' }}>
                             Based on {companyName}&apos;s profile as a {selectedCompany?.stage || 'clinical-stage'} {selectedCompany?.type || newSector || 'company'}{selectedCompany?.therapyArea ? ` in ${therapyAreaLabel(selectedCompany.therapyArea)}` : newTherapyArea ? ` in ${therapyAreaLabel(newTherapyArea)}` : ''}, we recommend these analyses:
                           </p>
-                          <div className="flex flex-wrap gap-1.5 mb-3">
+                          <div className="flex flex-wrap gap-2 mb-4">
                             {getRecommendedAnalyses().map(id => {
                               const analysis = ANALYSIS_TYPES.find(a => a.id === id);
                               if (!analysis) return null;
@@ -827,7 +827,7 @@ export default function IntelligencePage() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                     {ANALYSIS_TYPES.map((analysis, i) => {
                       const Icon = analysis.icon;
                       const isSelected = selectedAnalyses.has(analysis.id);
@@ -986,7 +986,7 @@ export default function IntelligencePage() {
                   </p>
                 </div>
 
-                <div className="p-6 space-y-6">
+                <div className="p-6 space-y-7">
                   {/* Report Title */}
                   <div>
                     <label className="input-label">Report Title</label>
@@ -1000,7 +1000,7 @@ export default function IntelligencePage() {
                   </div>
 
                   {/* Options Row */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-5">
                     <div>
                       <label className="input-label">Output Format</label>
                       <div className="flex gap-2">
@@ -1060,14 +1060,14 @@ export default function IntelligencePage() {
                     </div>
 
                     {/* Analysis badges */}
-                    <div className="flex flex-wrap gap-1.5 mt-4 pt-4" style={{ borderTop: '1px solid rgba(100,116,139,0.06)' }}>
+                    <div className="flex flex-wrap gap-2 mt-5 pt-5" style={{ borderTop: '1px solid rgba(100,116,139,0.06)' }}>
                       {Array.from(selectedAnalyses).map(id => {
                         const analysis = ANALYSIS_TYPES.find(a => a.id === id);
                         if (!analysis) return null;
                         return (
                           <span
                             key={id}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-medium"
                             style={{ background: `${analysis.color}10`, color: analysis.color, border: `1px solid ${analysis.color}20` }}
                           >
                             {analysis.name}
@@ -1156,7 +1156,7 @@ export default function IntelligencePage() {
                   </div>
 
                   {/* Analysis Status List */}
-                  <div className="w-full max-w-md space-y-2">
+                  <div className="w-full max-w-md space-y-3">
                     {Array.from(selectedAnalyses).map(id => {
                       const analysis = ANALYSIS_TYPES.find(a => a.id === id);
                       if (!analysis) return null;
@@ -1194,7 +1194,7 @@ export default function IntelligencePage() {
           {currentStep === 4 && generatedReport && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
               {/* Report Header */}
-              <div className="rounded-xl overflow-hidden mb-6" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
+              <div className="rounded-xl overflow-hidden mb-8" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
                 <div
                   className="px-6 py-6"
                   style={{
@@ -1272,7 +1272,7 @@ export default function IntelligencePage() {
 
               {/* Report Confidence Badge */}
               <div
-                className="rounded-xl px-5 py-4 mb-6 flex items-center justify-between"
+                className="rounded-xl px-5 py-4 mb-8 flex items-center justify-between"
                 style={{
                   background: '#07101e',
                   border: '1px solid rgba(95,212,227,0.15)',
@@ -1293,7 +1293,7 @@ export default function IntelligencePage() {
               </div>
 
               {/* Report Sections */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {generatedReport.sections.map((section, i) => {
                   const analysis = ANALYSIS_TYPES.find(a => a.id === section.type);
                   const Icon = analysis?.icon || FileText;
@@ -1313,7 +1313,7 @@ export default function IntelligencePage() {
                       <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} />
 
                       <div className="p-6">
-                        <div className="flex items-center gap-3 mb-5">
+                        <div className="flex items-center gap-4 mb-6">
                           <div
                             className="w-8 h-8 rounded-lg flex items-center justify-center"
                             style={{ background: `${color}10`, border: `1px solid ${color}15` }}
@@ -1327,7 +1327,7 @@ export default function IntelligencePage() {
 
                         {/* Metrics Grid */}
                         {Object.keys(section.metrics).length > 0 && (
-                          <div className="grid grid-cols-5 gap-4 mb-5 p-4 rounded-lg" style={{ background: '#0a1628', border: '1px solid rgba(100,116,139,0.04)' }}>
+                          <div className="grid grid-cols-5 gap-5 mb-6 p-5 rounded-lg" style={{ background: '#0a1628', border: '1px solid rgba(100,116,139,0.04)' }}>
                             {Object.entries(section.metrics).map(([key, value]) => (
                               <div key={key}>
                                 <p className="text-[10px] font-medium tracking-wider uppercase mb-1" style={{ color: '#334155' }}>{key}</p>
@@ -1395,11 +1395,11 @@ export default function IntelligencePage() {
                     <p className="text-[13px] font-medium mb-1.5 leading-snug" style={{ color: '#cbd5e1' }}>
                       {report.title}
                     </p>
-                    <div className="flex flex-wrap gap-1 mb-2">
+                    <div className="flex flex-wrap gap-1.5 mb-2">
                       {report.analyses.map(id => (
                         <span
                           key={id}
-                          className="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                          className="px-2 py-0.5 rounded text-[9px] font-medium"
                           style={{ background: 'rgba(100,116,139,0.08)', color: '#475569' }}
                         >
                           {getAnalysisName(id)}

@@ -187,7 +187,7 @@ export default function ContactsPage() {
       />
 
       {/* Stats Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
         {[
           { label: 'Total Contacts', value: pagination?.total ?? 0, icon: Users },
           { label: 'Warm Intros', value: contacts.filter((c) => c.relationship_strength === 'warm_intro').length, icon: Handshake },
@@ -211,7 +211,7 @@ export default function ContactsPage() {
       </div>
 
       {/* Filter / Search Bar */}
-      <Card className="mb-8 !bg-navy-900">
+      <Card className="mb-10 !bg-navy-900">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -311,7 +311,7 @@ export default function ContactsPage() {
       {/* Contact Cards */}
       {!isLoading && !error && sorted.length > 0 && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
             {sorted.map((contact, idx) => {
               const orgName = (contact as any).organizations?.name;
               const orgId = contact.organization_id;
@@ -322,7 +322,7 @@ export default function ContactsPage() {
                   className="group transition-all duration-200 hover:border-teal-500/20 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
                   style={{ animation: `slideUp 0.4s ease-out ${idx * 0.06}s both` }}
                 >
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-5">
                     <div className="flex items-start gap-3">
                       <div
                         className={`w-10 h-10 rounded-full bg-navy-800 border-2 ${relBorderColor[contact.relationship_strength] ?? 'border-slate-600'} flex items-center justify-center flex-shrink-0`}
@@ -356,7 +356,7 @@ export default function ContactsPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                       <Badge variant={contactTypeBadgeVariant[contact.contact_type] || 'slate'}>
                         {contactTypeLabel[contact.contact_type]}
                       </Badge>
@@ -365,7 +365,7 @@ export default function ContactsPage() {
                       </Badge>
                     </div>
 
-                    <div className="flex flex-col gap-1.5 text-xs">
+                    <div className="flex flex-col gap-2 text-xs">
                       {contact.email && (
                         <div className="flex items-center gap-2 text-slate-400">
                           <Mail className="w-3 h-3 text-slate-500 flex-shrink-0" />
@@ -381,11 +381,11 @@ export default function ContactsPage() {
                     </div>
 
                     {contact.therapy_area_expertise.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-2">
                         {contact.therapy_area_expertise.slice(0, 2).map((ta) => (
                           <span
                             key={ta}
-                            className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-navy-800 text-slate-400 border border-subtle"
+                            className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-navy-800 text-slate-400 border border-subtle"
                           >
                             {taLabel[ta] || ta}
                           </span>

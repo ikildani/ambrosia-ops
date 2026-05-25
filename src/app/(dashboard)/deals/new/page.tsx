@@ -137,18 +137,18 @@ export default function NewDealPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageHeader title="New Deal" />
 
-      <Card className="bg-navy-800 p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <Card className="bg-navy-800 p-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {serverError && (
             <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
               {serverError}
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
             <Input
               label="Deal Title"
               placeholder="Enter deal title"
@@ -240,7 +240,7 @@ export default function NewDealPage() {
           </div>
 
           <div>
-            <label className="input-label mb-2 block">Notes</label>
+            <label className="input-label mb-2.5 block">Notes</label>
             <textarea
               className="input min-h-[100px] w-full"
               placeholder="Deal notes and context"
@@ -248,7 +248,7 @@ export default function NewDealPage() {
             />
           </div>
 
-          <div className="flex items-center gap-3 pt-4">
+          <div className="flex items-center gap-4 pt-5">
             <Button type="submit" disabled={submitting}>
               {submitting ? 'Creating...' : 'Create Deal'}
             </Button>

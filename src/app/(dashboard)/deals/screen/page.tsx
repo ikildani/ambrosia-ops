@@ -155,7 +155,7 @@ export default function OpportunityScreeningPage() {
           </div>
 
           {/* Stage + Deal Size */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-5">
             <div>
               <label className="block text-[12px] font-medium mb-2" style={{ color: '#94a3b8' }}>Company Stage</label>
               <select
@@ -304,7 +304,7 @@ export default function OpportunityScreeningPage() {
 
         {/* AI Assessment — appears below form after analysis */}
         {error && (
-          <div className="rounded-xl p-4 mt-8 mb-6" style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)' }}>
+          <div className="rounded-xl p-5 mt-10 mb-8" style={{ background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.15)' }}>
             <p className="text-[13px]" style={{ color: '#f87171' }}>{error}</p>
           </div>
         )}
@@ -326,7 +326,7 @@ export default function OpportunityScreeningPage() {
               </h2>
 
               {/* Recommendation Badge */}
-              <div className="rounded-xl p-6 mb-6" style={{
+              <div className="rounded-xl p-6 mb-8" style={{
                 background: `${result.recommendationColor}08`,
                 border: `1px solid ${result.recommendationColor}20`,
               }}>
@@ -355,14 +355,14 @@ export default function OpportunityScreeningPage() {
 
               {/* Executive Summary */}
               {result.executiveSummary && (
-                <div className="rounded-xl p-5 mb-6" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
+                <div className="rounded-xl p-5 mb-8" style={{ background: '#07101e', border: '1px solid rgba(95,212,227,0.1)' }}>
                   <span className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#5fd4e3' }}>Executive Summary</span>
                   <p className="mt-2 text-[13px] leading-relaxed" style={{ color: '#cbd5e1' }}>{result.executiveSummary}</p>
                 </div>
               )}
 
               {/* Fee Estimate */}
-              <div className="rounded-xl p-5 mb-6" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.1)' }}>
+              <div className="rounded-xl p-5 mb-8" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.1)' }}>
                 <span className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: '#475569' }}>Estimated Advisory Fee</span>
                 <p className="mt-1" style={{ fontFamily: 'var(--font-mono)', fontSize: '22px', fontWeight: 600, color: '#5fd4e3' }}>
                   {result.estimatedFeeRange.low} – {result.estimatedFeeRange.high}
@@ -370,7 +370,7 @@ export default function OpportunityScreeningPage() {
               </div>
 
               {/* Dimension Scores */}
-              <div className="space-y-4 mb-6">
+              <div className="space-y-5 mb-8">
                 {(Object.entries(result.dimensions) as [keyof typeof DIMENSION_META, typeof result.dimensions.strategicFit][]).map(([key, dim]) => {
                   const meta = DIMENSION_META[key];
                   const Icon = meta.icon;
@@ -399,9 +399,9 @@ export default function OpportunityScreeningPage() {
                       </div>
                       <p className="text-[12px] leading-relaxed" style={{ color: '#64748b' }}>{dim.rationale}</p>
                       {'keyFactors' in dim && Array.isArray((dim as { keyFactors?: string[] }).keyFactors) && (
-                        <div className="flex flex-wrap gap-1.5 mt-2">
+                        <div className="flex flex-wrap gap-2 mt-3">
                           {((dim as { keyFactors: string[] }).keyFactors).map((f: string, i: number) => (
-                            <span key={i} className="px-2 py-0.5 rounded text-[10px]" style={{ background: 'rgba(100,116,139,0.06)', color: '#64748b' }}>{f}</span>
+                            <span key={i} className="px-2.5 py-1 rounded text-[10px]" style={{ background: 'rgba(100,116,139,0.06)', color: '#64748b' }}>{f}</span>
                           ))}
                         </div>
                       )}
@@ -412,11 +412,11 @@ export default function OpportunityScreeningPage() {
 
               {/* Competitive Insights */}
               {result.competitiveInsights && result.competitiveInsights.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: '#475569' }}>Competitive Insights</h3>
-                  <div className="space-y-2">
+                <div className="mb-8">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" style={{ color: '#475569' }}>Competitive Insights</h3>
+                  <div className="space-y-3">
                     {result.competitiveInsights.map((insight: string, i: number) => (
-                      <div key={i} className="flex items-start gap-2.5 rounded-lg p-3" style={{ background: 'rgba(95,212,227,0.03)', border: '1px solid rgba(95,212,227,0.08)' }}>
+                      <div key={i} className="flex items-start gap-2.5 rounded-lg p-4" style={{ background: 'rgba(95,212,227,0.03)', border: '1px solid rgba(95,212,227,0.08)' }}>
                         <TrendingUp className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: '#5fd4e3' }} />
                         <span className="text-[12px] leading-relaxed" style={{ color: '#94a3b8' }}>{insight}</span>
                       </div>
@@ -427,9 +427,9 @@ export default function OpportunityScreeningPage() {
 
               {/* Key Questions */}
               {result.keyQuestions && result.keyQuestions.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: '#475569' }}>Key Questions to Resolve</h3>
-                  <div className="space-y-2">
+                <div className="mb-8">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" style={{ color: '#475569' }}>Key Questions to Resolve</h3>
+                  <div className="space-y-3">
                     {result.keyQuestions.map((q: string, i: number) => (
                       <div key={i} className="flex items-start gap-2.5">
                         <span className="text-[12px] font-medium" style={{ fontFamily: 'var(--font-mono)', color: '#475569' }}>{String(i + 1).padStart(2, '0')}</span>
@@ -442,11 +442,11 @@ export default function OpportunityScreeningPage() {
 
               {/* Risk Factors */}
               {result.riskFactors.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: '#475569' }}>Risk Factors</h3>
-                  <div className="space-y-2">
+                <div className="mb-8">
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" style={{ color: '#475569' }}>Risk Factors</h3>
+                  <div className="space-y-3">
                     {result.riskFactors.map((risk, i) => (
-                      <div key={i} className="flex items-start gap-2.5 rounded-lg p-3" style={{ background: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.1)' }}>
+                      <div key={i} className="flex items-start gap-2.5 rounded-lg p-4" style={{ background: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.1)' }}>
                         <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: '#fbbf24' }} />
                         <span className="text-[12px] leading-relaxed" style={{ color: '#94a3b8' }}>{risk}</span>
                       </div>
@@ -456,9 +456,9 @@ export default function OpportunityScreeningPage() {
               )}
 
               {/* Next Steps */}
-              <div className="mb-6">
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: '#475569' }}>Suggested Next Steps</h3>
-                <div className="space-y-2">
+              <div className="mb-8">
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" style={{ color: '#475569' }}>Suggested Next Steps</h3>
+                <div className="space-y-3">
                   {result.suggestedNextSteps.map((step, i) => (
                     <div key={i} className="flex items-start gap-2.5">
                       <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: '#5fd4e3' }} />
@@ -469,7 +469,7 @@ export default function OpportunityScreeningPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <Link href="/deals/new"
                   className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-semibold transition-all"
                   style={{ background: 'linear-gradient(135deg, #5fd4e3, #9499d1)', color: '#04080f' }}>

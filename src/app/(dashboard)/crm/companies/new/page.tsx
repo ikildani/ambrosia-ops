@@ -541,12 +541,12 @@ function NetworkComparison({ score }: { score: number }) {
   ];
 
   return (
-    <div className="rounded-xl border border-slate-700/40 bg-navy-800/50 p-6 space-y-4 animate-[slideUp_0.4s_ease-out]">
+    <div className="rounded-xl border border-slate-700/40 bg-navy-800/50 p-6 space-y-5 animate-[slideUp_0.4s_ease-out]">
       <h3 className="text-[11px] font-semibold tracking-widest uppercase text-slate-500">Network Comparison</h3>
       <p className="text-sm text-slate-300">
         Compared to 48 companies in your CRM, this scores in the <strong className="text-slate-100">{percentile}</strong>
       </p>
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         {mockCompanies.map(c => (
           <div
             key={c.name}
@@ -749,7 +749,7 @@ export default function NewCompanyPage() {
           <StepSubheading>Let&apos;s start with the basics. Tell us about the organization you&apos;re adding.</StepSubheading>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-7">
           {/* Company Name */}
           <div>
             <FieldLabel>Company Name</FieldLabel>
@@ -820,7 +820,7 @@ export default function NewCompanyPage() {
           {/* HQ Location */}
           <div>
             <FieldLabel optional>Headquarters</FieldLabel>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                 <input
@@ -857,7 +857,7 @@ export default function NewCompanyPage() {
           </StepSubheading>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-7">
           {/* Stage (only biotech/pharma) */}
           {isBiotechPharma && (
             <div>
@@ -951,7 +951,7 @@ export default function NewCompanyPage() {
           <StepSubheading>What areas of medicine is this company working in? Select all that apply.</StepSubheading>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-7">
           {/* Therapy Areas Grid */}
           <div>
             <FieldLabel>Therapy Areas</FieldLabel>
@@ -1044,7 +1044,7 @@ export default function NewCompanyPage() {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-7">
           {/* Relationship Source */}
           <div>
             <FieldLabel>How do you know this company?</FieldLabel>
@@ -1083,7 +1083,7 @@ export default function NewCompanyPage() {
           {/* Existing Contacts */}
           <div>
             <FieldLabel>Do you have existing contacts there?</FieldLabel>
-            <div className="flex gap-3 mt-1">
+            <div className="flex gap-4 mt-1">
               {[
                 { id: 'yes', label: 'Yes' },
                 { id: 'no', label: 'Not Yet' },
@@ -1133,7 +1133,7 @@ export default function NewCompanyPage() {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-7">
           {/* Services Needed */}
           <div>
             <FieldLabel>What services might they need?</FieldLabel>
@@ -1169,7 +1169,7 @@ export default function NewCompanyPage() {
           {/* Catalysts */}
           <div>
             <FieldLabel>Upcoming catalysts?</FieldLabel>
-            <div className="flex gap-3 mt-1">
+            <div className="flex gap-4 mt-1">
               <PillButton
                 selected={form.has_catalysts}
                 onClick={() => update('has_catalysts', true)}
@@ -1271,8 +1271,8 @@ export default function NewCompanyPage() {
         </div>
 
         {/* Score Breakdown */}
-        <div className="rounded-xl border border-slate-700/40 bg-navy-800/50 p-6 space-y-4">
-          <h3 className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 mb-4">Score Breakdown</h3>
+        <div className="rounded-xl border border-slate-700/40 bg-navy-800/50 p-6 space-y-5">
+          <h3 className="text-[11px] font-semibold tracking-widest uppercase text-slate-500 mb-5">Score Breakdown</h3>
           <ScoreBar label="Company Fit" value={score.breakdown.companyFit} max={25} />
           <ScoreBar label="Relationship" value={score.breakdown.relationship} max={25} />
           <ScoreBar label="Market Timing" value={score.breakdown.marketTiming} max={25} />
@@ -1408,7 +1408,7 @@ export default function NewCompanyPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {isLastStep ? (
               <>
                 <button
