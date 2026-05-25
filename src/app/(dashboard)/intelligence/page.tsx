@@ -492,18 +492,26 @@ export default function IntelligencePage() {
 
       {/* Progress Steps */}
       {currentStep < 4 && (
-        <div className="flex items-center gap-5 mb-12" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '48px', animation: 'slideUp 0.5s ease-out 100ms both' }}>
           {[
             { step: 1, label: 'Select Subject' },
             { step: 2, label: 'Choose Analyses' },
             { step: 3, label: 'Configure & Generate' },
           ].map((s, i) => (
-            <div key={s.step} className="flex items-center gap-4">
-              {i > 0 && <div className="w-12 h-px" style={{ background: currentStep >= s.step ? 'rgba(95,212,227,0.3)' : '#1e293b' }} />}
-              <div className="flex items-center gap-3">
+            <div key={s.step} style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {i > 0 && <div style={{ width: '48px', height: '1px', background: currentStep >= s.step ? 'rgba(95,212,227,0.3)' : '#1e293b' }} />}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold transition-all duration-300"
                   style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    transition: 'all 0.3s ease',
                     background: currentStep > s.step
                       ? 'rgba(95,212,227,0.15)'
                       : currentStep === s.step
@@ -513,12 +521,9 @@ export default function IntelligencePage() {
                     border: `1px solid ${currentStep >= s.step ? 'rgba(95,212,227,0.2)' : 'rgba(100,116,139,0.1)'}`,
                   }}
                 >
-                  {currentStep > s.step ? <Check className="w-3.5 h-3.5" /> : s.step}
+                  {currentStep > s.step ? <Check className="w-4 h-4" /> : s.step}
                 </div>
-                <span
-                  className="text-[13px] font-medium tracking-wide"
-                  style={{ color: currentStep >= s.step ? '#94a3b8' : '#334155' }}
-                >
+                <span style={{ fontSize: '14px', fontWeight: 500, letterSpacing: '0.02em', color: currentStep >= s.step ? '#94a3b8' : '#334155' }}>
                   {s.label}
                 </span>
               </div>
@@ -527,25 +532,25 @@ export default function IntelligencePage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-10">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '48px' }}>
         {/* ── MAIN CONTENT ── */}
         <div>
           {/* ════════════════ STEP 1: SELECT SUBJECT ════════════════ */}
           {currentStep === 1 && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
-              <div className="rounded-xl overflow-hidden" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-                <div className="px-8 py-7 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
-                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+              <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
+                <div style={{ padding: '32px 36px', borderBottom: '1px solid rgba(100,116,139,0.06)' }}>
+                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#e2e8f0' }}>
                     Select Subject
                   </h2>
-                  <p className="mt-2" style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, marginTop: '10px' }}>
                     Search for an existing company or enter a new one
                   </p>
                 </div>
 
-                <div className="p-8">
+                <div style={{ padding: '36px' }}>
                   {/* Toggle */}
-                  <div className="flex items-center gap-3 mb-8">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
                     <button
                       onClick={() => { setIsNewCompany(false); setSelectedCompany(null); }}
                       className="px-4 py-2 rounded-lg text-[12px] font-semibold transition-all"
@@ -573,14 +578,15 @@ export default function IntelligencePage() {
                   {!isNewCompany ? (
                     <div>
                       {/* Search Input */}
-                      <div className="relative mb-5">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#475569' }} />
+                      <div className="relative" style={{ marginBottom: '24px' }}>
+                        <Search className="absolute top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#475569', left: '18px' }} />
                         <input
                           type="text"
-                          className="input pl-10"
+                          className="input"
                           placeholder="Search companies in your CRM..."
                           value={searchQuery}
                           onChange={e => { setSearchQuery(e.target.value); setSelectedCompany(null); }}
+                          style={{ paddingLeft: '46px', width: '100%' }}
                         />
                       </div>
 
@@ -716,14 +722,24 @@ export default function IntelligencePage() {
                   )}
 
                   {/* Next Button */}
-                  <div className="mt-8 flex justify-end">
+                  <div style={{ marginTop: '36px', display: 'flex', justifyContent: 'flex-end' }}>
                     <button
                       onClick={() => setCurrentStep(2)}
                       disabled={!canProceedStep1}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-[13px] font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                       style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '14px 28px',
+                        borderRadius: '12px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        border: 'none',
+                        cursor: canProceedStep1 ? 'pointer' : 'not-allowed',
+                        opacity: canProceedStep1 ? 1 : 0.3,
                         background: canProceedStep1 ? 'linear-gradient(135deg, #5fd4e3, #9499d1)' : '#1e293b',
                         color: canProceedStep1 ? '#04080f' : '#475569',
+                        transition: 'all 0.2s ease',
                       }}
                     >
                       Continue
@@ -738,13 +754,13 @@ export default function IntelligencePage() {
           {/* ════════════════ STEP 2: CHOOSE ANALYSES ════════════════ */}
           {currentStep === 2 && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
-              <div className="rounded-xl overflow-hidden" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-                <div className="px-8 py-7 border-b flex items-center justify-between" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
+              <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
+                <div style={{ padding: '32px 36px', borderBottom: '1px solid rgba(100,116,139,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+                    <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#e2e8f0' }}>
                       Choose Analyses
                     </h2>
-                    <p className="mt-2" style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, marginTop: '10px' }}>
                       Select the analyses to include in your report for <span style={{ color: '#5fd4e3' }}>{companyName}</span>
                     </p>
                   </div>
@@ -763,7 +779,7 @@ export default function IntelligencePage() {
                   </button>
                 </div>
 
-                <div className="p-8">
+                <div style={{ padding: '36px' }}>
                   {/* AI Recommendation Card */}
                   {companyName && (
                     <div
@@ -976,17 +992,17 @@ export default function IntelligencePage() {
           {/* ════════════════ STEP 3: CONFIGURE & GENERATE ════════════════ */}
           {currentStep === 3 && (
             <div style={{ animation: 'slideUp 0.4s ease-out' }}>
-              <div className="rounded-xl overflow-hidden" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-                <div className="px-8 py-7 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
-                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+              <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
+                <div style={{ padding: '32px 36px', borderBottom: '1px solid rgba(100,116,139,0.06)' }}>
+                  <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#e2e8f0' }}>
                     Configure & Generate
                   </h2>
-                  <p className="mt-2" style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, marginTop: '10px' }}>
                     Final configuration before generating your intelligence report
                   </p>
                 </div>
 
-                <div className="p-8 space-y-8">
+                <div style={{ padding: '36px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
                   {/* Report Title */}
                   <div>
                     <label className="input-label">Report Title</label>
@@ -1375,9 +1391,9 @@ export default function IntelligencePage() {
 
         {/* ── SIDEBAR: RECENT REPORTS ── */}
         <div style={{ animation: 'slideUp 0.5s ease-out 200ms both' }}>
-          <div className="rounded-xl overflow-hidden sticky top-[76px]" style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)' }}>
-            <div className="px-6 py-5 border-b" style={{ borderColor: 'rgba(100,116,139,0.06)' }}>
-              <h3 className="text-[14px] font-semibold tracking-wide" style={{ color: '#94a3b8' }}>Recent Reports</h3>
+          <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)', borderRadius: '16px', overflow: 'hidden', position: 'sticky', top: '76px' }}>
+            <div style={{ padding: '24px 28px', borderBottom: '1px solid rgba(100,116,139,0.06)' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '0.02em', color: '#94a3b8' }}>Recent Reports</h3>
             </div>
 
             {MOCK_RECENT_REPORTS.length > 0 ? (
@@ -1415,12 +1431,12 @@ export default function IntelligencePage() {
                 ))}
               </div>
             ) : (
-              <div className="px-6 py-12 text-center">
-                <Sparkles className="w-8 h-8 mx-auto mb-4" style={{ color: '#1e293b' }} />
-                <p className="text-[14px] font-medium mb-2" style={{ color: '#475569' }}>
+              <div style={{ padding: '40px 28px', textAlign: 'center' }}>
+                <Sparkles className="w-8 h-8 mx-auto" style={{ color: '#1e293b', marginBottom: '20px' }} />
+                <p style={{ fontSize: '15px', fontWeight: 500, color: '#475569', marginBottom: '10px' }}>
                   Generate your first intelligence report
                 </p>
-                <p className="text-[13px] leading-relaxed" style={{ color: '#334155' }}>
+                <p style={{ fontSize: '14px', lineHeight: 1.7, color: '#334155' }}>
                   Select a company and choose which analyses to include. Reports are assembled from proprietary data engines in under 60 seconds.
                 </p>
               </div>
