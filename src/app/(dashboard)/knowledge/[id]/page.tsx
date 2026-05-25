@@ -405,111 +405,121 @@ export default function KnowledgeDetailPage({
   const contentSections = getDetailContent(entry.id);
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div style={{ maxWidth: '880px', margin: '0 auto' }}>
       {/* Back Navigation */}
       <Link
         href="/knowledge"
-        className="mb-8 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-teal-400 transition-colors"
+        style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#64748b', textDecoration: 'none', marginBottom: '32px', transition: 'color 0.15s ease' }}
+        onMouseEnter={e => { e.currentTarget.style.color = '#00c9a7'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = '#64748b'; }}
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft style={{ width: '16px', height: '16px' }} />
         Back to Knowledge Base
       </Link>
 
       {/* Main Content Card */}
-      <Card style={{ padding: '56px 64px' }}>
-        {/* Category Badge + Read Time */}
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy-800 border border-subtle">
-              <Icon className="h-4 w-4 text-teal-400" />
-            </div>
-            <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
-          </div>
-          <div className="flex items-center gap-1.5 font-mono text-xs text-slate-500">
-            <Clock className="h-3.5 w-3.5" />
-            {entry.readTime}
-          </div>
-        </div>
+      <div style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.1)', borderRadius: '16px', overflow: 'hidden' }}>
 
-        {/* Title */}
-        <h1 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '36px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1.2, letterSpacing: '-0.01em', marginBottom: '20px' }}>
-          {entry.title}
-        </h1>
-
-        {/* Author + Last Updated */}
-        <div className="mb-8 flex items-center gap-5 text-sm text-slate-500">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-slate-600" />
-            <span className="font-medium text-slate-400">{entry.author}</span>
-          </div>
-          <span className="text-slate-700">|</span>
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-slate-600" />
-            <span>Last updated {entry.lastUpdated}</span>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="mb-10 flex flex-wrap gap-3">
-          {entry.tags.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1.5 rounded bg-navy-800 px-3 py-1.5 text-xs text-slate-400 border border-subtle"
-            >
-              <Tag className="h-3 w-3 text-slate-600" />
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Divider */}
-        <div className="mb-12 border-t border-subtle" />
-
-        {/* Description / Overview */}
-        <div className="mb-12">
-          <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '22px', fontWeight: 600, color: '#e2e8f0', marginBottom: '16px' }}>
-            Overview
-          </h2>
-          <p style={{ fontSize: '15px', lineHeight: 1.85, color: '#94a3b8', letterSpacing: '0.01em' }}>
-            {entry.description}
-          </p>
-        </div>
-
-        {/* Full Content Sections */}
-        <div className="space-y-12">
-          {contentSections.map((section, i) => {
-            const separatorIndex = section.indexOf(' -- ');
-            const hasHeading = separatorIndex > -1;
-            const heading = hasHeading ? section.slice(0, separatorIndex) : null;
-            const body = hasHeading ? section.slice(separatorIndex + 4) : section;
-
-            return (
-              <div key={i}>
-                {heading && (
-                  <h3 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '20px', fontWeight: 600, color: '#e2e8f0', marginBottom: '14px' }}>
-                    {heading}
-                  </h3>
-                )}
-                <p style={{ fontSize: '15px', lineHeight: 1.85, color: '#94a3b8', letterSpacing: '0.01em' }}>
-                  {body}
-                </p>
+        {/* Header Section */}
+        <div style={{ padding: '48px 56px 40px', borderBottom: '1px solid rgba(100,116,139,0.06)' }}>
+          {/* Category Badge + Read Time */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#0d1b2e', border: '1px solid rgba(100,116,139,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon style={{ width: '20px', height: '20px', color: '#00c9a7' }} />
               </div>
-            );
-          })}
-        </div>
-
-        {/* Footer Divider */}
-        <div className="mt-12 mb-6 border-t border-subtle" />
-
-        {/* Footer Metadata */}
-        <div className="flex items-center justify-between text-xs text-slate-600">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-3.5 w-3.5" />
-            <span className="font-mono">ID: {entry.id}</span>
+              <Badge variant={meta.badgeVariant}>{meta.label}</Badge>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)', fontSize: '13px', color: '#475569' }}>
+              <Clock style={{ width: '14px', height: '14px' }} />
+              {entry.readTime}
+            </div>
           </div>
-          <span className="font-mono">Ambrosia Ventures -- Internal Use Only</span>
+
+          {/* Title */}
+          <h1 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '40px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1.2, letterSpacing: '-0.015em', marginBottom: '24px' }}>
+            {entry.title}
+          </h1>
+
+          {/* Author + Last Updated */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '14px', color: '#475569', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <User style={{ width: '15px', height: '15px', color: '#334155' }} />
+              <span style={{ fontWeight: 500, color: '#94a3b8' }}>{entry.author}</span>
+            </div>
+            <span style={{ color: '#1e293b' }}>|</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Clock style={{ width: '15px', height: '15px', color: '#334155' }} />
+              <span>Last updated {entry.lastUpdated}</span>
+            </div>
+          </div>
+
+          {/* Tags */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            {entry.tags.map((tag) => (
+              <span
+                key={tag}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#0d1b2e', border: '1px solid rgba(100,116,139,0.08)', padding: '7px 14px', borderRadius: '8px', fontSize: '12px', color: '#64748b', letterSpacing: '0.02em' }}
+              >
+                <Tag style={{ width: '12px', height: '12px', color: '#334155' }} />
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
-      </Card>
+
+        {/* Content Section */}
+        <div style={{ padding: '48px 56px' }}>
+
+          {/* Overview */}
+          <div style={{ marginBottom: '48px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ width: '4px', height: '24px', borderRadius: '2px', background: 'linear-gradient(180deg, #5fd4e3, #9499d1)' }} />
+              <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
+                Overview
+              </h2>
+            </div>
+            <p style={{ fontSize: '15px', lineHeight: 1.9, color: '#94a3b8', letterSpacing: '0.015em' }}>
+              {entry.description}
+            </p>
+          </div>
+
+          {/* Content Sections */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
+            {contentSections.map((section, i) => {
+              const separatorIndex = section.indexOf(' -- ');
+              const hasHeading = separatorIndex > -1;
+              const heading = hasHeading ? section.slice(0, separatorIndex) : null;
+              const body = hasHeading ? section.slice(separatorIndex + 4) : section;
+
+              return (
+                <div key={i}>
+                  {heading && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                      <div style={{ width: '4px', height: '24px', borderRadius: '2px', background: '#102236' }} />
+                      <h3 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '22px', fontWeight: 600, color: '#e2e8f0' }}>
+                        {heading}
+                      </h3>
+                    </div>
+                  )}
+                  <p style={{ fontSize: '15px', lineHeight: 1.9, color: '#94a3b8', letterSpacing: '0.015em' }}>
+                    {body}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: '24px 56px', borderTop: '1px solid rgba(100,116,139,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#334155' }}>
+            <BookOpen style={{ width: '14px', height: '14px' }} />
+            <span style={{ fontFamily: 'var(--font-mono)' }}>ID: {entry.id}</span>
+          </div>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#334155' }}>Ambrosia Ventures — Internal Use Only</span>
+        </div>
+      </div>
     </div>
   );
 }
