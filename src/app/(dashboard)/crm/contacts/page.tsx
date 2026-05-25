@@ -17,25 +17,13 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Tabs } from '@/components/ui/Tabs';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { useContacts } from '@/lib/hooks/use-data';
+import { daysSince } from '@/lib/utils/format';
 
 /* ------------------------------------------------------------------ */
-/*  Types & constants                                                  */
+/*  Constants                                                          */
 /* ------------------------------------------------------------------ */
-
-interface MockContact {
-  id: string;
-  firstName: string;
-  lastName: string;
-  title: string;
-  organization: string;
-  orgId: string;
-  contactType: 'executive' | 'founder' | 'investor' | 'advisor' | 'board_member' | 'operator';
-  relationshipStrength: 'warm_intro' | 'direct' | 'met_once' | 'cold';
-  email?: string;
-  phone?: string;
-  therapyAreas: string[];
-  lastContactedDays?: number;
-}
 
 const contactTypeTabs = [
   { id: 'all', label: 'All' },
@@ -56,9 +44,8 @@ const relationshipFilterOptions = [
 ];
 
 const sortOptions = [
+  { value: 'recently_added', label: 'Recently Added' },
   { value: 'name_asc', label: 'Name A-Z' },
-  { value: 'recently_contacted', label: 'Recently Contacted' },
-  { value: 'relationship', label: 'Relationship Strength' },
 ];
 
 const contactTypeBadgeVariant: Record<string, 'teal' | 'blue' | 'green' | 'amber' | 'slate'> = {
@@ -79,7 +66,7 @@ const contactTypeLabel: Record<string, string> = {
   operator: 'Operator',
 };
 
-const relBadgeVariant: Record<string, 'green' | 'blue' | 'amber' | 'slate' | 'red'> = {
+const relBadgeVariant: Record<string, 'green' | 'blue' | 'amber' | 'slate'> = {
   warm_intro: 'green',
   direct: 'blue',
   met_once: 'amber',
@@ -107,31 +94,33 @@ const taLabel: Record<string, string> = {
   rare_disease: 'Rare Disease',
   cardiovascular: 'Cardiovascular',
   metabolic: 'Metabolic',
+  psychiatry: 'Psychiatry',
+  pain_management: 'Pain Mgmt',
+  infectious_disease: 'Infectious',
+  hematology: 'Hematology',
+  ophthalmology: 'Ophthalmology',
+  pulmonology: 'Pulmonology',
 };
-
-/* ------------------------------------------------------------------ */
-/*  Mock data                                                          */
-/* ------------------------------------------------------------------ */
-
-const MOCK_CONTACTS: MockContact[] = [];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
 function getInitials(first: string, last: string) {
-  return `${first[0]}${last[0]}`.toUpperCase();
+  return `${first?.[0] ?? ''}${last?.[0] ?? ''}`.toUpperCase();
 }
 
-function agingDot(days?: number) {
-  if (days === undefined) return 'bg-slate-600';
+function agingDot(lastDate?: string | null) {
+  if (!lastDate) return 'bg-slate-600';
+  const days = daysSince(lastDate);
   if (days <= 7) return 'bg-signal-green';
   if (days <= 30) return 'bg-signal-amber';
   return 'bg-signal-red';
 }
 
-function agingLabel(days?: number) {
-  if (days === undefined) return 'Never contacted';
+function agingLabel(lastDate?: string | null) {
+  if (!lastDate) return 'Never contacted';
+  const days = daysSince(lastDate);
   if (days === 0) return 'Today';
   if (days === 1) return '1d ago';
   return `${days}d ago`;
@@ -148,26 +137,42 @@ function truncateEmail(email: string, max = 24) {
 export default function ContactsPage() {
   const [activeTab, setActiveTab] = useState('all');
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('name_asc');
+  const [sort, setSort] = useState('recently_added');
   const [relFilter, setRelFilter] = useState('');
-  const [showEmpty] = useState(false);
+  const [page, setPage] = useState(1);
 
-  const filtered = MOCK_CONTACTS.filter((c) => {
-    if (activeTab !== 'all' && c.contactType !== activeTab) return false;
-    if (relFilter && c.relationshipStrength !== relFilter) return false;
-    if (
-      search &&
-      !`${c.firstName} ${c.lastName} ${c.title} ${c.organization}`
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    )
-      return false;
+  const { data: response, isLoading, error } = useContacts({
+    contact_type: activeTab !== 'all' ? activeTab : undefined,
+    search: search || undefined,
+    page,
+    limit: 30,
+  });
+
+  const contacts = response?.data ?? [];
+  const pagination = response?.pagination;
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setPage(1);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const filtered = contacts.filter((c) => {
+    if (relFilter && c.relationship_strength !== relFilter) return false;
     return true;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === 'name_asc') return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
+    return 0;
   });
 
   return (
     <>
-      {/* --- Header --- */}
       <PageHeader
         title="Contacts"
         subtitle="Your network of founders, investors, operators, and advisors"
@@ -181,13 +186,13 @@ export default function ContactsPage() {
         }
       />
 
-      {/* --- Stats Strip --- */}
+      {/* Stats Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Total Contacts', value: MOCK_CONTACTS.length, icon: Users },
-          { label: 'Warm Intros', value: MOCK_CONTACTS.filter((c) => c.relationshipStrength === 'warm_intro').length, icon: Handshake },
-          { label: 'Founders', value: MOCK_CONTACTS.filter((c) => c.contactType === 'founder').length, icon: GraduationCap },
-          { label: 'Needs Follow-up', value: MOCK_CONTACTS.filter((c) => (c.lastContactedDays ?? 999) > 30).length, icon: AlertCircle },
+          { label: 'Total Contacts', value: pagination?.total ?? 0, icon: Users },
+          { label: 'Warm Intros', value: contacts.filter((c) => c.relationship_strength === 'warm_intro').length, icon: Handshake },
+          { label: 'Founders', value: contacts.filter((c) => c.contact_type === 'founder').length, icon: GraduationCap },
+          { label: 'Needs Follow-up', value: contacts.filter((c) => !c.last_contacted_at || daysSince(c.last_contacted_at) > 30).length, icon: AlertCircle },
         ].map((stat) => (
           <Card variant="stat" key={stat.label}>
             <div className="flex items-start gap-3">
@@ -196,34 +201,33 @@ export default function ContactsPage() {
               </div>
               <div>
                 <p className="label">{stat.label}</p>
-                <p className="font-mono text-xl text-slate-100 mt-0.5">{stat.value}</p>
+                <p className="font-mono text-xl text-slate-100 mt-0.5">
+                  {isLoading ? '—' : stat.value}
+                </p>
               </div>
             </div>
           </Card>
         ))}
       </div>
 
-      {/* --- Filter / Search Bar --- */}
+      {/* Filter / Search Bar */}
       <Card className="mb-8 !bg-navy-900">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-          {/* Search */}
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
               placeholder="Search by name, title, or company..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="input pl-9 py-2 text-sm w-full"
             />
           </div>
 
-          {/* Type tabs */}
           <div className="overflow-x-auto -mx-1 px-1">
-            <Tabs tabs={contactTypeTabs} activeTab={activeTab} onTabChange={setActiveTab} />
+            <Tabs tabs={contactTypeTabs} activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
 
-          {/* Relationship strength filter */}
           <select
             value={relFilter}
             onChange={(e) => setRelFilter(e.target.value)}
@@ -236,7 +240,6 @@ export default function ContactsPage() {
             ))}
           </select>
 
-          {/* Sort */}
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
@@ -251,8 +254,39 @@ export default function ContactsPage() {
         </div>
       </Card>
 
-      {/* --- Contact Cards or Empty State --- */}
-      {showEmpty || filtered.length === 0 ? (
+      {/* Loading State */}
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i}>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-5 w-36 mb-1" />
+                    <Skeleton className="h-3 w-48" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <Card>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-sm text-signal-red mb-2">Failed to load contacts</p>
+            <p className="text-xs text-slate-500">{error.message}</p>
+          </div>
+        </Card>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !error && sorted.length === 0 && (
         <div className="relative rounded-xl border border-subtle overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-teal-900/10 via-transparent to-navy-950 pointer-events-none" />
           <div className="relative flex flex-col items-center justify-center py-24 px-6 text-center">
@@ -272,103 +306,124 @@ export default function ContactsPage() {
             </Link>
           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map((contact, idx) => (
-            <Card
-              key={contact.id}
-              className="group transition-all duration-200 hover:border-teal-500/20 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
-              style={{ animation: `slideUp 0.4s ease-out ${idx * 0.06}s both` }}
-            >
-              <div className="flex flex-col gap-4">
-                {/* Top row: avatar + name + badges */}
-                <div className="flex items-start gap-3">
-                  {/* Avatar */}
-                  <div
-                    className={`w-10 h-10 rounded-full bg-navy-800 border-2 ${relBorderColor[contact.relationshipStrength]} flex items-center justify-center flex-shrink-0`}
-                  >
-                    <span className="text-xs font-semibold text-slate-300">
-                      {getInitials(contact.firstName, contact.lastName)}
-                    </span>
-                  </div>
+      )}
 
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      href={`/crm/contacts/${contact.id}`}
-                      className="text-base font-medium text-slate-100 hover:text-teal-400 transition-colors block truncate"
-                    >
-                      Dr. {contact.firstName} {contact.lastName}
-                    </Link>
-                    <p className="text-xs text-slate-400 truncate">
-                      {contact.title} at{' '}
-                      <Link
-                        href={`/crm/companies/${contact.orgId}`}
-                        className="text-slate-300 hover:text-teal-400 transition-colors"
+      {/* Contact Cards */}
+      {!isLoading && !error && sorted.length > 0 && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {sorted.map((contact, idx) => {
+              const orgName = (contact as any).organizations?.name;
+              const orgId = contact.organization_id;
+
+              return (
+                <Card
+                  key={contact.id}
+                  className="group transition-all duration-200 hover:border-teal-500/20 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
+                  style={{ animation: `slideUp 0.4s ease-out ${idx * 0.06}s both` }}
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`w-10 h-10 rounded-full bg-navy-800 border-2 ${relBorderColor[contact.relationship_strength] ?? 'border-slate-600'} flex items-center justify-center flex-shrink-0`}
                       >
-                        {contact.organization}
-                      </Link>
-                    </p>
-                  </div>
-                </div>
+                        <span className="text-xs font-semibold text-slate-300">
+                          {getInitials(contact.first_name, contact.last_name)}
+                        </span>
+                      </div>
 
-                {/* Badges row */}
-                <div className="flex flex-wrap gap-1.5">
-                  <Badge variant={contactTypeBadgeVariant[contact.contactType] || 'slate'}>
-                    {contactTypeLabel[contact.contactType]}
-                  </Badge>
-                  <Badge variant={relBadgeVariant[contact.relationshipStrength] || 'slate'}>
-                    {relLabel[contact.relationshipStrength]}
-                  </Badge>
-                </div>
-
-                {/* Contact info */}
-                <div className="flex flex-col gap-1.5 text-xs">
-                  {contact.email && (
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <Mail className="w-3 h-3 text-slate-500 flex-shrink-0" />
-                      <span className="truncate">{truncateEmail(contact.email)}</span>
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          href={`/crm/contacts/${contact.id}`}
+                          className="text-base font-medium text-slate-100 hover:text-teal-400 transition-colors block truncate"
+                        >
+                          {contact.first_name} {contact.last_name}
+                        </Link>
+                        <p className="text-xs text-slate-400 truncate">
+                          {contact.title}
+                          {orgName && (
+                            <>
+                              {' at '}
+                              <Link
+                                href={`/crm/companies/${orgId}`}
+                                className="text-slate-300 hover:text-teal-400 transition-colors"
+                              >
+                                {orgName}
+                              </Link>
+                            </>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  {contact.phone && (
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <Phone className="w-3 h-3 text-slate-500 flex-shrink-0" />
-                      <span>{contact.phone}</span>
-                    </div>
-                  )}
-                </div>
 
-                {/* Therapy areas */}
-                {contact.therapyAreas.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {contact.therapyAreas.slice(0, 2).map((ta) => (
-                      <span
-                        key={ta}
-                        className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-navy-800 text-slate-400 border border-subtle"
-                      >
-                        {taLabel[ta] || ta}
-                      </span>
-                    ))}
-                    {contact.therapyAreas.length > 2 && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-navy-800 text-slate-500">
-                        +{contact.therapyAreas.length - 2} more
-                      </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge variant={contactTypeBadgeVariant[contact.contact_type] || 'slate'}>
+                        {contactTypeLabel[contact.contact_type]}
+                      </Badge>
+                      <Badge variant={relBadgeVariant[contact.relationship_strength] || 'slate'}>
+                        {relLabel[contact.relationship_strength]}
+                      </Badge>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 text-xs">
+                      {contact.email && (
+                        <div className="flex items-center gap-2 text-slate-400">
+                          <Mail className="w-3 h-3 text-slate-500 flex-shrink-0" />
+                          <span className="truncate">{truncateEmail(contact.email)}</span>
+                        </div>
+                      )}
+                      {contact.phone && (
+                        <div className="flex items-center gap-2 text-slate-400">
+                          <Phone className="w-3 h-3 text-slate-500 flex-shrink-0" />
+                          <span>{contact.phone}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {contact.therapy_area_expertise.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {contact.therapy_area_expertise.slice(0, 2).map((ta) => (
+                          <span
+                            key={ta}
+                            className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-navy-800 text-slate-400 border border-subtle"
+                          >
+                            {taLabel[ta] || ta}
+                          </span>
+                        ))}
+                        {contact.therapy_area_expertise.length > 2 && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-navy-800 text-slate-500">
+                            +{contact.therapy_area_expertise.length - 2} more
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
 
-                {/* Footer: last contacted */}
-                <div className="flex items-center justify-end pt-2 border-t border-subtle">
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${agingDot(contact.lastContactedDays)}`} />
-                    <span className="text-xs text-slate-500">
-                      {agingLabel(contact.lastContactedDays)}
-                    </span>
+                    <div className="flex items-center justify-end pt-2 border-t border-subtle">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 rounded-full ${agingDot(contact.last_contacted_at)}`} />
+                        <span className="text-xs text-slate-500">
+                          {agingLabel(contact.last_contacted_at)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+                </Card>
+              );
+            })}
+          </div>
+
+          {pagination && pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8">
+              <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                Previous
+              </Button>
+              <span className="font-mono text-xs text-slate-500">{page} / {pagination.totalPages}</span>
+              <Button variant="ghost" size="sm" disabled={page >= pagination.totalPages} onClick={() => setPage(page + 1)}>
+                Next
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </>
   );

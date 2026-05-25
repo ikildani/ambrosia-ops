@@ -9,38 +9,19 @@ import {
   TrendingUp,
   Target,
   ArrowRight,
-  ArrowUpRight,
   Sparkles,
-  Zap,
   ChevronRight,
-  Activity,
   Flame,
   DollarSign,
   Building2,
-  Shield,
   CheckCircle2,
-  Rocket,
-  BookOpen,
-  UserPlus,
-  FolderPlus,
   ChevronDown,
-  MessageSquare,
 } from 'lucide-react';
-
-/* ══════════════════════════════════════════════════════════════════
-   CONFIG — flip this to see empty vs populated state
-   ══════════════════════════════════════════════════════════════════ */
-const HAS_DATA = false; // Set to true to see the populated dashboard
-
-/* ══════════════════════════════════════════════════════════════════
-   MOCK DATA (only used when HAS_DATA = true)
-   ══════════════════════════════════════════════════════════════════ */
-
-const STAGES: { id: string; label: string; count: number; value: number; color: string }[] = [];
-
-const MANDATES: { id: string; codename: string; client: string; stage: string; stageColor: string; ev: number; type: string; priority: string; days: number }[] = [];
-
-const FEED: { id: string; text: string; by: string; time: string; accent: boolean }[] = [];
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Card } from '@/components/ui/Card';
+import { useOrganizations, useDeals, useActivities } from '@/lib/hooks/use-data';
+import { formatCurrency, formatRelativeDate } from '@/lib/utils/format';
+import { DEAL_STAGES } from '@/lib/data/constants';
 
 /* ══════════════════════════════════════════════════════════════════
    ONBOARDING WIZARD
@@ -95,9 +76,7 @@ function OnboardingWizard() {
 
   return (
     <div style={{ animation: 'fadeIn 0.8s ease-out' }}>
-      {/* Welcome */}
       <div className="text-center mb-20" style={{ animation: 'slideUp 0.6s ease-out' }}>
-        {/* Ambrosia icon */}
         <div className="flex justify-center mb-10 pt-4">
           <img src="/icon-white.png" alt="" className="w-16 h-auto opacity-40" />
         </div>
@@ -117,7 +96,6 @@ function OnboardingWizard() {
           Let&apos;s get you set up in four steps.
         </p>
 
-        {/* Progress */}
         <div className="flex items-center justify-center gap-2 mt-8">
           {WIZARD_STEPS.map((step) => (
             <div
@@ -134,7 +112,6 @@ function OnboardingWizard() {
         </div>
       </div>
 
-      {/* Steps */}
       <div className="max-w-xl mx-auto space-y-4">
         {WIZARD_STEPS.map((step, i) => {
           const isComplete = completedSteps.includes(step.id);
@@ -151,7 +128,6 @@ function OnboardingWizard() {
                 animation: `slideUp 0.5s ease-out ${200 + i * 80}ms both`,
               }}
             >
-              {/* Header */}
               <button
                 className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors"
                 onClick={() => setExpandedStep(isExpanded ? null : step.id)}
@@ -185,7 +161,6 @@ function OnboardingWizard() {
                 />
               </button>
 
-              {/* Expanded content */}
               {isExpanded && !isComplete && (
                 <div className="px-5 pb-5" style={{ animation: 'fadeIn 0.3s ease-out', paddingLeft: '56px' }}>
                   <p className="text-[13px] leading-relaxed mb-5" style={{ color: '#64748b' }}>
@@ -226,7 +201,6 @@ function OnboardingWizard() {
         })}
       </div>
 
-      {/* Bottom help text */}
       <div className="text-center mt-14" style={{ animation: 'slideUp 0.5s ease-out 800ms both' }}>
         <p className="text-[12px]" style={{ color: '#334155' }}>
           You can always access these steps from Settings.
@@ -240,7 +214,25 @@ function OnboardingWizard() {
    POPULATED DASHBOARD
    ══════════════════════════════════════════════════════════════════ */
 
-function PopulatedDashboard() {
+const STAGE_COLORS: Record<string, string> = {
+  sourcing: '#94a3b8',
+  initial_review: '#60a5fa',
+  due_diligence: '#fbbf24',
+  negotiation: '#a78bfa',
+  closing: '#5fd4e3',
+  closed_won: '#34d399',
+  closed_lost: '#f87171',
+};
+
+function PopulatedDashboard({
+  deals,
+  activities,
+  orgCount,
+}: {
+  deals: any[];
+  activities: any[];
+  orgCount: number;
+}) {
   const [date, setDate] = useState('');
 
   useEffect(() => {
@@ -254,12 +246,44 @@ function PopulatedDashboard() {
     return 'Good evening';
   }, []);
 
-  const totalValue = STAGES.reduce((s, st) => s + st.value, 0);
-  const totalDeals = STAGES.reduce((s, st) => s + st.count, 0);
+  const activeDealStages = ['sourcing', 'initial_review', 'due_diligence', 'negotiation', 'closing'];
+  const activeDeals = deals.filter(d => activeDealStages.includes(d.stage));
+  const totalValue = activeDeals.reduce((s, d) => s + (d.estimated_value ?? 0), 0);
+  const wonDeals = deals.filter(d => d.stage === 'closed_won');
+  const closedDeals = deals.filter(d => d.stage === 'closed_won' || d.stage === 'closed_lost');
+  const winRate = closedDeals.length > 0 ? Math.round((wonDeals.length / closedDeals.length) * 100) : 0;
+
+  const stageData = DEAL_STAGES.filter(s => activeDealStages.includes(s.id)).map(stage => {
+    const stageDeals = activeDeals.filter(d => d.stage === stage.id);
+    return {
+      id: stage.id,
+      label: stage.label,
+      count: stageDeals.length,
+      value: stageDeals.reduce((s, d) => s + (d.estimated_value ?? 0), 0),
+      color: STAGE_COLORS[stage.id] ?? '#94a3b8',
+    };
+  });
+
+  const topMandates = activeDeals.slice(0, 5).map(d => ({
+    id: d.id,
+    title: d.title,
+    company: (d as any).organizations?.name ?? '',
+    stage: DEAL_STAGES.find(s => s.id === d.stage)?.label ?? d.stage,
+    stageColor: STAGE_COLORS[d.stage] ?? '#94a3b8',
+    dealType: d.deal_type,
+    priority: d.priority,
+    value: d.estimated_value ?? 0,
+  }));
+
+  const recentActivity = activities.slice(0, 8).map(a => ({
+    id: a.id,
+    text: a.subject,
+    time: formatRelativeDate(a.occurred_at),
+    accent: a.activity_type === 'deal_update' || a.activity_type === 'intro_made',
+  }));
 
   return (
     <>
-      {/* ── HEADER ── */}
       <div className="flex items-end justify-between mb-12">
         <div>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', letterSpacing: '0.12em', color: '#5fd4e3', textTransform: 'uppercase' }}>
@@ -278,13 +302,13 @@ function PopulatedDashboard() {
         </Link>
       </div>
 
-      {/* ── HEADLINE METRICS ── */}
+      {/* Headline Metrics */}
       <div className="grid grid-cols-4 gap-10 mb-14" style={{ animation: 'slideUp 0.5s ease-out 100ms both' }}>
         {[
-          { label: 'Active Mandates', value: String(totalDeals), delta: '+2 this month', deltaColor: '#5fd4e3' },
-          { label: 'Pipeline Value', value: `$${(totalValue / 1000).toFixed(1)}B`, delta: '+$275M vs Q4', deltaColor: '#34d399' },
-          { label: 'Win Rate', value: '67%', delta: '2 of 3 closed · Q1', deltaColor: '#94a3b8' },
-          { label: 'Avg. Days to Close', value: '94', delta: '−12d vs benchmark', deltaColor: '#34d399' },
+          { label: 'Active Mandates', value: String(activeDeals.length), delta: `${orgCount} companies tracked`, deltaColor: '#5fd4e3' },
+          { label: 'Pipeline Value', value: formatCurrency(totalValue, true), delta: `${activeDeals.length} active`, deltaColor: '#34d399' },
+          { label: 'Win Rate', value: `${winRate}%`, delta: `${wonDeals.length} of ${closedDeals.length} closed`, deltaColor: '#94a3b8' },
+          { label: 'Total Deals', value: String(deals.length), delta: `${closedDeals.length} resolved`, deltaColor: '#94a3b8' },
         ].map((m, i) => (
           <div key={m.label}>
             <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#475569', marginBottom: '10px' }}>
@@ -304,7 +328,7 @@ function PopulatedDashboard() {
         ))}
       </div>
 
-      {/* ── MANDATE PIPELINE ── */}
+      {/* Mandate Pipeline */}
       <div className="mb-14">
         <div className="flex items-center justify-between mb-6">
           <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>
@@ -318,7 +342,7 @@ function PopulatedDashboard() {
         </div>
 
         <div className="flex gap-3">
-          {STAGES.map((stage, i) => (
+          {stageData.map((stage, i) => (
             <div key={stage.id} className="flex-1 relative group rounded-xl px-5 py-5 transition-all duration-300"
               style={{ background: '#07101e', border: `1px solid ${stage.color}12`, animation: `slideUp 0.4s ease-out ${i * 50}ms both` }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = `${stage.color}30`; }}
@@ -329,23 +353,26 @@ function PopulatedDashboard() {
                 <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#64748b' }}>{stage.label}</span>
               </div>
               <p style={{ fontFamily: 'var(--font-cormorant)', fontSize: '34px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1 }}>{stage.count}</p>
-              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#475569', marginTop: '4px' }}>${stage.value}M</p>
-              {i < STAGES.length - 1 && <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 z-10"><ChevronRight className="w-3 h-3" style={{ color: '#1e293b' }} /></div>}
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: '#475569', marginTop: '4px' }}>
+                {formatCurrency(stage.value, true)}
+              </p>
+              {i < stageData.length - 1 && <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 z-10"><ChevronRight className="w-3 h-3" style={{ color: '#1e293b' }} /></div>}
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── TWO-COLUMN: MANDATES + INTELLIGENCE ── */}
+      {/* Two-Column: Mandates + Activity */}
       <div className="grid grid-cols-2 gap-8">
-
-        {/* Left: Active Mandates */}
         <div>
           <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0', marginBottom: '20px' }}>
             Active Mandates
           </h2>
           <div className="space-y-3">
-            {MANDATES.map((m, i) => (
+            {topMandates.length === 0 && (
+              <p className="text-sm text-slate-500 py-8 text-center">No active mandates</p>
+            )}
+            {topMandates.map((m, i) => (
               <Link key={m.id} href={`/deals/${m.id}`}
                 className="flex items-center justify-between rounded-xl px-6 py-5 transition-all duration-200 group"
                 style={{ background: '#07101e', border: '1px solid rgba(100,116,139,0.08)', animation: `slideUp 0.4s ease-out ${200 + i * 70}ms both` }}
@@ -353,28 +380,26 @@ function PopulatedDashboard() {
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(100,116,139,0.08)'; }}>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
+                    {m.priority === 'critical' && <Flame className="w-3.5 h-3.5" style={{ color: '#f87171' }} />}
                     {m.priority === 'high' && <Flame className="w-3.5 h-3.5" style={{ color: '#fbbf24' }} />}
-                    <span className="text-[15px] font-medium group-hover:text-[#5fd4e3] transition-colors" style={{ color: '#f0f4f8' }}>{m.codename}</span>
+                    <span className="text-[15px] font-medium group-hover:text-[#5fd4e3] transition-colors" style={{ color: '#f0f4f8' }}>{m.title}</span>
                     <span className="px-2 py-[2px] rounded text-[9px] font-semibold uppercase tracking-wider" style={{ background: `${m.stageColor}12`, color: m.stageColor }}>{m.stage}</span>
                   </div>
                   <div className="flex items-center gap-3 mt-1">
-                    <span className="text-[12px]" style={{ color: '#64748b' }}>{m.client}</span>
+                    <span className="text-[12px]" style={{ color: '#64748b' }}>{m.company}</span>
                     <span style={{ color: '#1e293b' }}>·</span>
-                    <span className="text-[11px] uppercase tracking-wider" style={{ color: '#475569' }}>{m.type}</span>
-                    <span style={{ color: '#1e293b' }}>·</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#475569' }}>{m.days}d in stage</span>
+                    <span className="text-[11px] uppercase tracking-wider" style={{ color: '#475569' }}>{m.dealType}</span>
                   </div>
                 </div>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', fontWeight: 600, color: '#5fd4e3' }}>${m.ev}M</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', fontWeight: 600, color: '#5fd4e3' }}>
+                  {m.value > 0 ? formatCurrency(m.value, true) : '—'}
+                </span>
               </Link>
             ))}
           </div>
         </div>
 
-        {/* Right: Activity + Intelligence */}
         <div className="space-y-8">
-
-          {/* Activity */}
           <div>
             <div className="flex items-center gap-3 mb-5">
               <h2 style={{ fontFamily: 'var(--font-cormorant)', fontSize: '24px', fontWeight: 600, color: '#e2e8f0' }}>Team Activity</h2>
@@ -384,25 +409,26 @@ function PopulatedDashboard() {
               </span>
             </div>
             <div className="space-y-0">
-              {FEED.map((item, i) => (
+              {recentActivity.length === 0 && (
+                <p className="text-sm text-slate-500 py-8 text-center">No recent activity</p>
+              )}
+              {recentActivity.map((item, i) => (
                 <div key={item.id} className="flex items-start gap-3 py-3 group cursor-pointer" style={{ animation: `slideUp 0.3s ease-out ${300 + i * 50}ms both` }}>
                   <div className="w-[6px] h-[6px] rounded-full flex-shrink-0 mt-[7px]" style={{ background: item.accent ? '#5fd4e3' : '#334155' }} />
                   <div className="flex-1">
                     <p className="text-[13px] leading-relaxed group-hover:text-slate-100 transition-colors" style={{ color: '#94a3b8' }}>{item.text}</p>
-                    <p className="mt-1" style={{ fontSize: '11px', color: '#334155' }}>{item.by} · {item.time}</p>
+                    <p className="mt-1" style={{ fontSize: '11px', color: '#334155' }}>{item.time}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Separator */}
           <div className="h-px" style={{ background: 'rgba(100,116,139,0.06)' }} />
 
-          {/* Quick actions */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: 'AI Deep Dive', href: '/research/new', icon: Sparkles, color: '#5fd4e3' },
+              { label: 'AI Deep Dive', href: '/intelligence', icon: Sparkles, color: '#5fd4e3' },
               { label: 'Add Company', href: '/crm/companies/new', icon: Building2, color: '#9499d1' },
               { label: 'View Pipeline', href: '/deals', icon: Target, color: '#60a5fa' },
             ].map((action) => {
@@ -430,9 +456,49 @@ function PopulatedDashboard() {
    ══════════════════════════════════════════════════════════════════ */
 
 export default function DashboardPage() {
+  const { data: orgsResponse, isLoading: orgsLoading } = useOrganizations({ limit: 1 });
+  const { data: dealsResponse, isLoading: dealsLoading } = useDeals({ limit: 100 });
+  const { data: activitiesResponse, isLoading: activitiesLoading } = useActivities({ limit: 10 });
+
+  const isLoading = orgsLoading || dealsLoading || activitiesLoading;
+  const orgCount = orgsResponse?.pagination?.total ?? 0;
+  const dealCount = dealsResponse?.pagination?.total ?? 0;
+  const hasData = orgCount > 0 || dealCount > 0;
+
+  if (isLoading) {
+    return (
+      <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
+        <div className="flex items-end justify-between mb-12">
+          <div>
+            <Skeleton className="h-3 w-48 mb-3" />
+            <Skeleton className="h-10 w-64" />
+          </div>
+          <Skeleton className="h-10 w-36 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-4 gap-10 mb-14">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i}>
+              <Skeleton className="h-3 w-24 mb-3" />
+              <Skeleton className="h-12 w-20" />
+            </div>
+          ))}
+        </div>
+        <Skeleton className="h-32 w-full rounded-xl" />
+      </div>
+    );
+  }
+
   return (
     <div style={{ animation: 'fadeIn 0.6s ease-out' }}>
-      {HAS_DATA ? <PopulatedDashboard /> : <OnboardingWizard />}
+      {hasData ? (
+        <PopulatedDashboard
+          deals={dealsResponse?.data ?? []}
+          activities={activitiesResponse?.data ?? []}
+          orgCount={orgCount}
+        />
+      ) : (
+        <OnboardingWizard />
+      )}
     </div>
   );
 }

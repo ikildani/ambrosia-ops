@@ -36,32 +36,6 @@ const SUGGESTIONS = [
 ];
 
 /* ══════════════════════════════════════════════════════════════════
-   MOCK RESPONSE (replace with Claude API)
-   ══════════════════════════════════════════════════════════════════ */
-
-function getMockResponse(input: string): string {
-  const lower = input.toLowerCase();
-
-  if (lower.includes('mandate') || lower.includes('deal') || lower.includes('pipeline')) {
-    return `You currently have **6 active mandates** with a combined pipeline value of **$1.5B**.\n\n**Priority mandates:**\n- **Project Falcon** — NeuroGen Therapeutics (M&A, $450M EV) — In Due Diligence for 18 days. CIM finalization is due today.\n- **ADC Licensing** — PharmaLink ($380M) — In Negotiation, 34 days. Comp analysis update needed by Thursday.\n- **Gene Therapy Partnership** — GenVista ($275M) — Closing stage, term sheet going to counsel tomorrow.\n\nWould you like me to draft a status update memo for the team?`;
-  }
-
-  if (lower.includes('follow') || lower.includes('contact') || lower.includes('relationship')) {
-    return `**8 contacts need follow-up** (no interaction in 30+ days):\n\n1. **Dr. Emily Walsh** — CSO at BioVantage (45 days) — Last: intro call\n2. **James Liu** — MD at Wellington FO (38 days) — Last: NDA discussion\n3. **Sarah Kim** — VP BD at Meridian Bio (35 days) — Never contacted\n\nI recommend prioritizing Dr. Walsh — BioVantage is a potential Series B advisory mandate in the immunology space.\n\nShall I draft outreach emails for these contacts?`;
-  }
-
-  if (lower.includes('deep dive') || lower.includes('research') || lower.includes('company')) {
-    return `I can generate a comprehensive deep dive on any company. This will include:\n\n- **Market opportunity** — TAM/SAM analysis from Terrain\n- **Competitive landscape** — pipeline density and differentiation\n- **Clinical pipeline** — active trials from ClinicalTrials.gov\n- **Valuation context** — comparable transactions from Benchmarker\n- **Key risks** and **investment thesis**\n\nWhich company would you like me to analyze? I can pull data across all three platforms.`;
-  }
-
-  if (lower.includes('comparable') || lower.includes('comp') || lower.includes('valuation')) {
-    return `For comparable deal analysis, I'll pull from the Benchmarker database of **280+ transactions**.\n\nTo run the analysis, I need:\n1. **Therapy area** (e.g., Oncology, Neurology)\n2. **Development stage** (e.g., Phase 2, Phase 3)\n3. **Deal type** (M&A, Licensing, Partnership)\n\nFor example, recent **Phase 2 Oncology M&A** transactions:\n- Median upfront: **$125M**\n- Median total value: **$450M**\n- Royalty range: **5–12%**\n\nWhich parameters should I use?`;
-  }
-
-  return `I can help you with:\n\n- **Mandate tracking** — status updates, stage analysis, team assignments\n- **Relationship intelligence** — follow-up recommendations, intro paths\n- **Research & analysis** — company deep dives, sector memos, comp analysis\n- **Deal support** — term sheet drafting, valuation context, CIM outlines\n- **Platform guidance** — how to use any feature in Ambrosia Ops\n\nWhat would you like to explore?`;
-}
-
-/* ══════════════════════════════════════════════════════════════════
    SAFE MARKDOWN RENDERING
    ══════════════════════════════════════════════════════════════════ */
 
@@ -116,23 +90,76 @@ export function AIAssistant() {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput('');
     setIsTyping(true);
 
-    // Simulate streaming delay
-    await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+    try {
+      const res = await fetch('/api/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+        }),
+      });
 
-    const response = getMockResponse(text);
-    const assistantMsg: Message = {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: response,
-      timestamp: new Date(),
-    };
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
-    setIsTyping(false);
-    setMessages(prev => [...prev, assistantMsg]);
+      const assistantMsgId = (Date.now() + 1).toString();
+      let fullText = '';
+
+      setMessages(prev => [...prev, {
+        id: assistantMsgId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      }]);
+      setIsTyping(false);
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') break;
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.text) {
+                  fullText += parsed.text;
+                  setMessages(prev =>
+                    prev.map(m =>
+                      m.id === assistantMsgId ? { ...m, content: fullText } : m
+                    )
+                  );
+                }
+              } catch {
+                // skip malformed chunks
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      setIsTyping(false);
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'I encountered an issue connecting to the AI service. Please try again in a moment.',
+        timestamp: new Date(),
+      }]);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -140,7 +167,6 @@ export function AIAssistant() {
     sendMessage(input);
   };
 
-  // Floating trigger button
   if (!isOpen) {
     return (
       <button
@@ -156,7 +182,6 @@ export function AIAssistant() {
     );
   }
 
-  // Minimized state
   if (isMinimized) {
     return (
       <button
@@ -177,7 +202,6 @@ export function AIAssistant() {
     );
   }
 
-  // Full chat panel
   return (
     <div
       className="fixed bottom-6 right-6 z-50 flex flex-col rounded-2xl overflow-hidden"
@@ -189,7 +213,7 @@ export function AIAssistant() {
         boxShadow: '0 8px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(95,212,227,0.05)',
       }}
     >
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="flex-shrink-0 px-5 py-4" style={{
         background: 'linear-gradient(135deg, rgba(95,212,227,0.06), rgba(148,153,209,0.04))',
         borderBottom: '1px solid rgba(95,212,227,0.08)',
@@ -221,12 +245,10 @@ export function AIAssistant() {
         </div>
       </div>
 
-      {/* ── Messages ── */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: 'thin' }}>
         {messages.length === 0 ? (
-          /* Welcome state */
           <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
-            {/* Brand mark */}
             <div className="flex justify-center mb-6 mt-4">
               <svg width="40" height="50" viewBox="0 0 64 80" className="opacity-20">
                 <defs>
@@ -247,7 +269,6 @@ export function AIAssistant() {
               I have context on your mandates, companies, contacts, and market intelligence.
             </p>
 
-            {/* Suggestion cards */}
             <div className="space-y-2">
               {SUGGESTIONS.map((s, i) => {
                 const Icon = s.icon;
@@ -273,12 +294,11 @@ export function AIAssistant() {
             </div>
           </div>
         ) : (
-          /* Conversation */
           <div className="space-y-5">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 style={{ animation: 'slideUp 0.3s ease-out' }}>
-                <div className={`max-w-[85%] ${msg.role === 'user' ? '' : ''}`}>
+                <div className="max-w-[85%]">
                   {msg.role === 'assistant' && (
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-5 h-5 rounded flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5fd4e3, #9499d1)' }}>
@@ -328,7 +348,7 @@ export function AIAssistant() {
         )}
       </div>
 
-      {/* ── Input ── */}
+      {/* Input */}
       <div className="flex-shrink-0 px-4 py-3" style={{ borderTop: '1px solid rgba(100,116,139,0.08)' }}>
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <input

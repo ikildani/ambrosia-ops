@@ -1,9 +1,10 @@
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
+import { Providers } from '@/lib/providers';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <Providers>
       <Sidebar />
       <div style={{ marginLeft: '260px', minHeight: '100vh', display: 'flex', flexDirection: 'column' as const, background: '#04080f' }}>
         <Topbar />
@@ -11,6 +12,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
-    </>
+    </Providers>
   );
 }
