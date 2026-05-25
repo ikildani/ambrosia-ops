@@ -256,11 +256,12 @@ const knowledgeEntries: KnowledgeEntry[] = [
 function getDetailContent(id: string): string[] {
   const contentMap: Record<string, string[]> = {
     'pb-001': [
-      'Phase 1: Sourcing & Screening -- The transaction process begins with systematic identification of potential targets or acquirers through therapeutic area mapping, pipeline gap analysis, and corporate development relationship leverage. Our proprietary screening framework evaluates over 40 criteria across clinical maturity, IP strength, commercial readiness, and strategic fit. Initial desk research is followed by confidential, high-level conversations to gauge interest without revealing client identity or specific mandate parameters.',
-      'Phase 2: Initial Engagement -- Upon identifying qualified counterparties, the team initiates structured outreach through existing relationships or cold corporate development contacts. Non-disclosure agreements are executed using our standardized CDA templates with appropriate carve-outs for life sciences diligence. A teaser document is prepared summarizing the opportunity at a level sufficient to generate interest without disclosing proprietary data. Management teams are briefed on messaging discipline and information boundaries.',
-      'Phase 3: Due Diligence -- Once a counterparty expresses serious interest and signs an appropriate NDA, a staged due diligence process is initiated. Phase 1 covers publicly available information and high-level clinical/commercial data. Phase 2 grants access to the virtual data room with detailed regulatory filings, CMC documentation, IP opinions, and financial models. Phase 3 involves expert sessions, site visits, and management presentations. Each phase has defined gating criteria before proceeding.',
-      'Phase 4: Negotiation & Structuring -- Deal terms are negotiated through iterative markup sessions beginning with a non-binding letter of intent. Key economic variables include upfront consideration, development and regulatory milestones, commercial milestones, royalty rates and tiers, and territory definitions. Our valuation models (rNPV, comparable transactions, precedent premiums) provide quantitative anchors for each negotiation point. Representations, warranties, and indemnification provisions are tailored to the specific risk profile of the asset.',
-      'Phase 5: Closing & Integration -- Post-signing, the team manages the regulatory approval process (HSR, CFIUS where applicable), coordinates third-party consents, and oversees the closing mechanics including escrow arrangements, working capital adjustments, and transition service agreements. A structured integration plan is developed covering personnel retention, technology transfer, regulatory filing continuity, and ongoing clinical trial management to preserve asset value through the ownership transition.',
+      'Phase 1: Sourcing & Screening -- The transaction process begins with systematic identification of potential targets or acquirers through therapeutic area mapping, pipeline gap analysis, and corporate development relationship leverage. Our proprietary screening framework evaluates over 40 criteria across clinical maturity, IP strength, commercial readiness, and strategic fit. Initial desk research is followed by confidential, high-level conversations to gauge interest without revealing client identity or specific mandate parameters. The sourcing phase typically spans 4-8 weeks depending on the breadth of the search mandate and the specificity of the client\'s strategic criteria. During this phase, the team builds a comprehensive landscape map of 50-200 potential counterparties, tiered by strategic fit (Tier 1: 10-15 high-conviction targets, Tier 2: 20-30 qualified candidates, Tier 3: 30-50 exploratory contacts). Each target is profiled across financial capacity, therapeutic area overlap, recent transaction activity, stated corporate strategy, and relationship accessibility. The output of this phase is a ranked target list with recommended outreach sequencing and a preliminary timeline for engagement.',
+      'Phase 2: Initial Engagement & Teaser Distribution -- Upon identifying qualified counterparties, the team initiates structured outreach through existing relationships or cold corporate development contacts. Non-disclosure agreements are executed using our standardized CDA templates with appropriate carve-outs for life sciences diligence. A teaser document is prepared summarizing the opportunity at a level sufficient to generate interest without disclosing proprietary data. Management teams are briefed on messaging discipline and information boundaries. The engagement phase requires careful orchestration of multiple parallel conversations, tracking each counterparty\'s level of interest, diligence requests, and internal approval timelines. Standard deliverables include a 2-3 page teaser (anonymous or named, depending on client preference), a process letter outlining timeline and expectations, and a preliminary information package for parties that sign NDAs. The advisory team maintains a detailed CRM tracker logging every interaction, document shared, and follow-up commitment. A weekly pipeline review with the client ensures alignment on which parties to advance, pause, or decline. Typical conversion rates from teaser to NDA execution range from 30-50% for well-targeted outreach.',
+      'Phase 3: Due Diligence Management -- Once a counterparty expresses serious interest and signs an appropriate NDA, a staged due diligence process is initiated. Phase 1 DD covers publicly available information and high-level clinical/commercial data shared via a summary presentation. Phase 2 DD grants access to the virtual data room with detailed regulatory filings, CMC documentation, IP opinions, and financial models. Phase 3 DD involves expert sessions, site visits, and management presentations. Each phase has defined gating criteria before proceeding — specifically, the counterparty must provide written confirmation of continued interest and an indicative value range before advancing to the next phase. The data room is organized into a standardized folder structure (Corporate, Clinical, Regulatory, Manufacturing, IP, Commercial, Financial, Legal) with granular access controls that allow different parties to see different levels of detail. A Q&A log is maintained centrally, with responses reviewed by legal counsel before distribution. Management presentations are rehearsed with the advisory team, with clear guidelines on what information can be shared verbally versus what must remain in the data room. The DD phase typically spans 6-10 weeks for M&A transactions and 4-6 weeks for licensing deals.',
+      'Phase 4: Negotiation & Structuring -- Deal terms are negotiated through iterative markup sessions beginning with a non-binding letter of intent (LOI) or term sheet. Key economic variables include upfront consideration (cash, stock, or combination), development and regulatory milestones (tied to IND, Phase initiations, data readouts, regulatory submissions, and approvals), commercial milestones (net sales thresholds), royalty rates and tiers, and territory definitions. Our valuation models — including risk-adjusted NPV (rNPV), comparable transaction analysis, precedent premium analysis, and sum-of-the-parts assessment — provide quantitative anchors for each negotiation point. Representations, warranties, and indemnification provisions are tailored to the specific risk profile of the asset, with particular attention to clinical data integrity, IP ownership, regulatory compliance, and undisclosed liabilities. The negotiation phase typically involves 3-5 rounds of markup on the definitive agreement, with separate workstreams for the purchase agreement, disclosure schedules, transition services agreement, and any ancillary documents (employment agreements, consulting arrangements, escrow agreements). The advisory team serves as the primary interface between the parties\' legal teams, translating business terms into legal language and flagging provisions that may have unintended economic consequences. Closing conditions are negotiated to balance deal certainty with appropriate protections for both parties.',
+      'Phase 5: Signing, Regulatory Approval & Closing -- Post-signing, the team manages the regulatory approval process (HSR/Hart-Scott-Rodino filing where transaction value exceeds thresholds, CFIUS review for cross-border transactions, and antitrust clearance in relevant jurisdictions), coordinates third-party consents (from collaboration partners, landlords, key suppliers, and government agencies), and oversees the closing mechanics including escrow arrangements, working capital adjustments, and transition service agreements. A structured integration plan is developed covering personnel retention (key employee agreements, stay bonuses, and retention pools), technology transfer (lab equipment, manufacturing processes, analytical methods), regulatory filing continuity (IND transfers, DMF amendments, annual report obligations), and ongoing clinical trial management to preserve asset value through the ownership transition. The period between signing and closing typically spans 30-90 days for domestic transactions and 60-180 days for cross-border deals requiring multiple regulatory approvals. During this period, the advisory team monitors compliance with interim operating covenants, manages any material adverse change (MAC) risks, and coordinates the mechanics of funds flow at closing. Post-closing deliverables include final working capital calculations, earnout tracking mechanisms, and transition support as specified in the TSA.',
+      'Phase 6: Post-Close Advisory & Relationship Management -- While the formal mandate concludes at closing, Ambrosia maintains an active advisory relationship through the critical first 90 days post-close. This includes monitoring earnout milestone progress, facilitating introductions between the combined entity\'s management teams, providing market intelligence on competitive developments that may affect integration priorities, and serving as an ongoing resource for the client\'s board on strategic matters. This phase also serves a business development function: successful transactions generate referrals, repeat mandates, and enhanced market positioning. The team conducts a structured post-mortem within 30 days of closing, documenting lessons learned, process improvements, and relationship insights for the institutional knowledge base.',
     ],
     'pb-002': [
       'Clinical Workstream -- The clinical due diligence workstream covers a comprehensive review of all INDs, clinical trial protocols, statistical analysis plans, clinical study reports, and safety databases. For each ongoing trial, the team evaluates enrollment velocity, site performance, endpoint definitions, interim analysis triggers, and comparability to prior studies. Particular attention is paid to protocol amendments, clinical holds, and any FDA or EMA correspondence that may indicate regulatory concerns. Stage-specific checklists scale from preclinical toxicology packages through post-marketing commitments.',
@@ -409,9 +410,9 @@ export default function KnowledgeDetailPage({
       </Link>
 
       {/* Main Content Card */}
-      <Card className="px-10 py-10">
+      <Card style={{ padding: '56px 64px' }}>
         {/* Category Badge + Read Time */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy-800 border border-subtle">
               <Icon className="h-4 w-4 text-teal-400" />
@@ -425,12 +426,12 @@ export default function KnowledgeDetailPage({
         </div>
 
         {/* Title */}
-        <h1 className="font-cormorant text-3xl font-semibold leading-tight text-slate-100 mb-6">
+        <h1 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '36px', fontWeight: 600, color: '#f0f4f8', lineHeight: 1.2, letterSpacing: '-0.01em', marginBottom: '20px' }}>
           {entry.title}
         </h1>
 
         {/* Author + Last Updated */}
-        <div className="mb-6 flex items-center gap-4 text-sm text-slate-500">
+        <div className="mb-8 flex items-center gap-5 text-sm text-slate-500">
           <div className="flex items-center gap-2">
             <User className="h-4 w-4 text-slate-600" />
             <span className="font-medium text-slate-400">{entry.author}</span>
@@ -443,7 +444,7 @@ export default function KnowledgeDetailPage({
         </div>
 
         {/* Tags */}
-        <div className="mb-8 flex flex-wrap gap-2">
+        <div className="mb-10 flex flex-wrap gap-3">
           {entry.tags.map((tag) => (
             <span
               key={tag}
@@ -456,22 +457,21 @@ export default function KnowledgeDetailPage({
         </div>
 
         {/* Divider */}
-        <div className="mb-10 border-t border-subtle" />
+        <div className="mb-12 border-t border-subtle" />
 
         {/* Description / Overview */}
-        <div className="mb-10">
-          <h2 className="font-cormorant text-xl font-semibold text-slate-200 mb-4">
+        <div className="mb-12">
+          <h2 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '22px', fontWeight: 600, color: '#e2e8f0', marginBottom: '16px' }}>
             Overview
           </h2>
-          <p className="text-sm leading-relaxed text-slate-400">
+          <p style={{ fontSize: '15px', lineHeight: 1.85, color: '#94a3b8', letterSpacing: '0.01em' }}>
             {entry.description}
           </p>
         </div>
 
         {/* Full Content Sections */}
-        <div className="space-y-8">
+        <div className="space-y-12">
           {contentSections.map((section, i) => {
-            // Split on " -- " to separate heading from body
             const separatorIndex = section.indexOf(' -- ');
             const hasHeading = separatorIndex > -1;
             const heading = hasHeading ? section.slice(0, separatorIndex) : null;
@@ -480,11 +480,11 @@ export default function KnowledgeDetailPage({
             return (
               <div key={i}>
                 {heading && (
-                  <h3 className="font-cormorant text-lg font-semibold text-slate-200 mb-3">
+                  <h3 style={{ fontFamily: 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif', fontSize: '20px', fontWeight: 600, color: '#e2e8f0', marginBottom: '14px' }}>
                     {heading}
                   </h3>
                 )}
-                <p className="text-sm leading-relaxed text-slate-400">
+                <p style={{ fontSize: '15px', lineHeight: 1.85, color: '#94a3b8', letterSpacing: '0.01em' }}>
                   {body}
                 </p>
               </div>

@@ -214,7 +214,7 @@ h1, h2, h3, h4 {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 32px 36px;
+  padding: 32px 36px !important;
   position: relative;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -235,7 +235,7 @@ h1, h2, h3, h4 {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 32px 36px;
+  padding: 32px 36px !important;
   position: relative;
   overflow: hidden;
 }
