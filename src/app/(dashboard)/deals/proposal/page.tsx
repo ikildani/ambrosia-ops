@@ -85,10 +85,9 @@ const styles = {
   } as React.CSSProperties,
 
   layout: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '36px',
-    alignItems: 'start',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '48px',
   } as React.CSSProperties,
 
   card: {
@@ -246,42 +245,42 @@ const styles = {
     cursor: 'not-allowed',
   } as React.CSSProperties,
 
-  /* Proposal sidebar styles */
+  /* Proposal display styles */
   proposalCard: {
     background: '#07101e',
-    border: '1px solid rgba(100,116,139,0.1)',
-    borderRadius: '14px',
+    border: '1px solid rgba(95,212,227,0.1)',
+    borderRadius: '16px',
     overflow: 'hidden',
-    position: 'sticky' as const,
-    top: '24px',
   } as React.CSSProperties,
 
   proposalHeader: {
-    padding: '24px 32px',
+    padding: '36px 48px',
     borderBottom: '1px solid rgba(100,116,139,0.06)',
+    background: 'linear-gradient(135deg, rgba(95,212,227,0.04), rgba(148,153,209,0.03))',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   } as React.CSSProperties,
 
   proposalSection: {
-    padding: '28px 32px',
+    padding: '36px 48px',
     borderBottom: '1px solid rgba(100,116,139,0.04)',
   } as React.CSSProperties,
 
   proposalSectionTitle: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
-    marginBottom: '16px',
+    gap: '12px',
+    marginBottom: '20px',
   } as React.CSSProperties,
 
   proposalContent: {
     fontSize: '15px',
-    lineHeight: 1.85,
+    lineHeight: 1.9,
     color: '#94a3b8',
     letterSpacing: '0.015em',
     whiteSpace: 'pre-wrap' as const,
+    maxWidth: '800px',
   } as React.CSSProperties,
 
   loadingContainer: {
