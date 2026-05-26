@@ -11,6 +11,7 @@ import {
   Kanban,
   Eye,
   BarChart3,
+  FileText,
   FolderKanban,
   CheckSquare,
   Zap,
@@ -54,6 +55,7 @@ const navigation: NavSection[] = [
       { label: 'Pipeline', href: '/deals', icon: Kanban },
       { label: 'Screen', href: '/deals/screen', icon: Eye },
       { label: 'Analytics', href: '/deals/analytics', icon: BarChart3 },
+      { label: 'Proposal', href: '/deals/proposal', icon: FileText },
     ],
   },
   {

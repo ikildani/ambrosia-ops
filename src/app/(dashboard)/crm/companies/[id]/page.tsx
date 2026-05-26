@@ -22,6 +22,9 @@ import {
   ChevronRight,
   Activity,
   Briefcase,
+  Upload,
+  Sparkles,
+  Loader2,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -216,6 +219,10 @@ export default function CompanyDetailPage({
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [activityForm, setActivityForm] = useState({ activity_type: 'note', subject: '', body: '' });
   const [savingActivity, setSavingActivity] = useState(false);
+  const [uploadedDocs, setUploadedDocs] = useState<Array<{ name: string; size: string; type: string; content: string; summary?: string; summarizing?: boolean }>>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [marketIntel, setMarketIntel] = useState<{ tam: string; competitors: string; loa: string; peakRevenue: string; summary: string } | null>(null);
+  const [loadingIntel, setLoadingIntel] = useState(false);
 
   useEffect(() => {
     async function loadCompany() {
@@ -273,6 +280,38 @@ export default function CompanyDetailPage({
           new Date(a.occurred_at) > new Date(latest.occurred_at) ? a : latest
         ).occurred_at
       : null;
+
+  async function handleSummarize(index: number) {
+    setUploadedDocs(prev => prev.map((d, i) => i === index ? { ...d, summarizing: true } : d));
+    try {
+      const doc = uploadedDocs[index];
+      const res = await fetch('/api/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: `Summarize this document in 3-4 sentences for an M&A advisory context. Document name: ${doc.name}, Type: ${doc.type}. Provide a concise executive summary focusing on key financial terms, strategic implications, and actionable insights.` }],
+        }),
+      });
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let summary = '';
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value);
+          for (const line of chunk.split('\n')) {
+            if (line.startsWith('data: ') && line.slice(6) !== '[DONE]') {
+              try { summary += JSON.parse(line.slice(6)).text || ''; } catch { /* parse error */ }
+            }
+          }
+        }
+      }
+      setUploadedDocs(prev => prev.map((d, i) => i === index ? { ...d, summary, summarizing: false } : d));
+    } catch {
+      setUploadedDocs(prev => prev.map((d, i) => i === index ? { ...d, summarizing: false } : d));
+    }
+  }
 
   return (
     <div className="animate-fade-in">
@@ -564,54 +603,6 @@ export default function CompanyDetailPage({
             )}
           </Card>
 
-          {/* --- Documents card --- */}
-          <Card className="animate-slide-up" style={{ animationDelay: '0.2s' } as React.CSSProperties}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-teal-500" />
-                <h2 className="label text-xs tracking-widest">Documents</h2>
-                {documents.length > 0 && (
-                  <span className="font-mono text-[10px] text-slate-500 ml-1">{documents.length}</span>
-                )}
-              </div>
-            </div>
-
-            {documents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileText className="w-8 h-8 text-slate-700 mb-3" />
-                <p className="text-sm text-slate-500">No documents yet.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {documents.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-start gap-3 p-3 rounded-md bg-navy-800/40 border border-navy-700/30 hover:border-teal-500/20 transition-all cursor-pointer"
-                  >
-                    <div className="w-9 h-9 rounded bg-navy-700/60 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <FileText className="w-4 h-4 text-slate-400" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm text-slate-200 truncate">{doc.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider">
-                          {DOC_TYPE_LABELS[doc.document_type] ?? doc.document_type}
-                        </span>
-                        {doc.file_size && (
-                          <span className="text-[10px] text-slate-600 font-mono">
-                            {formatFileSize(doc.file_size)}
-                          </span>
-                        )}
-                        <span className="text-[10px] text-slate-600">
-                          {formatRelativeDate(doc.created_at)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
         </div>
 
         {/* ============================================================
@@ -865,6 +856,79 @@ export default function CompanyDetailPage({
       </div>
 
       {/* ================================================================
+          DOCUMENTS & DATA ROOM
+          ================================================================ */}
+      <Card style={{ padding: '32px', marginBottom: '24px', marginTop: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#0d1b2e', border: '1px solid rgba(100,116,139,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FileText style={{ width: '20px', height: '20px', color: '#00c9a7' }} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#e2e8f0' }}>Documents &amp; Data Room</h2>
+              <p style={{ fontSize: '13px', color: '#475569', marginTop: '2px' }}>Upload files or connect Google Drive</p>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <a href="https://drive.google.com" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="sm">
+                <ExternalLink className="w-3.5 h-3.5" />
+                Google Drive
+              </Button>
+            </a>
+            <Button size="sm" onClick={() => setShowUploadModal(true)}>
+              <Upload className="w-4 h-4" />
+              Upload
+            </Button>
+          </div>
+        </div>
+
+        {/* Document list or empty state */}
+        {uploadedDocs.length === 0 ? (
+          <div style={{ border: '2px dashed rgba(100,116,139,0.15)', borderRadius: '12px', padding: '40px', textAlign: 'center' }}>
+            <FileText style={{ width: '32px', height: '32px', color: '#334155', margin: '0 auto 16px' }} />
+            <p style={{ fontSize: '14px', color: '#475569', marginBottom: '4px' }}>No documents yet</p>
+            <p style={{ fontSize: '13px', color: '#334155' }}>Upload CIMs, pitch decks, term sheets, or financial models</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {uploadedDocs.map((doc, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: '#0a1628', borderRadius: '10px', border: '1px solid rgba(100,116,139,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <FileText style={{ width: '18px', height: '18px', color: '#5fd4e3' }} />
+                  <div>
+                    <p style={{ fontSize: '14px', fontWeight: 500, color: '#e2e8f0' }}>{doc.name}</p>
+                    <p style={{ fontSize: '12px', color: '#475569', marginTop: '2px' }}>{doc.size} · {doc.type}</p>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {doc.summary ? (
+                    <span style={{ fontSize: '12px', color: '#34d399' }}>Summarized</span>
+                  ) : (
+                    <button onClick={() => handleSummarize(i)} disabled={doc.summarizing} style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #5fd4e3, #9499d1)', color: '#04080f' }}>
+                      {doc.summarizing ? 'Analyzing...' : 'AI Summarize'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Show summaries */}
+        {uploadedDocs.some(d => d.summary) && (
+          <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {uploadedDocs.filter(d => d.summary).map((doc, i) => (
+              <div key={i} style={{ padding: '20px 24px', background: 'rgba(52,211,153,0.04)', border: '1px solid rgba(52,211,153,0.1)', borderRadius: '12px' }}>
+                <p style={{ fontSize: '13px', fontWeight: 600, color: '#34d399', marginBottom: '8px' }}>{doc.name} — AI Summary</p>
+                <p style={{ fontSize: '14px', lineHeight: 1.75, color: '#94a3b8' }}>{doc.summary}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
+
+      {/* ================================================================
           ENRICHMENT / TERRAIN INTEGRATION SECTION
           ================================================================ */}
       <div className="mt-8 animate-slide-up" style={{ animationDelay: '0.25s' } as React.CSSProperties}>
@@ -882,16 +946,18 @@ export default function CompanyDetailPage({
                   <h2 className="text-sm font-medium text-slate-200">Market Intelligence</h2>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="badge badge-teal text-[9px] px-1.5 py-0">Terrain</span>
+                    <span className="badge badge-teal text-[9px] px-1.5 py-0" style={{ background: 'rgba(148,153,209,0.12)', color: '#9499d1', borderColor: 'rgba(148,153,209,0.3)' }}>Benchmarker</span>
                     <span className="text-[10px] text-slate-600">Powered by Ambrosia Ventures</span>
                   </div>
                 </div>
               </div>
 
-              <p className="text-sm text-slate-500 leading-relaxed max-w-xl mt-2">
-                Connect to Terrain to see TAM/SAM analysis, competitive landscape, and regulatory
-                pathways for this company&apos;s indication. Unlock pricing benchmarks, likelihood
-                of approval data, and S-curve market projections.
-              </p>
+              {!marketIntel && (
+                <p className="text-sm text-slate-500 leading-relaxed max-w-xl mt-2">
+                  Generate AI-powered market intelligence for this company — TAM/SAM analysis,
+                  competitive landscape, likelihood of approval, and peak revenue projections.
+                </p>
+              )}
 
               <div className="flex items-center gap-3 mt-4">
                 {company.therapy_areas.map((ta) => (
@@ -908,6 +974,57 @@ export default function CompanyDetailPage({
             </div>
 
             <div className="flex flex-col gap-2 flex-shrink-0 mt-1">
+              {!marketIntel && (
+                <button
+                  onClick={async () => {
+                    setLoadingIntel(true);
+                    try {
+                      const res = await fetch('/api/market-intel', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          companyName: company.name,
+                          therapyAreas: company.therapy_areas,
+                          indications: company.indications,
+                          leadAsset: company.lead_asset,
+                          leadAssetPhase: company.lead_asset_phase,
+                        }),
+                      });
+                      const json = await res.json();
+                      if (json.data) {
+                        setMarketIntel(json.data);
+                      }
+                    } catch (err) {
+                      console.error('Market intel generation failed:', err);
+                    } finally {
+                      setLoadingIntel(false);
+                    }
+                  }}
+                  disabled={loadingIntel}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    cursor: loadingIntel ? 'not-allowed' : 'pointer',
+                    background: 'linear-gradient(135deg, #5fd4e3, #9499d1)',
+                    color: '#04080f',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    opacity: loadingIntel ? 0.7 : 1,
+                    transition: 'opacity 0.2s',
+                  }}
+                >
+                  {loadingIntel ? (
+                    <Loader2 className="w-4 h-4" style={{ animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                  {loadingIntel ? 'Generating...' : 'Generate Intelligence'}
+                </button>
+              )}
               <a href={`https://terrain.ambrosiaventures.co${company.therapy_areas[0] ? `?ta=${company.therapy_areas[0]}` : ''}`} target="_blank" rel="noopener noreferrer">
                 <Button variant="ghost" size="sm" className="w-full">
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -923,21 +1040,61 @@ export default function CompanyDetailPage({
             </div>
           </div>
 
-          {/* Placeholder grid — hints at the data that would appear */}
+          {/* Metrics grid */}
           <div className="grid grid-cols-4 gap-4 mt-6 pt-5 border-t border-navy-700/30">
             {[
-              { label: 'TAM Estimate', value: '--', sub: 'Total Addressable Market' },
-              { label: 'Competitive Intensity', value: '--', sub: 'Active programs in indication' },
-              { label: 'LoA (Phase 2 \u2192 Approval)', value: '--', sub: 'Likelihood of Approval' },
-              { label: 'Peak Revenue', value: '--', sub: 'S-curve projection' },
+              { label: 'TAM Estimate', value: marketIntel?.tam ?? '--', sub: 'Total Addressable Market' },
+              { label: 'Competitive Intensity', value: marketIntel?.competitors ?? '--', sub: 'Active programs in indication' },
+              { label: 'LoA (Phase 2 \u2192 Approval)', value: marketIntel?.loa ?? '--', sub: 'Likelihood of Approval' },
+              { label: 'Peak Revenue', value: marketIntel?.peakRevenue ?? '--', sub: 'S-curve projection' },
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <span className="label text-[9px]">{item.label}</span>
-                <p className="font-mono text-lg text-slate-600 mt-1">{item.value}</p>
+                <p
+                  className="font-mono mt-1"
+                  style={{
+                    fontSize: marketIntel ? '20px' : '18px',
+                    color: marketIntel ? '#5fd4e3' : 'rgb(71 85 105)',
+                    fontWeight: marketIntel ? 600 : 400,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  {item.value}
+                </p>
                 <p className="text-[10px] text-slate-700 mt-0.5">{item.sub}</p>
               </div>
             ))}
           </div>
+
+          {/* AI Summary */}
+          {marketIntel?.summary && (
+            <div style={{
+              marginTop: '20px',
+              padding: '16px 20px',
+              borderRadius: '10px',
+              background: 'rgba(95,212,227,0.04)',
+              border: '1px solid rgba(95,212,227,0.1)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <Sparkles className="w-3.5 h-3.5" style={{ color: '#5fd4e3' }} />
+                <span style={{ fontSize: '11px', fontWeight: 600, color: '#5fd4e3', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Market Summary</span>
+              </div>
+              <p style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.7 }}>{marketIntel.summary}</p>
+            </div>
+          )}
+
+          {/* Loading shimmer bar */}
+          {loadingIntel && (
+            <div style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '3px',
+              background: 'linear-gradient(90deg, transparent, #5fd4e3, #9499d1, transparent)',
+              animation: 'shimmer 1.5s ease-in-out infinite',
+            }} />
+          )}
         </Card>
       </div>
 
@@ -991,6 +1148,42 @@ export default function CompanyDetailPage({
               }} style={{ padding: '12px 28px', borderRadius: '10px', fontSize: '14px', fontWeight: 600, border: 'none', background: (!activityForm.subject.trim() || savingActivity) ? '#1e293b' : 'linear-gradient(135deg, #5fd4e3, #9499d1)', color: (!activityForm.subject.trim() || savingActivity) ? '#475569' : '#04080f', cursor: (!activityForm.subject.trim() || savingActivity) ? 'not-allowed' : 'pointer', opacity: (!activityForm.subject.trim() || savingActivity) ? 0.4 : 1 }}>
                 {savingActivity ? 'Saving...' : 'Log Activity'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          UPLOAD DOCUMENT MODAL
+          ================================================================ */}
+      {showUploadModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,8,15,0.8)', backdropFilter: 'blur(4px)' }} onClick={() => setShowUploadModal(false)} />
+          <div style={{ position: 'relative', background: '#07101e', border: '1px solid rgba(100,116,139,0.15)', borderRadius: '16px', padding: '36px 40px', width: '520px' }}>
+            <h2 style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '26px', fontWeight: 600, color: '#f0f4f8', marginBottom: '8px' }}>Upload Document</h2>
+            <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '32px' }}>Upload files for AI analysis and summarization</p>
+
+            <div style={{ border: '2px dashed rgba(95,212,227,0.2)', borderRadius: '12px', padding: '48px', textAlign: 'center', cursor: 'pointer', background: 'rgba(10,22,40,0.5)' }}>
+              <input type="file" multiple accept=".pdf,.docx,.pptx,.xlsx,.txt,.csv" onChange={async (e) => {
+                const files = Array.from(e.target.files || []);
+                const newDocs = files.map(f => ({
+                  name: f.name,
+                  size: f.size > 1024*1024 ? `${(f.size/1024/1024).toFixed(1)} MB` : `${(f.size/1024).toFixed(0)} KB`,
+                  type: f.name.split('.').pop()?.toUpperCase() || 'FILE',
+                  content: '',
+                }));
+                setUploadedDocs(prev => [...prev, ...newDocs]);
+                setShowUploadModal(false);
+              }} style={{ display: 'none' }} id="file-upload" />
+              <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+                <Upload style={{ width: '32px', height: '32px', color: '#5fd4e3', margin: '0 auto 16px', display: 'block' }} />
+                <p style={{ fontSize: '15px', color: '#94a3b8', marginBottom: '8px' }}>Click to select files</p>
+                <p style={{ fontSize: '13px', color: '#475569' }}>PDF, DOCX, PPTX, XLSX, TXT, CSV</p>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+              <button onClick={() => setShowUploadModal(false)} style={{ padding: '12px 24px', borderRadius: '10px', fontSize: '14px', fontWeight: 500, border: '1px solid rgba(100,116,139,0.15)', background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}>Close</button>
             </div>
           </div>
         </div>
